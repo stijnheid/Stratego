@@ -1,3 +1,5 @@
+package tools.search;
+
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.table.TableColumn;
