@@ -4,7 +4,7 @@ import static java.lang.Math.*;
 /**
  * Implementation of a camera with a position and orientation. 
  */
-class Camera {
+public class Camera {
     /** The position of the camera. */
     public Vector eye = new Vector(3f, 6f, 5f);
 

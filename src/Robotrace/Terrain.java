@@ -27,7 +27,7 @@ import static javax.media.opengl.fixedfunc.GLLightingFunc.*;
 /**
  * Implementation of the terrain.
  */
-class Terrain {
+public class Terrain {
 	
 	/** Variables holding the width and length of this terrain */
 	double width;
