@@ -51,10 +51,6 @@ public class Terrain extends Base {
     /** Instance of the camera. */
     private final Camera camera;
     
-
-    /** Instance of the terrain. */
-    //private final Terrain terrain;
-    
     /** Instances of different textures */
     public static Texture grass, wood,leaves, water;
     
@@ -109,14 +105,14 @@ public class Terrain extends Base {
         
 
 
-        glu.gluLookAt(0,0,0,0,0,0,0,0,0);
+        glu.gluLookAt(10,10,10,0,0,0,0,0,1);
         
         //Lighting implementation
 
         gl.glShadeModel(GL_SMOOTH);
-        gl.glEnable(GL_LIGHTING);
+        /*gl.glEnable(GL_LIGHTING);
         gl.glEnable(GL_LIGHT0);
-        gl.glEnable(GL_LIGHT1);
+        gl.glEnable(GL_LIGHT1);*/
         gl.glDisable(GL_COLOR_MATERIAL);
 
         // White color definition
@@ -178,15 +174,36 @@ public class Terrain extends Base {
      * Function to draw the terrain including environment.
      */
     public void drawTerrain(){
-        
+
     }
     
     /**
      * Function to draw the pieces on top of the already existing board.
-     * @param s GameState that should be graphically represented on the screen.
      */
-    public void drawBoard(GameState s){
+    public void drawBoard(){
+        double xmin = -3;
+        double xmax = 3;
+        double ymin = -3;
+        double ymax = 3;
+        double delta = 1;
+        double z = 0;
         
+        boolean[][] cells = new boolean[6][6];
+        
+        //Square board.
+        gl.glColor3f(0f,0f,1f); 
+        for(double x = xmin; x < xmax; x += delta){
+            for(double y = ymin; y < ymax; y += delta){
+                if (! ((x==-1 && y==-2) || (x==-1 && y==-1) || (x==1 && y==-2) || (x==1 && y==-1))){
+                    gl.glBegin(GL_QUAD_STRIP);
+                    gl.glVertex3d(x, y, z);
+                    gl.glVertex3d(x + delta, y, z);
+                    gl.glVertex3d(x, y + delta, z);
+                    gl.glVertex3d(x + delta, y + delta, z);
+                    gl.glEnd();                
+                }
+            }
+        }
     }
     
     /**
@@ -214,8 +231,7 @@ public class Terrain extends Base {
      */
     @Override
     public void drawScene() {
-    		
-        
+    	    
     	// Background color.
         gl.glClearColor(135/255f, 206/255f, 235/255f, 0f);
         
@@ -229,13 +245,8 @@ public class Terrain extends Base {
         gl.glColor3f(1f, 1f, 1f);
         
         gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-
-        // Draw the axis frame.
-        // Draw the terrain.
-
         
-
+        drawTerrain();
     }
     
     public static void main (String[] args){

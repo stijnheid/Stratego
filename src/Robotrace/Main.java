@@ -304,13 +304,13 @@ public class Main extends Base {
     					  	a.z*b.x - b.z*a.x,
     					  	a.x*b.y - b.x*a.y}; 
     }
-
+}
     /**
      * Main program execution body, delegates to an instance of
  the Main implementation.
-     */
+     
     public static void main(String args[]) {
         Main robotRace = new Main();
         robotRace.run();
     } 
-}
+}*/
