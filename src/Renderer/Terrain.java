@@ -53,7 +53,7 @@ public class Terrain extends Base {
     
 
     /** Instance of the terrain. */
-    private final robotrace.Terrain terrain;
+    //private final Terrain terrain;
     
     /** Instances of different textures */
     public static Texture grass, wood,leaves, water;
@@ -80,7 +80,6 @@ public class Terrain extends Base {
             }
         */
         // Initialize the terrain
-        terrain = new robotrace.Terrain(40, 40);
     }
     
        /**
@@ -234,7 +233,6 @@ public class Terrain extends Base {
 
         // Draw the axis frame.
         // Draw the terrain.
-        terrain.draw(gl);
 
         
 
