@@ -54,6 +54,9 @@ public class Terrain extends Base {
     /** Instances of different textures */
     public static Texture grass, wood,leaves, water;
     
+    private final int boardsize = 6;
+    private final int terrainsize = 20;
+    
     
     public Terrain(){
 
@@ -159,7 +162,7 @@ public class Terrain extends Base {
         gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
         gl.glBindTexture(GL_TEXTURE_2D, 0);
 		
-        String pwd = "src" + File.separator + "robotrace" + File.separator;
+        String pwd = "src" + File.separator + "Renderer" + File.separator;
         grass = loadTexture(pwd + "Grass.jpg");
         wood = loadTexture(pwd + "Wood.jpg");
         leaves = loadTexture(pwd + "Leaves.jpg");
@@ -174,17 +177,42 @@ public class Terrain extends Base {
      * Function to draw the terrain including environment.
      */
     public void drawTerrain(){
-
+        double xmin = -terrainsize/2;
+        double xmax = terrainsize/2;
+        double ymin = -terrainsize/2;
+        double ymax = terrainsize/2;
+        double delta = 0.1;
+        
+        
+        this.grass.bind(gl);
+        gl.glColor3f(0.4f,0.7f,0.1f); 
+        for(double x = xmin; x < xmax; x += delta){
+            for(double y = ymin; y < ymax; y += delta){
+                if (! ((x > -boardsize/2 && x <boardsize/2) && (y > -boardsize/2 && y <boardsize/2))){
+                    gl.glBegin(GL_TRIANGLE_STRIP);
+                    gl.glTexCoord2d(0, 0);
+                    gl.glVertex3d(x, y, heightAt(x,y));
+                    gl.glTexCoord2d(0, 1);
+                    gl.glVertex3d(x, y + delta, heightAt(x,y+delta));
+                    gl.glTexCoord2d(1, 0);
+                    gl.glVertex3d(x + delta, y, heightAt(x+delta,y));
+                    gl.glTexCoord2d(1, 1);
+                    gl.glVertex3d(x + delta, y + delta, heightAt(x+delta,y+delta));
+                    gl.glEnd();                
+                }
+            }
+        }
+        
     }
     
     /**
      * Function to draw the pieces on top of the already existing board.
      */
     public void drawBoard(){
-        double xmin = -3;
-        double xmax = 3;
-        double ymin = -3;
-        double ymax = 3;
+        double xmin = -boardsize/2;
+        double xmax = boardsize/2;
+        double ymin = -boardsize/2;
+        double ymax = boardsize/2;
         double delta = 1;
         double z = 0;
         
@@ -252,5 +280,12 @@ public class Terrain extends Base {
     public static void main (String[] args){
         Terrain terrain = new Terrain();
         terrain.run();
+    }
+    
+        public double heightAt(double x, double y) {
+        double formula1 = 0.6*cos(0.3*x + 0.2*y) + 0.4*cos(x-0.5* y);
+        double formula2 = 0;
+        double ding = ((abs(x)-boardsize/2)*(abs(y)-boardsize/2))/terrainsize/2;
+        return (ding*formula1);
     }
 }
