@@ -10,10 +10,12 @@ import Game.GameState;
 import Game.Piece;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.gl2.GLUT;
 import java.io.File;
 import static java.lang.Math.*;
 import java.util.ArrayList;
 import javax.media.opengl.*;
+import javax.media.opengl.glu.GLU;
 import static javax.media.opengl.GL.GL_BLEND;
 import static javax.media.opengl.GL.GL_COLOR_BUFFER_BIT;
 import static javax.media.opengl.GL.GL_DEPTH_BUFFER_BIT;
@@ -53,10 +55,13 @@ public class Terrain extends Base {
     
     /** Instances of different textures */
     public static Texture grass, wood,leaves, water;
-    
+     
+    Skeleton test;
     
     public Terrain(){
+        
 
+        test = new Skeleton(this, new Vector(0,0,1));
         
         // Initialize the camera
         camera = new Camera();    
@@ -105,14 +110,16 @@ public class Terrain extends Base {
         
 
 
-        glu.gluLookAt(10,10,10,0,0,0,0,0,1);
+        glu.gluLookAt(  0,10,10,
+                        0,0,0,
+                        0,0,1);
         
         //Lighting implementation
 
         gl.glShadeModel(GL_SMOOTH);
-        /*gl.glEnable(GL_LIGHTING);
+        gl.glEnable(GL_LIGHTING);
         gl.glEnable(GL_LIGHT0);
-        gl.glEnable(GL_LIGHT1);*/
+        //gl.glEnable(GL_LIGHT1);
         gl.glDisable(GL_COLOR_MATERIAL);
 
         // White color definition
@@ -120,19 +127,19 @@ public class Terrain extends Base {
         float[] sunAmbientColor = {255/255f, 255/255f, 220/255f, 0.07f};
 
         // Light source 10 degrees up and 10 degrees left from the camera
-        //float[] lightDir = { (float)(camera.center.x + gs.vDist*cos(gs.phi+toRadians(10))*cos(gs.theta+toRadians(10))), 
-        //					 (float)(camera.center.y + gs.vDist*cos(gs.phi+toRadians(10))*sin(gs.theta+toRadians(10))), 
-        //					 (float)(camera.center.z + gs.vDist*sin(gs.phi+toRadians(10))) };
-        //float[] whiteColor = {255/255f, 255/255f, 255/255f, 1f};
+        /*float[] lightDir = { (float)(0 + gs.vDist*cos(gs.phi+toRadians(10))*cos(gs.theta+toRadians(10))), 
+        					 (float)(0 + gs.vDist*cos(gs.phi+toRadians(10))*sin(gs.theta+toRadians(10))), 
+        					 (float)(0 + gs.vDist*sin(gs.phi+toRadians(10))) };
+        float[] whiteColor = {255/255f, 255/255f, 255/255f, 1f};
 
         // Setting the GL_POSITION and GL_DIFFUSE
-        //gl.glLightfv(GL_LIGHT0, GL_POSITION, lightDir, 0);
-        //gl.glLightfv(GL_LIGHT0, GL_DIFFUSE, whiteColor, 0);
+        gl.glLightfv(GL_LIGHT1, GL_POSITION, lightDir, 0);
+        gl.glLightfv(GL_LIGHT1, GL_DIFFUSE, whiteColor, 0);*/
         
-        gl.glLightfv(GL_LIGHT1, GL_POSITION, new float[]{1, 1, 0}, 0);
-        gl.glLightfv(GL_LIGHT1, GL_DIFFUSE, sunColor, 0);
-        gl.glLightfv(GL_LIGHT1, GL_AMBIENT, sunAmbientColor, 0);
-        gl.glLightfv(GL_LIGHT1, GL_SPECULAR, sunColor, 0);
+        gl.glLightfv(GL_LIGHT0, GL_POSITION, new float[]{1, 1, 0}, 0);
+        gl.glLightfv(GL_LIGHT0, GL_DIFFUSE, sunColor, 0);
+        gl.glLightfv(GL_LIGHT0, GL_AMBIENT, sunAmbientColor, 0);
+        gl.glLightfv(GL_LIGHT0, GL_SPECULAR, sunColor, 0);
 
     }
     
@@ -178,7 +185,7 @@ public class Terrain extends Base {
     }
     
     /**
-     * Function to draw the pieces on top of the already existing board.
+     * Function to draw the board containing the game pieces.
      */
     public void drawBoard(){
         double xmin = -3;
@@ -188,13 +195,19 @@ public class Terrain extends Base {
         double delta = 1;
         double z = 0;
         
+        //invalid cells (aka lakes) on the board.
         boolean[][] cells = new boolean[6][6];
+        cells[1][2] = true;
+        cells[1][3] = true;
+        cells[4][2] = true;
+        cells[4][3] = true;
         
         //Square board.
-        gl.glColor3f(0f,0f,1f); 
+        gl.glColor3f(0, 0, 1);
+        gl.glNormal3d(0, 0, 1);
         for(double x = xmin; x < xmax; x += delta){
             for(double y = ymin; y < ymax; y += delta){
-                if (! ((x==-1 && y==-2) || (x==-1 && y==-1) || (x==1 && y==-2) || (x==1 && y==-1))){
+                if (!cells[(int)x+3][(int)y+3]){
                     gl.glBegin(GL_QUAD_STRIP);
                     gl.glVertex3d(x, y, z);
                     gl.glVertex3d(x + delta, y, z);
@@ -208,11 +221,10 @@ public class Terrain extends Base {
     
     /**
      * Method to draw a single piece at the specified position.
-     * @param p the Piece object that should be drawn.
      * @param x the x coordinate of this piece (on the board).
      * @param y the y coordinate of this piece (on the board).
      */
-    public void drawPiece(Piece p, int x, int y){
+    public void drawPiece(int x, int y){
         
     }
     
@@ -246,7 +258,15 @@ public class Terrain extends Base {
         
         gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         
-        drawTerrain();
+        drawBoard();
+        
+        gl.glColor3f(1f,1f,1f);
+        test.draw(gl,glut);
+        test.move(new Vector(2,2,0));
+        test.rotate(45);
+        test.draw(gl,glut);
+        test.move(new Vector(-2,-2,0));
+        test.rotate(-45);
     }
     
     public static void main (String[] args){
