@@ -21,11 +21,12 @@ public class Skeleton {
     
     public List<Vector> joints;
     
-    Terrain terrain;
-    
-    public Skeleton (Terrain origin, Vector offset){
+    /**
+     * Constructor for a skeleton. Does not yet draw a skeleton.
+     * @param offset 
+     */
+    public Skeleton (Vector offset){
         joints = new ArrayList<Vector>();
-        this.terrain = origin;
         this.offset = offset;
         
         head = new Vector(0, 0, 0.95f);
@@ -63,9 +64,7 @@ public class Skeleton {
         footR = new Vector (0.075f, 0.1f, 0);
         joints.add(footR);
         
-        for(Vector v : joints){
-            v.add(offset);
-        }
+        joints.stream().forEach(v -> v.add(offset));
     }
     
     public void draw(GL2 gl, GLUT glut){
@@ -81,10 +80,9 @@ public class Skeleton {
     }
     
     public void rotate(double degrees){
-        joints.stream().map((v) -> {
+        joints.stream().forEach((v) -> {
             v.subtract(offset);
             v.rotate(degrees);
-            v.add(offset);
-            return v;});
+            v.add(offset);});
     }
 }

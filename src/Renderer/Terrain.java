@@ -46,7 +46,7 @@ import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
 /** Class designated to drawing board and surrounding environment.
  *
- * @author Maurits Ambags (0771400)
+ *
  */
 public class Terrain extends Base {	
    
@@ -61,7 +61,8 @@ public class Terrain extends Base {
     public Terrain(){
         
 
-        test = new Skeleton(this, new Vector(0,0,1));
+        test = new Skeleton(new Vector(0,0,1));
+        test.rotate(90);
         
         // Initialize the camera
         camera = new Camera();    
@@ -262,11 +263,6 @@ public class Terrain extends Base {
         
         gl.glColor3f(1f,1f,1f);
         test.draw(gl,glut);
-        test.move(new Vector(2,2,0));
-        test.rotate(45);
-        test.draw(gl,glut);
-        test.move(new Vector(-2,-2,0));
-        test.rotate(-45);
     }
     
     public static void main (String[] args){
