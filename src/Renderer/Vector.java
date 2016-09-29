@@ -20,6 +20,13 @@ public class Vector {
         this.length = Math.sqrt(x*x+y*y+z*z);
     }
     
+    public Vector(double x, double y, double z){
+        this.x = (float) x;
+        this.y = (float) y;
+        this.z = (float) z;
+        this.length = Math.sqrt(x*x+y*y+z*z);
+    }
+    
     public double x(){
         return x;
     }
