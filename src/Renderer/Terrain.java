@@ -63,7 +63,11 @@ public class Terrain extends Base {
 
         test = new Skeleton(new Vector(0,0,1));
         test.rotate(90);
-        
+        test.shoulderLRotX = 45;
+        test.shoulderRRotX = 90;
+        test.shoulderRRotY = 45;
+        test.hipLRotX = 45;
+        test.kneeLRotX = -45;
         // Initialize the camera
         camera = new Camera();    
 
@@ -98,10 +102,10 @@ public class Terrain extends Base {
 
         // Set the perspective.
         // Modify this to meet the requirements in the assignment.
-        glu.gluPerspective( 2 * toDegrees(atan((0.5*(((float)gs.vWidth*(float)gs.h/(float)gs.w))) / (float)gs.vDist)),
-        					(float) gs.w / (float) gs.h,
-        					0.27 + 0.001 * gs.vDist,
-        					10 * gs.vDist);
+        float aspectRatio = (float) gs.w / (float) gs.h;
+        float height = gs.vWidth / aspectRatio;
+        double fovy = Math.toDegrees(2 * Math.atan(height / (2 * gs.vDist)));
+        glu.gluPerspective(fovy, aspectRatio, 0.1 * gs.vDist, 10.0 * gs.vDist);
         // Set camera.
         gl.glMatrixMode(GL_MODELVIEW);
         gl.glLoadIdentity();
@@ -110,9 +114,9 @@ public class Terrain extends Base {
         // For camera modes 1 to 4, determine which robot to focus on.
         
 
-
-        glu.gluLookAt(  0,10,10,
-                        0,0,0,
+        camera.update(gs);
+        glu.gluLookAt(  camera.eye.x(), camera.eye.y(), camera.eye.z(),
+                        gs.cnt.x(), gs.cnt.y(), gs.cnt.z(),
                         0,0,1);
         
         //Lighting implementation
@@ -189,26 +193,26 @@ public class Terrain extends Base {
      * Function to draw the board containing the game pieces.
      */
     public void drawBoard(){
-        double xmin = -3;
-        double xmax = 3;
-        double ymin = -3;
-        double ymax = 3;
+        double xmin = 0;
+        double xmax = 8;
+        double ymin = 0;
+        double ymax = 8;
         double delta = 1;
         double z = 0;
         
         //invalid cells (aka lakes) on the board.
-        boolean[][] cells = new boolean[6][6];
-        cells[1][2] = true;
-        cells[1][3] = true;
-        cells[4][2] = true;
-        cells[4][3] = true;
+        boolean[][] cells = new boolean[8][8];
+        cells[2][3] = true;
+        cells[2][4] = true;
+        cells[5][3] = true;
+        cells[5][4] = true;
         
         //Square board.
         gl.glColor3f(0, 0, 1);
         gl.glNormal3d(0, 0, 1);
         for(double x = xmin; x < xmax; x += delta){
             for(double y = ymin; y < ymax; y += delta){
-                if (!cells[(int)x+3][(int)y+3]){
+                if (!cells[(int)x][(int)y]){
                     gl.glBegin(GL_QUAD_STRIP);
                     gl.glVertex3d(x, y, z);
                     gl.glVertex3d(x + delta, y, z);
