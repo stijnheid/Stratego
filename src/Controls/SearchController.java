@@ -4,8 +4,8 @@
  * and open the template in the editor.
  */
 package Controls;
-import Logic.Action;
 import Game.GameState;
+import actions.Action;
 
 /**
  *
