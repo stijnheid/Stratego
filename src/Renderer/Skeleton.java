@@ -92,6 +92,7 @@ public class Skeleton {
      */
     public void draw(GL2 gl, GLUT glut){
         gl.glPushMatrix();
+        gl.glColor3f(1,1,1);
         gl.glRotated(rotation, 0, 0, 1);
         drawTorso(gl, glut);
         drawArm(gl, glut, true);// left arm

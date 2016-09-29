@@ -61,9 +61,13 @@ public class Terrain extends Base {
     private final int boardsize = 8;
     private final int terrainsize = 20;
     
+    Skeleton test;
+    
     
     public Terrain(){
         
+        test = new Skeleton(new Vector(-3.5,-3.5,0));
+                
         // Initialize the camera
         camera = new Camera();    
 
@@ -231,14 +235,18 @@ public class Terrain extends Base {
      */
     public void drawBoard(){      
 
-        double xmin = -boardsize/2;
-        double xmax = boardsize/2;
-        double ymin = -boardsize/2;
-        double ymax = boardsize/2;
-        double delta = 1;
+        int xmin = -boardsize/2;
+        int xmax = boardsize/2;
+        int ymin = -boardsize/2;
+        int ymax = boardsize/2;
+        int delta = 1;
         double z = 0;
         this.vakje.bind(gl);
-        boolean[][] cells = new boolean[6][6];
+        boolean[][] cells = new boolean[8][8];
+        cells[2][3]=true;
+        cells[2][4]=true;
+        cells[5][3]=true;
+        cells[5][4]=true;
         
         gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Material.CONCRETE.diffuse, 0);
         gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.CONCRETE.specular, 0);
@@ -249,7 +257,7 @@ public class Terrain extends Base {
         gl.glNormal3d(0, 0, 1);
         for(double x = xmin; x < xmax; x += delta){
             for(double y = ymin; y < ymax; y += delta){
-                if (!cells[(int)x][(int)y]){
+                if (!cells[(int)x+4][(int)y+4]){
                     gl.glBegin(GL_QUAD_STRIP);
                     gl.glTexCoord2d(0, 0);
                     gl.glVertex3d(x, y, z);
@@ -306,6 +314,7 @@ public class Terrain extends Base {
         
         drawTerrain();
         drawBoard();
+        test.draw(gl, glut);
     }
     
     public static void main (String[] args){
