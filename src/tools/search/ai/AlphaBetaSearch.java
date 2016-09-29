@@ -437,7 +437,7 @@ public class AlphaBetaSearch {
         // TODO Actually only necessary at the initial call. Not useful
         // for lower depths.
         node.setBestMove(bestMove);
-        System.out.println(depth + " bestValue = " + bestValue);
+        //System.out.println(depth + " bestValue = " + bestValue);
         return bestValue;
     }
     

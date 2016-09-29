@@ -30,11 +30,12 @@ public class BattleEngine {
     
     public static void main(String[] args) {
         //new BattleEngine().runTests(); //initialize();
-        new BattleEngine().initialize();
+        //new BattleEngine().initialize();
         //new BattleEngine().testTranscript();
         //new BattleEngine().testApplyUndoMove();
         //new BattleEngine().testUnequalAttack();
         //new BattleEngine().testAlphaBeta();
+        new BattleEngine().smallBattle();
     }
     
     public void runTests() {
@@ -59,7 +60,34 @@ public class BattleEngine {
         AIBot attacker = new DefaultPlayer(Team.RED); //new RandomPlayer(Team.RED);
         AIBot defender = new DefaultPlayer(Team.BLUE);
         System.out.println("Start Battle");
-        battle(board, attacker, defender, 10000); //1500);
+        battle(board, attacker, defender, 3000); //1500);
+        System.out.println("Battle ended");
+    }
+    
+    private void smallBattle() {
+        GameBoard board = new GameBoard(5, 5, Team.RED, Team.BLUE);
+        try {
+            // Setup the teams.
+            board.setupPiece(0, 0, Pieces.SERGEANT, Team.RED);
+            board.setupPiece(0, 1, Pieces.LIEUTENANT, Team.RED);
+            board.setupPiece(1, 0, Pieces.FLAG, Team.RED);
+            board.setupPiece(1, 1, Pieces.CAPTAIN, Team.RED);
+            
+            board.setupPiece(1, 4, Pieces.SERGEANT, Team.RED);
+            board.setupPiece(1, 3, Pieces.LIEUTENANT, Team.RED);
+            board.setupPiece(0, 4, Pieces.FLAG, Team.RED);
+            board.setupPiece(0, 3, Pieces.CAPTAIN, Team.RED);
+        } catch (InvalidPositionException ex) {
+            Logger.getLogger(BattleEngine.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        AIBot attacker = new DefaultPlayer(Team.RED);
+        AIBot defender = new DefaultPlayer(Team.BLUE);
+        
+        // Execute the battle.
+        int computationTime = 2000;
+        // Do we also want to limit the search depth?
+        battle(board, attacker, defender, computationTime);
     }
     
     // Load the defensive setup for the computer, this is one of the setups
@@ -127,13 +155,16 @@ public class BattleEngine {
         AIBot blue = null;
         
         
-        
         // if a player is a human than wait for the input listeners to supply an
         // action to the simulation. if a player is an AI than actively invoke
         // the nextMove function and enforce the timeout.
         
         // Determine winner and supply start setup and winner to learning
         // algorithm.
+        
+    }
+    
+    private void startDeepLearning() {
         
     }
     
@@ -151,11 +182,10 @@ public class BattleEngine {
         // Simulate the game.
         state.setRunning(true);
         int iterations = 0;
-        System.out.println("Start Game.");
+        System.out.println("Start Game with computation time: " + computationTime);
         BattleTranscript transcript = new BattleTranscript(board);
-        int i = 0;
         while(board.isEndState() == null) {
-            if(i >= 30) {
+            if(iterations >= 30) {
                 break;
             }
             
@@ -187,10 +217,10 @@ public class BattleEngine {
             
             System.out.println("Next Move");
             iterations++;
-            i++;
         }
         
-        System.out.println("Game Ended.");
+        state.setRunning(false);
+        System.out.println("Game Ended in " + (state.getGameDuration() / 1000d) + " s.");
         transcript.print();
     }
     

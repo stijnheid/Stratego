@@ -479,13 +479,17 @@ public class GameBoard {
                 return this.defender;
             }
         }
+        
+        // TODO end game if there are no movable pieces left.
+        
         // No end state.
         return null;
     }
     
     /**
      * This algorithm cannot handle a general case where a player is allowed
-     * to fill n rows. Instead we solve the simple case that is relevant
+     * to fill n rows. It can only handle the specific case where a player must
+     * fill two rows. Instead we solve the simple case that is relevant
      * for our project, in which a player is only allowed to fill the last 2
      * rows with pieces, that is either row 0 and 1, or row (h - 1) and (h - 2),
      * where h indicates the height of the board, that is the # of rows.
@@ -510,23 +514,31 @@ public class GameBoard {
         BoardPosition origin = flag.getPosition();
         int y = origin.getY();
         
-        // Is the flag surrounded?
-        boolean surrounded = true;
+        // Is the flag surrounded by bombs?
+        boolean surrounded = false;
         if(y == 0 || y == (this.height - 1)) {
+            // Check now if all the nieghbours of the flag are bombs otherwise
+            // it is not surrounded by bombs.
+            boolean bombs = true;
             List<BoardPosition> neighbours = this.getNeighbours(origin);
             for(BoardPosition neighbour : neighbours) {
                 try {
                     GamePiece piece = getPiece(neighbour);
+                    // This neighbour is an empty cell or the surrounding piece
+                    // is not a bomb, this means the flag is not surrounded
+                    // by bombs.
                     if(piece == null || piece.getRank() != Pieces.BOMB) {
-                        if(piece != null && piece.getTeam() != this.defender) {
-                            throw new RuntimeException("Weird, attacker's bomb next to flag.");
-                        }
-                        surrounded = false;
+                        bombs = false;
+                        break;
                     }
                     
                 } catch (InvalidPositionException ex) {
                     Logger.getLogger(GameBoard.class.getName()).log(Level.SEVERE, null, ex);
                 }
+            }
+            
+            if(bombs) {
+                surrounded = true;
             }
         }
         return surrounded;

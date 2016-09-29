@@ -41,4 +41,8 @@ public class BattleTranscript {
             System.out.println("\n");
         }
     }
+    
+    public void save(String filename) {
+        
+    }
 }

@@ -80,14 +80,13 @@ public class DefaultPlayer implements AIBot {
                 1, -1, isAttacker);
         */
         System.out.println("Minimax Searching");
-        MoveAction move = this.searchEngine.iterativeDeepeningMinimax(node, 1, 10, isAttacker);
+        int range = 10; //10;
+        MoveAction move = this.searchEngine.iterativeDeepeningMinimax(node, 1, range, isAttacker);
         System.out.println("Reached Depth: " + this.searchEngine.getDeepestDepth());
         System.out.println("ExploredNodesCount: " + this.searchEngine.getExploredCount());
         if(move == null) {
             throw new RuntimeException("Move == null");
         }
-        
-
         
         //System.out.println("Move: " + move.getPiece());
         //System.out.println("Move: " + move.getOrigin().toString() + " -> " 

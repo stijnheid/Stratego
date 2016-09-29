@@ -9,4 +9,5 @@ public class GlobalSettings {
     public final static int MAXIMUM_MOVES = 500; //16;
     public final static int OFFENSIVE_ARMY_SIZE = 12;
     public final static int DEFENSIVE_ARMY_SIZE = 12;
+    public final static String BATTLE_SAVE_FOLDER = "/battles";
 }
