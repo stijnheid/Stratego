@@ -10,10 +10,12 @@ import Game.GameState;
 import Game.Piece;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.util.texture.Texture;
+import com.jogamp.opengl.util.gl2.GLUT;
 import java.io.File;
 import static java.lang.Math.*;
 import java.util.ArrayList;
 import javax.media.opengl.*;
+import javax.media.opengl.glu.GLU;
 import static javax.media.opengl.GL.GL_BLEND;
 import static javax.media.opengl.GL.GL_COLOR_BUFFER_BIT;
 import static javax.media.opengl.GL.GL_DEPTH_BUFFER_BIT;
@@ -46,7 +48,7 @@ import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 
 /** Class designated to drawing board and surrounding environment.
  *
- * @author Maurits Ambags (0771400)
+ *
  */
 public class Terrain extends Base {	
    
@@ -61,7 +63,6 @@ public class Terrain extends Base {
     
     
     public Terrain(){
-
         
         // Initialize the camera
         camera = new Camera();    
@@ -83,10 +84,9 @@ public class Terrain extends Base {
 
         // Set the perspective.
         // Modify this to meet the requirements in the assignment.
-        glu.gluPerspective( 2 * toDegrees(atan((0.5*(((float)gs.vWidth*(float)gs.h/(float)gs.w))) / (float)gs.vDist)),
-        					(float) gs.w / (float) gs.h,
-        					0.27 + 0.001 * gs.vDist,
-        					10 * gs.vDist);
+        float aspectRatio = (float) gs.w / (float) gs.h;
+        double fovy = 60;
+        glu.gluPerspective(fovy, aspectRatio, 0.1 * gs.vDist, 10.0 * gs.vDist);
         // Set camera.
         gl.glMatrixMode(GL_MODELVIEW);
         gl.glLoadIdentity();
@@ -104,7 +104,6 @@ public class Terrain extends Base {
         gl.glDisable(GL_COLOR_MATERIAL);
 
         // White color definition
-
 
     }
     
@@ -228,10 +227,9 @@ public class Terrain extends Base {
     }
     
     /**
-     * Function to draw the pieces on top of the already existing board.
+     * Function to draw the board containing the game pieces.
      */
-    public void drawBoard(){
-        
+    public void drawBoard(){      
 
         double xmin = -boardsize/2;
         double xmax = boardsize/2;
@@ -247,10 +245,11 @@ public class Terrain extends Base {
         gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Material.CONCRETE.shininess);
         
         //Square board.
-        gl.glColor3f(0f,0f,1f); 
+        gl.glColor3f(0, 0, 1);
+        gl.glNormal3d(0, 0, 1);
         for(double x = xmin; x < xmax; x += delta){
             for(double y = ymin; y < ymax; y += delta){
-                if (! ((x==-1 && y==-2) || (x==-1 && y==-1) || (x==1 && y==-2) || (x==1 && y==-1))){
+                if (!cells[(int)x][(int)y]){
                     gl.glBegin(GL_QUAD_STRIP);
                     gl.glTexCoord2d(0, 0);
                     gl.glVertex3d(x, y, z);
@@ -268,11 +267,10 @@ public class Terrain extends Base {
     
     /**
      * Method to draw a single piece at the specified position.
-     * @param p the Piece object that should be drawn.
      * @param x the x coordinate of this piece (on the board).
      * @param y the y coordinate of this piece (on the board).
      */
-    public void drawPiece(Piece p, int x, int y){
+    public void drawPiece(int x, int y){
         
     }
     
