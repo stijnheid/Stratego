@@ -96,4 +96,22 @@ public class Vector {
         
         return new Vector(x1,y1,z1);
     }
+    
+    /**
+     * Return the distance between the two vectors.
+     * @param a operand.
+     * @return distance between this and a in 3D space.
+     */
+    public float distance(Vector a){
+        return (float)Math.sqrt(Math.pow(x - a.x, 2)+ Math.pow(y - a.y, 2)+ Math.pow(z - a.z, 2));
+    }
+    
+    /**
+     * Scale this vector by a factor of t.
+     * @param t scaling factor (t \in [0,1]).
+     * @return 
+     */
+    public Vector scale(float t){
+        return new Vector(x*t,y*t,z*t);
+    }
 }

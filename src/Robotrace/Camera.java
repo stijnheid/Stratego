@@ -1,5 +1,6 @@
 package robotrace;
 import static java.lang.Math.*;
+import Renderer.Vector;
 
 /**
  * Implementation of a camera with a position and orientation. 
@@ -9,10 +10,12 @@ public class Camera {
     public Vector eye = new Vector(3f, 6f, 5f);
 
     /** The point to which the camera is looking. */
-    public Vector center = Vector.O;
+    public Vector center = new Vector(0,0,0);
 
     /** The up vector. */
-    public Vector up = Vector.Z;
+    public Vector up = new Vector(0,0,1);
+    
+    public final static Vector Z = new Vector(0,0,1);
   
     /**
      * Updates the camera viewpoint and direction based on the
@@ -47,7 +50,7 @@ public class Camera {
                     Math.sin(gs.theta) * gs.vDist * Math.cos(gs.phi) + gs.cnt.y(),
                     gs.vDist * Math.sin(gs.phi) + gs.cnt.z());//converting given variables to cartesian coordinates.
             center = new Vector(gs.cnt.x(), gs.cnt.y(), gs.cnt.z());
-            up = Vector.Z;
+            up = Z;
     }
 
 

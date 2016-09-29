@@ -7,7 +7,7 @@ package Renderer;
 
 import robotrace.*;
 import Game.GameState;
-import Game.Piece;
+import Game.GamePiece;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.gl2.GLUT;
@@ -53,7 +53,7 @@ import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 public class Terrain extends Base {	
    
     /** Instance of the camera. */
-    private final Camera camera;
+    public final Camera camera;
     
     /** Instances of different textures */
     public static Texture grass, vakje ,leaves, water;
@@ -66,7 +66,7 @@ public class Terrain extends Base {
     
     public Terrain(){
         
-        test = new Skeleton(new Vector(-3.5,-3.5,0));
+        test = new Skeleton(new Vector(-3.5/2,-3.5/2,0));
                 
         // Initialize the camera
         camera = new Camera();    
@@ -121,9 +121,6 @@ public class Terrain extends Base {
 
         gl.glEnable(GL_LIGHTING);
         gl.glEnable(GL_LIGHT0);
-
-
-        
         
                 // White color definition
         float[] sunColor = {255/255f, 255/255f, 220/255f, 0.7f};
@@ -315,6 +312,10 @@ public class Terrain extends Base {
         drawTerrain();
         drawBoard();
         test.draw(gl, glut);
+    }
+    
+    public void adjustCamera(Vector eye, Vector cnt){
+        camera.center.x = cnt.x;
     }
     
     public static void main (String[] args){

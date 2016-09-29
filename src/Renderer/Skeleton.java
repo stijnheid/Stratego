@@ -8,6 +8,10 @@ import java.util.List;
 import java.util.ArrayList;
 import javax.media.opengl.GL2;
 import com.jogamp.opengl.util.gl2.GLUT;
+import static javax.media.opengl.GL.GL_FRONT_AND_BACK;
+import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_AMBIENT_AND_DIFFUSE;
+import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_SHININESS;
+import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_SPECULAR;
 
 /**
  *  Class to holding information for the skeleton of a piece.
@@ -92,13 +96,15 @@ public class Skeleton {
      */
     public void draw(GL2 gl, GLUT glut){
         gl.glPushMatrix();
-        gl.glColor3f(1,1,1);
+        gl.glDisable(gl.GL_TEXTURE_2D);
+        gl.glScalef(2,2,2);
         gl.glRotated(rotation, 0, 0, 1);
         drawTorso(gl, glut);
         drawArm(gl, glut, true);// left arm
         drawArm(gl, glut, false);//right arm
         drawLeg(gl, glut, true);//left leg
         drawLeg(gl, glut, false);//right leg
+        gl.glEnable(gl.GL_TEXTURE_2D);
         gl.glPopMatrix();        
     }
     
@@ -114,6 +120,7 @@ public class Skeleton {
         gl.glPushMatrix();
         middle = head.between(neck);
         gl.glTranslatef(middle.x, middle.y, middle.z);
+        gl.glRotated(-Math.toDegrees(Math.atan((head.y-neck.y)/(head.z-neck.z))),1,0,0);
         gl.glScalef(boneWidth, boneWidth, head.z-neck.z);
         glut.glutSolidCube(1f);//neck to head.
         gl.glPopMatrix();
@@ -121,20 +128,23 @@ public class Skeleton {
         gl.glPushMatrix();
         middle = neck.between(shoulderL);
         gl.glTranslatef(middle.x, middle.y, middle.z);
-        gl.glScalef(shoulderL.x - neck.x, boneWidth, boneWidth);
+        gl.glRotated(Math.toDegrees(Math.atan((neck.y-shoulderL.y)/(neck.x-shoulderL.x))),0,0,1);
+        gl.glScalef(neck.distance(shoulderL), boneWidth, boneWidth);
         glut.glutSolidCube(1f);//neck to shoulderL.
         gl.glPopMatrix();
         gl.glPushMatrix();
         middle = neck.between(shoulderR);
         gl.glTranslatef(middle.x, middle.y, middle.z);
-        gl.glScalef(neck.x - shoulderR.x, boneWidth, boneWidth);
+        gl.glRotated(Math.toDegrees(Math.atan((neck.y-shoulderR.y)/(neck.x-shoulderR.x))),0,0,1);
+        gl.glScalef(neck.distance(shoulderR), boneWidth, boneWidth);
         glut.glutSolidCube(1f);//neck to shoulderR.
         gl.glPopMatrix();
         
         gl.glPushMatrix();
         middle = neck.between(spine);
         gl.glTranslatef(middle.x, middle.y, middle.z);
-        gl.glScalef(boneWidth, boneWidth, neck.z - spine.z);
+        gl.glRotated(-Math.toDegrees(Math.atan((neck.y-spine.y)/(neck.z-spine.z))),1,0,0);
+        gl.glScalef(boneWidth, boneWidth, neck.distance(spine));
         glut.glutSolidCube(1f);//neck to spine.
         gl.glPopMatrix();
         
@@ -143,7 +153,8 @@ public class Skeleton {
         double angle = Math.toDegrees(Math.atan((spine.z-hipL.z)/(spine.x-hipL.x)));
         gl.glTranslatef(middle.x, middle.y, middle.z);
         gl.glRotated(90 - angle, 0, 1, 0);
-        gl.glScalef(boneWidth, boneWidth, (float)Math.sqrt(Math.pow(spine.x-hipL.x,2)+Math.pow(spine.z-hipL.z,2)));
+        gl.glRotated(-90 + Math.toDegrees(Math.atan((spine.z-hipL.z)/(spine.y-hipL.y))),1,0,0);
+        gl.glScalef(boneWidth, boneWidth, spine.distance(hipL));
         glut.glutSolidCube(1f);//spine to hipL.
         gl.glPopMatrix();
         
@@ -152,7 +163,8 @@ public class Skeleton {
         angle = -angle;
         gl.glTranslatef(middle.x, middle.y, middle.z);
         gl.glRotated(90 - angle, 0, 1, 0);
-        gl.glScalef(boneWidth, boneWidth, (float)Math.sqrt(Math.pow(spine.x-hipR.x,2)+Math.pow(spine.z-hipR.z,2)));
+        gl.glRotated(90 - Math.toDegrees(Math.atan((spine.z-hipR.z)/(spine.y-hipR.y))),1,0,0);
+        gl.glScalef(boneWidth, boneWidth, spine.distance(hipR));
         glut.glutSolidCube(1f);//spine to hipR.
         gl.glPopMatrix();
         
