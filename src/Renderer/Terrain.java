@@ -103,8 +103,7 @@ public class Terrain extends Base {
         // Set the perspective.
         // Modify this to meet the requirements in the assignment.
         float aspectRatio = (float) gs.w / (float) gs.h;
-        float height = gs.vWidth / aspectRatio;
-        double fovy = Math.toDegrees(2 * Math.atan(height / (2 * gs.vDist)));
+        double fovy = 60;
         glu.gluPerspective(fovy, aspectRatio, 0.1 * gs.vDist, 10.0 * gs.vDist);
         // Set camera.
         gl.glMatrixMode(GL_MODELVIEW);
