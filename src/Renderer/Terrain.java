@@ -30,6 +30,7 @@ import static javax.media.opengl.GL2.*;
 import static javax.media.opengl.GL2ES1.GL_PERSPECTIVE_CORRECTION_HINT;
 import static javax.media.opengl.GL2GL3.GL_FILL;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_AMBIENT;
+import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_AMBIENT_AND_DIFFUSE;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_COLOR_MATERIAL;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_DIFFUSE;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_LIGHT0;
@@ -37,6 +38,7 @@ import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_LIGHT1;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_LIGHTING;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_NORMALIZE;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_POSITION;
+import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_SHININESS;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_SMOOTH;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_SPECULAR;
 import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_MODELVIEW;
@@ -54,38 +56,18 @@ public class Terrain extends Base {
     private final Camera camera;
     
     /** Instances of different textures */
-    public static Texture grass, wood,leaves, water;
-     
-    Skeleton test;
+    public static Texture grass, vakje ,leaves, water;
+    
+    private final int boardsize = 8;
+    private final int terrainsize = 20;
+    
     
     public Terrain(){
         
-
-        test = new Skeleton(new Vector(0,0,1));
-        test.rotate(90);
-        test.shoulderLRotX = 45;
-        test.shoulderRRotX = 90;
-        test.shoulderRRotY = 45;
-        test.hipLRotX = 45;
-        test.kneeLRotX = -45;
         // Initialize the camera
         camera = new Camera();    
 
-        /*ArrayList<Vector> treePositions = new ArrayList();
-        for(int i =0; i<100; i++){
-                   Vector outerPos= new Vector(0, 0, 0);
-                   Vector outerTan= new Vector(1, 0, 0);
-                   Vector treePos = new Vector(outerPos.x + (1+random())*4*outerTan.y, outerPos.y - (1+2*random())*4*outerTan.x, outerPos.z);
-                   if (treePos.x>-20 && treePos.x<20 && treePos.y>-20 && treePos.y<20) {
-                       treePositions.add(treePos);
-                   }
-        }
-        trees = new Tree[treePositions.size()];
-        for (int i =0; i<treePositions.size(); i++){
-            trees[i] = new Tree(treePositions.get(i).x, treePositions.get(i).y,1.5-0.4*random(), 4-1.5*random())  ;
-            }
-        */
-        // Initialize the terrain
+
     }
     
        /**
@@ -114,36 +96,14 @@ public class Terrain extends Base {
         
 
         camera.update(gs);
-        glu.gluLookAt(  camera.eye.x(), camera.eye.y(), camera.eye.z(),
-                        gs.cnt.x(), gs.cnt.y(), gs.cnt.z(),
-                        0,0,1);
+        glu.gluLookAt(camera.eye.x(),camera.eye.y(),camera.eye.z(),gs.cnt.x(),gs.cnt.y(),gs.cnt.z(),0,0,1);
         
         //Lighting implementation
 
         gl.glShadeModel(GL_SMOOTH);
-        gl.glEnable(GL_LIGHTING);
-        gl.glEnable(GL_LIGHT0);
-        //gl.glEnable(GL_LIGHT1);
         gl.glDisable(GL_COLOR_MATERIAL);
 
         // White color definition
-        float[] sunColor = {255/255f, 255/255f, 220/255f, 0.7f};
-        float[] sunAmbientColor = {255/255f, 255/255f, 220/255f, 0.07f};
-
-        // Light source 10 degrees up and 10 degrees left from the camera
-        /*float[] lightDir = { (float)(0 + gs.vDist*cos(gs.phi+toRadians(10))*cos(gs.theta+toRadians(10))), 
-        					 (float)(0 + gs.vDist*cos(gs.phi+toRadians(10))*sin(gs.theta+toRadians(10))), 
-        					 (float)(0 + gs.vDist*sin(gs.phi+toRadians(10))) };
-        float[] whiteColor = {255/255f, 255/255f, 255/255f, 1f};
-
-        // Setting the GL_POSITION and GL_DIFFUSE
-        gl.glLightfv(GL_LIGHT1, GL_POSITION, lightDir, 0);
-        gl.glLightfv(GL_LIGHT1, GL_DIFFUSE, whiteColor, 0);*/
-        
-        gl.glLightfv(GL_LIGHT0, GL_POSITION, new float[]{1, 1, 0}, 0);
-        gl.glLightfv(GL_LIGHT0, GL_DIFFUSE, sunColor, 0);
-        gl.glLightfv(GL_LIGHT0, GL_AMBIENT, sunAmbientColor, 0);
-        gl.glLightfv(GL_LIGHT0, GL_SPECULAR, sunColor, 0);
 
     }
     
@@ -153,7 +113,38 @@ public class Terrain extends Base {
      */
     @Override
     public void initialize() {
-		
+        
+
+        gl.glEnable(GL_LIGHTING);
+        gl.glEnable(GL_LIGHT0);
+
+
+        
+        
+                // White color definition
+        float[] sunColor = {255/255f, 255/255f, 220/255f, 0.7f};
+        float[] sunAmbientColor = {255/255f, 255/255f, 220/255f, 0.7f};
+
+
+        
+        gl.glLightfv(GL_LIGHT0, GL_POSITION, new float[]{0, 0, 20}, 0);
+        gl.glLightfv(GL_LIGHT0, GL_DIFFUSE, sunColor, 0);
+        gl.glLightfv(GL_LIGHT0, GL_AMBIENT, sunAmbientColor, 0);
+        gl.glLightfv(GL_LIGHT0, GL_SPECULAR, sunColor, 0);
+        
+        gl.glClearColor(135/255f, 206/255f, 235/255f, 0f);
+        
+        // Clear background.
+        gl.glClear(GL_COLOR_BUFFER_BIT);
+        
+        // Clear depth buffer.
+        gl.glClear(GL_DEPTH_BUFFER_BIT);
+        
+        // Set color to black.
+        gl.glColor3f(1f, 1f, 1f);
+        
+        gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
         // Enable blending.
         gl.glEnable(GL_BLEND);
         gl.glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -170,9 +161,9 @@ public class Terrain extends Base {
         gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
         gl.glBindTexture(GL_TEXTURE_2D, 0);
 		
-        String pwd = "src" + File.separator + "robotrace" + File.separator;
-        grass = loadTexture(pwd + "Grass.jpg");
-        wood = loadTexture(pwd + "Wood.jpg");
+        String pwd = "src" + File.separator + "Renderer" + File.separator;
+        grass = loadTexture(pwd + "battlefieldos.jpg");
+        vakje = loadTexture(pwd + "Vakje.jpg");
         leaves = loadTexture(pwd + "Leaves.jpg");
         water = loadTexture(pwd + "water.jpg");
         
@@ -185,26 +176,73 @@ public class Terrain extends Base {
      * Function to draw the terrain including environment.
      */
     public void drawTerrain(){
+        double xmin = -terrainsize/2;
+        double xmax = terrainsize/2;
+        double ymin = -terrainsize/2;
+        double ymax = terrainsize/2;
+        double delta = 0.1;
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Material.GROUND.diffuse, 0);
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.GROUND.specular, 0);
+        gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Material.GROUND.shininess);
+        
 
+        
+        this.grass.bind(gl);
+        gl.glColor3f(0.4f,0.7f,0.1f); 
+        for(double x = xmin; x <= xmax; x += delta){
+
+            for(double y = ymin; y <= ymax; y += delta){
+                            
+                if (! ((x > -boardsize/2 && x <boardsize/2) && (y > -boardsize/2 && y <boardsize/2))){
+                    gl.glBegin(GL_TRIANGLE_STRIP);
+
+
+                    //gl.glTexCoord2d(0, 0);
+                    Vector vector1 = new Vector(0,-delta, heightAt(x, y-delta)-heightAt(x, y));
+                    Vector vector2 = new Vector(-delta,0, heightAt(x-delta, y)-heightAt(x, y));
+                    Vector vector3 = vector2.cross(vector1);
+
+                    Vector vector4 = new Vector(0,-delta, heightAt(x-delta, y-delta)-heightAt(x, y-delta));
+                    Vector vector5 = new Vector(-delta,0, heightAt(x-delta, y-delta)-heightAt(x-delta, y));
+                    Vector vector6 = vector5.cross(vector4);
+                    
+                    gl.glTexCoord2d(texPos(x,y)[0], texPos(x,y)[1]);
+                    gl.glNormal3d(vector3.x(),vector3.y(),vector3.z());
+                    gl.glVertex3d(x, y, heightAt(x,y));
+                    
+                    gl.glTexCoord2d(texPos(x, y - delta)[0], texPos(x,y - delta)[1]);
+                    gl.glVertex3d(x, y - delta, heightAt(x,y-delta));
+                    
+                    gl.glTexCoord2d(texPos(x-delta,y)[0], texPos(x-delta,y)[1]);
+                    gl.glVertex3d(x - delta, y, heightAt(x-delta,y));
+                    
+                    gl.glTexCoord2d(texPos(x - delta,y - delta)[0], texPos(x - delta,y - delta)[1]);
+                    //gl.glNormal3d(vector6.x(),vector6.y(),vector6.z());
+                    gl.glVertex3d(x - delta, y - delta, heightAt(x - delta,y - delta));
+                    gl.glEnd();                
+                }
+            }
+        }
+        
     }
     
     /**
      * Function to draw the board containing the game pieces.
      */
-    public void drawBoard(){
-        double xmin = 0;
-        double xmax = 8;
-        double ymin = 0;
-        double ymax = 8;
+    public void drawBoard(){      
+
+        double xmin = -boardsize/2;
+        double xmax = boardsize/2;
+        double ymin = -boardsize/2;
+        double ymax = boardsize/2;
         double delta = 1;
         double z = 0;
+        this.vakje.bind(gl);
+        boolean[][] cells = new boolean[6][6];
         
-        //invalid cells (aka lakes) on the board.
-        boolean[][] cells = new boolean[8][8];
-        cells[2][3] = true;
-        cells[2][4] = true;
-        cells[5][3] = true;
-        cells[5][4] = true;
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Material.CONCRETE.diffuse, 0);
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.CONCRETE.specular, 0);
+        gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Material.CONCRETE.shininess);
         
         //Square board.
         gl.glColor3f(0, 0, 1);
@@ -213,9 +251,13 @@ public class Terrain extends Base {
             for(double y = ymin; y < ymax; y += delta){
                 if (!cells[(int)x][(int)y]){
                     gl.glBegin(GL_QUAD_STRIP);
+                    gl.glTexCoord2d(0, 0);
                     gl.glVertex3d(x, y, z);
+                    gl.glTexCoord2d(1, 0);
                     gl.glVertex3d(x + delta, y, z);
+                    gl.glTexCoord2d(0, 1);
                     gl.glVertex3d(x, y + delta, z);
+                    gl.glTexCoord2d(1, 1);
                     gl.glVertex3d(x + delta, y + delta, z);
                     gl.glEnd();                
                 }
@@ -262,14 +304,26 @@ public class Terrain extends Base {
         
         gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         
+        drawTerrain();
         drawBoard();
-        
-        gl.glColor3f(1f,1f,1f);
-        test.draw(gl,glut);
     }
     
     public static void main (String[] args){
         Terrain terrain = new Terrain();
         terrain.run();
     }
+    
+        public double heightAt(double x, double y) {
+        double formula1 = 0.6*cos(0.3*x + 0.2*y) + 0.4*cos(x-0.5* y);
+        double ding = 2*((abs(x)-boardsize/2)*(abs(y)-boardsize/2))/terrainsize/2;
+        return (ding*formula1);
+    }
+        
+        public double[] texPos(double x, double y) {
+        double xPos = (terrainsize/2+x)/terrainsize;
+        double yPos = (terrainsize/2+y)/terrainsize;
+        double position[] = new double[]{xPos,yPos};
+        return position;
+    }
+
 }
