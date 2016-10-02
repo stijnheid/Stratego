@@ -162,7 +162,7 @@ public class Terrain extends Base {
         gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
         gl.glBindTexture(GL_TEXTURE_2D, 0);
 		
-        String pwd = "src" + File.separator + "Renderer" + File.separator;
+        String pwd = "src/Textures/";
         grass = loadTexture(pwd + "battlefieldos.jpg");
         vakje = loadTexture(pwd + "Vakje.jpg");
         leaves = loadTexture(pwd + "Leaves.jpg");

@@ -166,12 +166,6 @@ abstract public class Base {
             // Try to load from local folder.
             result = TextureIO.newTexture(new File(file), false);
         } catch(Exception e1) {
-            // Try to load from /src folder instead.
-            try {
-                result = TextureIO.newTexture(new File("src/" + file), false);
-            } catch(Exception e2) {
-                 
-            }
         }
             
         if(result != null) {
@@ -201,7 +195,7 @@ abstract public class Base {
     /**
      * Pass a vector as a vertex to OpenGL.
      */
-    public void glVertex(robotrace.Vector vector) {
+    public void glVertex(Vector vector) {
         gl.glVertex3d(vector.x(),
                       vector.y(),
                       vector.z());
