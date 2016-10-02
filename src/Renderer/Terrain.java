@@ -314,10 +314,6 @@ public class Terrain extends Base {
         test.draw(gl, glut);
     }
     
-    public void adjustCamera(Vector eye, Vector cnt){
-        camera.center.x = cnt.x;
-    }
-    
     public static void main (String[] args){
         Terrain terrain = new Terrain();
         terrain.run();

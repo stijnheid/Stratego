@@ -39,7 +39,7 @@ public class GameState {
         this.board = board;
     }
     
-    public boolean isRunnning() {
+    public boolean isRunning() {
         return this.isRunning;
     }
     

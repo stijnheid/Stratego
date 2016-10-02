@@ -45,6 +45,7 @@ public class Animation {
      * @param center Vector representing the goal focus point of the camera.
      */
     private void moveCamera (Vector eye, Vector center){
+        /*
         Vector currenteye = new Vector(terrain.camera.eye);
         Vector currentorigin = new Vector(terrain.camera.center);
         Vector eyepath = new Vector(currenteye);
@@ -68,7 +69,7 @@ public class Animation {
             terrain.adjustCamera(currenteye,currentorigin);
         }
         //just to make sure it's in place correctly.
-        terrain.adjustCamera(eye, center);
+        terrain.adjustCamera(eye, center);*/
     }
     
     /**
