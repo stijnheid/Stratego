@@ -66,7 +66,7 @@ public class Terrain extends Base {
     
     public Terrain(){
         
-        test = new Skeleton(new Vector(-3.5/2,-3.5/2,0));
+        test = new Skeleton(new Vector(-3.5,-3.5,0));
                 
         // Initialize the camera
         camera = new Camera();    

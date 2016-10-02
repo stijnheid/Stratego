@@ -32,7 +32,7 @@ public class Skeleton {
     public int rotation;
     
     /** Thickness of bones in skeleton. */
-    private float boneWidth = 0.025f;
+    private float boneWidth = 0.05f;
     
     /**Rotations of vital joints in X and Y dimensions.*/
     float shoulderLRotX = 0;
@@ -61,29 +61,29 @@ public class Skeleton {
         this.offset = offset;
         rotation = 0;
         
-        head = new Vector(0, 0, 0.9f);
+        head = new Vector(0, 0, 1.8f);
         joints.add(head);
-        neck = new Vector(0, 0, 0.8f);
+        neck = new Vector(0, 0, 1.6f);
         joints.add(neck);
-        shoulderL = new Vector (-0.1f, 0, 0.8f);
+        shoulderL = new Vector (-0.2f, 0, 1.6f);
         joints.add(shoulderL);
-        shoulderR = new Vector (0.1f, 0, 0.8f);
+        shoulderR = new Vector (0.2f, 0, 1.6f);
         joints.add(shoulderR);
-        elbow = new Vector (0.05f, 0, -0.15f);//RELATIVE TO SHOULDER
+        elbow = new Vector (0.1f, 0, -0.3f);//RELATIVE TO SHOULDER
         joints.add(elbow);
-        wrist = new Vector (0, 0, -0.15f);//RELATIVE TO ELBOW
+        wrist = new Vector (0, 0, -0.3f);//RELATIVE TO ELBOW
         joints.add(wrist);
-        spine = new Vector (0, 0, 0.5f);
+        spine = new Vector (0, 0, 1);
         joints.add(spine);
-        hipL = new Vector (-0.075f, 0, 0.4f);
+        hipL = new Vector (-0.15f, 0, 0.8f);
         joints.add(hipL);
-        hipR = new Vector (0.075f, 0, 0.4f);
+        hipR = new Vector (0.15f, 0, 0.8f);
         joints.add(hipR);
-        knee = new Vector (0, 0, -0.2f);//RELATIVE TO HIP
+        knee = new Vector (0, 0, -0.4f);//RELATIVE TO HIP
         joints.add(knee);
-        heel = new Vector (0, 0, -0.2f);//RELATIVE TO KNEE
+        heel = new Vector (0, 0, -0.4f);//RELATIVE TO KNEE
         joints.add(heel);
-        foot = new Vector (0, 0.05f, 0);//RELATIVE TO HEEL
+        foot = new Vector (0, 0.1f, 0);//RELATIVE TO HEEL
         joints.add(foot);
         
         joints.stream().forEach(v -> v.add(offset));
@@ -97,7 +97,9 @@ public class Skeleton {
     public void draw(GL2 gl, GLUT glut){
         gl.glPushMatrix();
         gl.glDisable(gl.GL_TEXTURE_2D);
-        gl.glScalef(2,2,2);
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Material.GOLD.diffuse, 0);
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.GOLD.specular, 0);
+        gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Material.GOLD.shininess);
         gl.glRotated(rotation, 0, 0, 1);
         drawTorso(gl, glut);
         drawArm(gl, glut, true);// left arm
@@ -113,7 +115,7 @@ public class Skeleton {
         //draw head manually (make it a bit larger).
         gl.glPushMatrix();
         gl.glTranslatef(head.x,head.y,head.z);
-        glut.glutSolidSphere(0.05f, 10, 10);
+        glut.glutSolidSphere(2*boneWidth, 10, 10);
         gl.glPopMatrix();
         
         //draw torso joint connections.
@@ -327,7 +329,7 @@ public class Skeleton {
     }
     
     private void drawSphere(GLUT glut){
-        glut.glutSolidSphere(0.025f, 10, 10);
+        glut.glutSolidSphere(boneWidth, 10, 10);
     }
     
     public void move(Vector a){

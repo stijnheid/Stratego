@@ -27,6 +27,12 @@ public class Vector {
         this.length = Math.sqrt(x*x+y*y+z*z);
     }
     
+    public Vector(Vector a){
+        this.x = a.x;
+        this.y = a.y;
+        this.z = a.z;
+    }
+    
     public double x(){
         return x;
     }
