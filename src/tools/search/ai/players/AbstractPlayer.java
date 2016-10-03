@@ -5,6 +5,7 @@
  */
 package tools.search.ai.players;
 
+import Game.GamePiece;
 import Game.GameState;
 import Game.Team;
 import actions.MoveAction;
@@ -17,7 +18,7 @@ import tools.search.ai.AIBot;
 public abstract class AbstractPlayer implements AIBot{
 
     protected boolean active;
-    private Team team;
+    protected Team team;
     
     @Override
     public abstract MoveAction nextMove(GameState state);
@@ -34,5 +35,4 @@ public abstract class AbstractPlayer implements AIBot{
     public Team getTeam() {
         return this.team;
     }
-    
 }
