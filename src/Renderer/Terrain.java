@@ -312,6 +312,7 @@ public class Terrain extends Base {
         drawTerrain();
         drawBoard();
         test.draw(gl, glut);
+        System.out.println("current phi: "+cs.phi+" theta: "+cs.theta);
     }
     
     public static void main (String[] args){

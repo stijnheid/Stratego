@@ -11,20 +11,17 @@ package Renderer;
 public class Vector {
     
     public float x,y,z;
-    double length;
     
     public Vector(float x, float y, float z){
         this.x=x;
         this.y=y;
         this.z=z;
-        this.length = Math.sqrt(x*x+y*y+z*z);
     }
     
     public Vector(double x, double y, double z){
         this.x = (float) x;
         this.y = (float) y;
         this.z = (float) z;
-        this.length = Math.sqrt(x*x+y*y+z*z);
     }
     
     public Vector(Vector a){
@@ -43,6 +40,10 @@ public class Vector {
     
     public double z(){
         return z;
+    }
+    
+    public double length(){
+        return Math.sqrt(x*x+y*y+z*z);
     }
     
     

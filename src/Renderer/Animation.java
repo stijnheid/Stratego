@@ -6,6 +6,7 @@
 package Renderer;
 import Game.GamePiece;
 import Game.BoardPosition;
+import Game.Team;
 
 /**
  *  Class to represent an animation.
@@ -45,31 +46,7 @@ public class Animation {
      * @param center Vector representing the goal focus point of the camera.
      */
     private void moveCamera (Vector eye, Vector center){
-        /*
-        Vector currenteye = new Vector(terrain.camera.eye);
-        Vector currentorigin = new Vector(terrain.camera.center);
-        Vector eyepath = new Vector(currenteye);
-        eyepath.subtract(eye);
-        Vector centerpath = new Vector(currentorigin);
-        centerpath.subtract(center);
-        float index;
         
-        //move towards goal over a period of 2 seconds.
-        float start = System.currentTimeMillis();
-        float now = start;
-        while(now - start < 2000){
-            now = System.currentTimeMillis();
-            index = (now-start)/2000;
-            currenteye.x = eye.x - (1-index) * eyepath.x;
-            currenteye.y = eye.y - (1-index) * eyepath.y;
-            currenteye.z = eye.z - (1-index) * eyepath.z;
-            currentorigin.x = center.x - (1-index) * centerpath.x;
-            currentorigin.y = center.y - (1-index) * centerpath.y;
-            currentorigin.z = center.z - (1-index) * centerpath.z;
-            terrain.adjustCamera(currenteye,currentorigin);
-        }
-        //just to make sure it's in place correctly.
-        terrain.adjustCamera(eye, center);*/
     }
     
     /**
@@ -97,5 +74,46 @@ public class Animation {
         }   else {
             //rotate to face backwards.
         }
+    }
+    
+    /**
+     * Returns the theta for the vector eye.
+     * @param eye camera eye.
+     * @param center camera centre;
+     * @return 
+     */
+    private double getTheta(Vector eye, Vector center){
+        double theta;
+        eye.subtract(center);
+        theta = Math.atan(eye.x/eye.y);
+        eye.add(center);
+        return theta;
+    }
+    
+    /**
+     * Returns the phi for the vector eye.
+     * @param eye camera eye.
+     * @param center camera centre;
+     * @return 
+     */
+    private double getPhi(Vector eye, Vector center){
+        double phi;
+        eye.subtract(center);
+        phi = Math.asin(eye.z()/eye.length());
+        eye.add(center);
+        return phi;
+    }
+    
+    /**
+     * Returns distance from eye to center vectors.
+     * @param eye camera eye.
+     * @param center camera centre.
+     * @return 
+     */
+    private double getDist(Vector eye, Vector center){
+        eye.subtract(center);
+        Vector diff = new Vector(eye);
+        eye.add(center);
+        return diff.length();
     }
 }
