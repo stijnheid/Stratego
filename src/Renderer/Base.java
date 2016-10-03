@@ -75,6 +75,9 @@ abstract public class Base {
     // Global state, created at startup.
     protected GameState gs;
     
+    //Camera State with FOV variables.
+    protected CameraState cs;
+    
     // OpenGL reference, continuously updated for correct thread.
     protected GL2 gl;
     
@@ -97,6 +100,8 @@ abstract public class Base {
         
         // Global state.
         this.gs = new GameState();
+        
+        this.cs = new CameraState();
         
         // Check the source files
         File src = new File("src");
@@ -229,10 +234,10 @@ abstract public class Base {
             gl = drawable.getGL().getGL2();
             
             // Update wall time, and reset if required.
-            if(gs.tAnim < 0) {
+            if(cs.tAnim < 0) {
                 startTime = System.currentTimeMillis();
             }
-            gs.tAnim = (float) (System.currentTimeMillis() - startTime) / 1000f;
+            cs.tAnim = (float) (System.currentTimeMillis() - startTime) / 1000f;
             
             // Also update view, because global state may have changed.
             setView();
@@ -261,8 +266,8 @@ abstract public class Base {
             gl = drawable.getGL().getGL2();
             
             // Update state.
-            gs.w = width;
-            gs.h = height;
+            cs.w = width;
+            cs.h = height;
             
             setView();
         }
@@ -295,16 +300,16 @@ abstract public class Base {
             
             // Change camera angle when left button is pressed.
             if(mouseButton == MouseEvent.BUTTON1) {
-                gs.theta += dX * DRAG_PIXEL_TO_RADIAN;
-                gs.phi = Math.max(PHI_MIN,
+                cs.theta += dX * DRAG_PIXEL_TO_RADIAN;
+                cs.phi = Math.max(PHI_MIN,
                                     Math.min(PHI_MAX,
-                                             gs.phi + dY * DRAG_PIXEL_TO_RADIAN));
+                                             cs.phi + dY * DRAG_PIXEL_TO_RADIAN));
             }
             // Change vWidth when right button is pressed.
             else if(mouseButton == MouseEvent.BUTTON3) {
-                gs.vWidth = Math.max(VWIDTH_MIN,
+                cs.vWidth = Math.max(VWIDTH_MIN,
                                      Math.min(VWIDTH_MAX,
-                                              gs.vWidth + dY * DRAG_PIXEL_TO_VWIDTH));
+                                              cs.vWidth + dY * DRAG_PIXEL_TO_VWIDTH));
             }
             
             dragSourceX = e.getX();
@@ -317,8 +322,8 @@ abstract public class Base {
 
         @Override
         public void mouseWheelMoved(MouseWheelEvent e) {
-            gs.vDist = (float) Math.max(MIN_CAMERA_DISTANCE,
-                                        gs.vDist *
+            cs.vDist = (float) Math.max(MIN_CAMERA_DISTANCE,
+                                        cs.vDist *
                                         Math.pow(MOUSE_WHEEL_FACTOR,
                                                  e.getWheelRotation()));
         }
@@ -353,38 +358,38 @@ abstract public class Base {
         @Override
         public void keyPressed(KeyEvent e) {
             // Move center point.
-            double phiQ = gs.theta + Math.PI / 2.0;
+            double phiQ = cs.theta + Math.PI / 2.0;
             
             switch(e.getKeyChar()) {
                 // Right.
-                case 'a':   gs.cnt.subtract(
+                case 'a':   cs.cnt.subtract(
                                         new Vector(Math.cos(phiQ), Math.sin(phiQ), 0)
                                         .scale(CENTER_POINT_CHANGE));
                             break;
                 // Left.
-                case 'd':   gs.cnt.add(
+                case 'd':   cs.cnt.add(
                                         new Vector(Math.cos(phiQ), Math.sin(phiQ), 0)
                                         .scale(CENTER_POINT_CHANGE));
                             break;
                 // Forwards.
-                case 'w':   gs.cnt.subtract(
-                                        new Vector(Math.cos(gs.theta), Math.sin(gs.theta), 0)
+                case 'w':   cs.cnt.subtract(
+                                        new Vector(Math.cos(cs.theta), Math.sin(cs.theta), 0)
                                         .scale(CENTER_POINT_CHANGE));
                             break;
                 // Backwards.
-                case 's':   gs.cnt.add(
-                                        new Vector(Math.cos(gs.theta), Math.sin(gs.theta), 0)
+                case 's':   cs.cnt.add(
+                                        new Vector(Math.cos(cs.theta), Math.sin(cs.theta), 0)
                                         .scale(CENTER_POINT_CHANGE));
                             break;
                 // Up.
-                case 'q':   gs.cnt = new Vector(gs.cnt.x,
-                                                gs.cnt.y,
-                                                gs.cnt.z + CENTER_POINT_CHANGE);
+                case 'q':   cs.cnt = new Vector(cs.cnt.x,
+                                                cs.cnt.y,
+                                                cs.cnt.z + CENTER_POINT_CHANGE);
                             break;
                 // Down.
-                case 'z':   gs.cnt = new Vector(gs.cnt.x,
-                                                gs.cnt.y,
-                                                gs.cnt.z - CENTER_POINT_CHANGE);
+                case 'z':   cs.cnt = new Vector(cs.cnt.x,
+                                                cs.cnt.y,
+                                                cs.cnt.z - CENTER_POINT_CHANGE);
                             break;
             }
         }

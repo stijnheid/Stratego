@@ -70,7 +70,7 @@ public class Terrain extends Base {
                 
         // Initialize the camera
         camera = new Camera();    
-
+        
 
     }
     
@@ -80,7 +80,7 @@ public class Terrain extends Base {
     @Override
     public void setView() {
         // Select part of window.
-        gl.glViewport(0, 0, gs.w, gs.h);
+        gl.glViewport(0, 0, cs.w, cs.h);
 
         // Set projection matrix.
         gl.glMatrixMode(GL_PROJECTION);
@@ -88,9 +88,9 @@ public class Terrain extends Base {
 
         // Set the perspective.
         // Modify this to meet the requirements in the assignment.
-        float aspectRatio = (float) gs.w / (float) gs.h;
+        float aspectRatio = (float) cs.w / (float) cs.h;
         double fovy = 60;
-        glu.gluPerspective(fovy, aspectRatio, 0.1 * gs.vDist, 10.0 * gs.vDist);
+        glu.gluPerspective(fovy, aspectRatio, 0.1 * cs.vDist, 10.0 * cs.vDist);
         // Set camera.
         gl.glMatrixMode(GL_MODELVIEW);
         gl.glLoadIdentity();
@@ -99,8 +99,8 @@ public class Terrain extends Base {
         // For camera modes 1 to 4, determine which robot to focus on.
         
 
-        camera.update(gs);
-        glu.gluLookAt(camera.eye.x(),camera.eye.y(),camera.eye.z(),gs.cnt.x(),gs.cnt.y(),gs.cnt.z(),0,0,1);
+        camera.update(cs);
+        glu.gluLookAt(camera.eye.x(),camera.eye.y(),camera.eye.z(),cs.cnt.x(),cs.cnt.y(),cs.cnt.z(),0,0,1);
         
         //Lighting implementation
 
@@ -168,8 +168,8 @@ public class Terrain extends Base {
         leaves = loadTexture(pwd + "Leaves.jpg");
         water = loadTexture(pwd + "water.jpg");
         
-        gs.theta = 4.5f;
-        gs.phi = 0.5f;
+        cs.theta = 4.5f;
+        cs.phi = 0.5f;
 
     }
     

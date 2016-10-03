@@ -1,7 +1,7 @@
 package robotrace;
 import static java.lang.Math.*;
 import Renderer.Vector;
-import Game.GameState;
+import Renderer.CameraState;
 
 /**
  * Implementation of a camera with a position and orientation. 
@@ -22,7 +22,7 @@ public class Camera {
      * Updates the camera viewpoint and direction based on the
      * selected camera mode.
      */
-    public void update(GameState gs) {
+    public void update(CameraState gs) {
         setDefaultMode(gs);
     }
 
@@ -31,7 +31,7 @@ public class Camera {
      * The camera is never rolled, so the view is always alligned with the 
      * horizon, thus the upvector is equal to the Z vector.
      */
-    private void setDefaultMode(GameState gs) {
+    private void setDefaultMode(CameraState gs) {
         /*eye = new Vector(gs.cnt.x + gs.vDist*cos(gs.phi)*cos(gs.theta),
         		 gs.cnt.y + gs.vDist*cos(gs.phi)*sin(gs.theta),
         		 gs.cnt.z + gs.vDist*sin(gs.phi) );
