@@ -279,6 +279,9 @@ public class AlphaBetaSearch {
         
         //int maxDepth = 2; //10;
         int maxDepth = initialDepth;
+        
+        // NOT NEEDED
+        /**
         double bestValue;
         // Initialize bestValue
         if(isMaxPlayer) {
@@ -287,7 +290,9 @@ public class AlphaBetaSearch {
         } else {
             // Worst case for the minimizing player.
             bestValue = Double.POSITIVE_INFINITY;
-        }
+        }*/
+        
+        this.initialPlayer = isMaxPlayer;
         
         MoveAction bestMove = null;
         // Apply iterative deepening.
@@ -307,6 +312,23 @@ public class AlphaBetaSearch {
                 System.out.println("isMaxPlayer: " + isMaxPlayer);
                 
                 double value = miniMax(node, maxDepth, isMaxPlayer);
+                
+                // If the worst possible value occurs for a player, it means
+                // that the game is inevitably lost when the opponent continues
+                // perfect play. The returned move will be none and
+                // continueing iterative deepening is now pointless.
+                // Can it occur that our current bestMove is none when this
+                // occurs, what do we do then?
+                if(isMaxPlayer && value == Double.NEGATIVE_INFINITY ||
+                        !isMaxPlayer && value == Double.POSITIVE_INFINITY) {
+                    if(bestMove == null) {
+                        throw new RuntimeException("bestMove was never set.");
+                    }
+                    
+                    break;
+                }
+                
+                bestMove = node.getBestMove();
                 System.out.println("Explored in Iteration: " + this.exploredNodes);
                 System.out.println("Value: " + value);
                 this.deepestDepth = maxDepth;
@@ -315,10 +337,18 @@ public class AlphaBetaSearch {
                 // smallest possible value.
                 // If this is the maximizing player you wan to store the
                 // greatest value.
+                // This is not necessary, you MUST always pick the move returned
+                // in the latest iteration. In this way moves that return a
+                // neutral rating like 0.0 will be already stored and cannot
+                // be overwritten by a better move in a later iteration that
+                // also scores 0.0, but because it has looked more moves ahead,
+                // it can BE better.
+                /**
                 if(isMaxPlayer && value > bestValue || !isMaxPlayer && bestValue > value) {
                     bestValue = value;
+                    System.out.println("BestMove MiniMax: " + node.getBestMove().toString());
                     bestMove = node.getBestMove();
-                }
+                }*/
 
                 // Increment max depth.
                 maxDepth++;
@@ -328,9 +358,12 @@ public class AlphaBetaSearch {
         
         // Reset timeout.
         this.timeout = false;
+        
         // Return best move.
         return bestMove;
     }
+    
+    private boolean initialPlayer;
     
     public double miniMax(GameNode node, int depth, boolean maxPlayer) 
             throws TimeoutException {
@@ -350,8 +383,14 @@ public class AlphaBetaSearch {
         Team winner = board.isEndState();
         // If winner != null, means we reached an end state.
         if(winner != null) {
-            System.out.println("END STATE REACHED");
+            //System.out.println("END STATE REACHED");
             // What score should we give to an end state?
+            // TODO
+            // This structure is wrong it should return the value of this end
+            // state with respect to the current player, the player at the root
+            // node, not at the current node via propagation of the maxPlayer
+            // value.
+            /**
             if(maxPlayer) {
                 if(winner == Team.RED) {
                     return Double.POSITIVE_INFINITY;
@@ -365,12 +404,27 @@ public class AlphaBetaSearch {
                 } else {
                     return Double.POSITIVE_INFINITY;
                 }
+            }*/
+            
+            if(this.initialPlayer) { // Initial call was for the maxiziming player.
+                if(winner == Team.RED) {
+                    return Double.POSITIVE_INFINITY;
+                } else {
+                    return Double.NEGATIVE_INFINITY;
+                }
+            } else {
+                if(winner == Team.BLUE) {
+                    return Double.NEGATIVE_INFINITY;
+                } else {
+                    return Double.POSITIVE_INFINITY;
+                }
             }
         }
         
         // Reached maximum depth.
         if(depth == 0) {
             // Calculate the heuristic value.
+            //System.out.println("Heuristic Value: " + this.evaluation.score(state));
             return this.evaluation.score(state);
         }
         
@@ -389,6 +443,7 @@ public class AlphaBetaSearch {
                 
                 // Recursive call with DFS implementation.
                 double value = miniMax(next, depth - 1, false);
+                //System.out.println(move.toString());
                 //System.out.println("MaxPlayer value: " + value);
                 // Try to maximize the value over all nodes.
                 if(value > bestValue) {
@@ -416,6 +471,7 @@ public class AlphaBetaSearch {
                 
                 // Recursive call with DFS implementation.
                 double value = miniMax(next, depth - 1, true);
+                //System.out.println(move.toString());
                 //System.out.println("MinPlayer value: " + value);
                 // Try to minimize the value over all nodes.
                 if(bestValue > value) {
@@ -438,6 +494,7 @@ public class AlphaBetaSearch {
         // for lower depths.
         node.setBestMove(bestMove);
         //System.out.println(depth + " bestValue = " + bestValue);
+        //System.out.println("Best move: " + bestMove.toString());
         return bestValue;
     }
     

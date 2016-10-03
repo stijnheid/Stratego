@@ -8,6 +8,7 @@ import Game.GlobalSettings;
 import Game.InvalidPositionException;
 import Game.Pieces;
 import Game.Team;
+import Logic.Simulation;
 import actions.MoveAction;
 import java.security.SecureRandom;
 import java.util.ArrayList;
@@ -29,13 +30,22 @@ import tools.search.ai.SetupGenerator;
 public class BattleEngine {
     
     public static void main(String[] args) {
-        //new BattleEngine().runTests(); //initialize();
-        //new BattleEngine().initialize();
-        //new BattleEngine().testTranscript();
-        //new BattleEngine().testApplyUndoMove();
-        //new BattleEngine().testUnequalAttack();
-        //new BattleEngine().testAlphaBeta();
-        new BattleEngine().smallBattle();
+        try {
+            //new BattleEngine().runTests(); //initialize();
+            //new BattleEngine().initialize();
+            //new BattleEngine().testTranscript();
+            //new BattleEngine().testApplyUndoMove();
+            //new BattleEngine().testUnequalAttack();
+            //new BattleEngine().testAlphaBeta();
+            //new BattleEngine().smallBattle();
+            //new BattleEngine().test();
+            //new BattleEngine().testEndState();
+            
+            
+            new BattleEngine().debug();
+        } catch (InvalidPositionException ex) {
+            Logger.getLogger(BattleEngine.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public void runTests() {
@@ -65,7 +75,7 @@ public class BattleEngine {
     }
     
     private void smallBattle() {
-        GameBoard board = new GameBoard(5, 5, Team.RED, Team.BLUE);
+        GameBoard board = new GameBoard(2, 5, Team.RED, Team.BLUE);
         try {
             // Setup the teams.
             board.setupPiece(0, 0, Pieces.SERGEANT, Team.RED);
@@ -73,10 +83,10 @@ public class BattleEngine {
             board.setupPiece(1, 0, Pieces.FLAG, Team.RED);
             board.setupPiece(1, 1, Pieces.CAPTAIN, Team.RED);
             
-            board.setupPiece(1, 4, Pieces.SERGEANT, Team.RED);
-            board.setupPiece(1, 3, Pieces.LIEUTENANT, Team.RED);
-            board.setupPiece(0, 4, Pieces.FLAG, Team.RED);
-            board.setupPiece(0, 3, Pieces.CAPTAIN, Team.RED);
+            board.setupPiece(1, 4, Pieces.SERGEANT, Team.BLUE);
+            board.setupPiece(1, 3, Pieces.LIEUTENANT, Team.BLUE);
+            board.setupPiece(0, 4, Pieces.FLAG, Team.BLUE);
+            board.setupPiece(0, 3, Pieces.CAPTAIN, Team.BLUE);
         } catch (InvalidPositionException ex) {
             Logger.getLogger(BattleEngine.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -168,6 +178,136 @@ public class BattleEngine {
         
     }
     
+    private void test() {
+        GameBoard board = new GameBoard(2, 5, Team.RED, Team.BLUE);
+        
+        try {
+            // Setup the teams.
+            //board.setupPiece(0, 0, Pieces.SERGEANT, Team.RED);
+            //board.setupPiece(0, 1, Pieces.LIEUTENANT, Team.RED);
+            //board.setupPiece(1, 0, Pieces.FLAG, Team.RED);
+            board.setupPiece(0, 2, Pieces.CAPTAIN, Team.RED);
+            
+            board.setupPiece(1, 4, Pieces.SERGEANT, Team.BLUE);
+            board.setupPiece(1, 3, Pieces.LIEUTENANT, Team.BLUE);
+            board.setupPiece(0, 4, Pieces.FLAG, Team.BLUE);
+            board.setupPiece(1, 0, Pieces.CAPTAIN, Team.BLUE);
+        } catch (InvalidPositionException ex) {
+            Logger.getLogger(BattleEngine.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        System.out.println(board.transcript());
+        
+        List<GamePiece> captains = board.getPieces(Team.RED, Pieces.CAPTAIN);
+        System.out.println("Captains: " + captains.size());
+        
+        // Check if this is an endstate.
+        Team winner = board.isEndState();
+        System.out.println("Winner: " + winner);
+        
+        // Check if we win when the flag is surrounded by bombs and no miners
+        // are left.
+        
+    }
+    
+    private void testEndState() {      
+        String setup = "r:F|r:B|   |r:3\n" +
+                        "--- --- --- ---\n" +
+                        "r:B|r:3|b:5|r:4\n" +
+                        "--- --- --- ---\n" +
+                        "   |   |   |   \n" +
+                        "--- --- --- ---\n" +
+                        "   |   |   |   \n" +
+                        "--- --- --- ---\n" +
+                        "b:B|   |b:3|b:4\n" +
+                        "--- --- --- ---\n" +
+                        "b:F|b:B|b:2|b:3";
+        GameBoard board = GameBoard.loadBoard(setup, 4, 6);
+        // Print board.
+        System.out.println(board.transcript());
+        
+        // Test end state.
+        Team winner = board.isEndState();
+        System.out.println("Winner: " + winner);
+    }
+    
+    public BattleTranscript battle(GameState state, AIBot attacker, AIBot defender, 
+            long computationTime, Simulation simulation) {
+        
+        // Attacker starts the game.
+        AIBot currentTurn = attacker;
+        
+        // Start the game.
+        state.setRunning(true);
+        int totalMoves = 0;
+        System.out.println("Start Battle with computation time: " + computationTime);
+        
+        // Initialize the battle transcript.
+        GameBoard board = state.getGameBoard();
+        BattleTranscript transcript = new BattleTranscript(board, 
+                board.getAttacker(), board.getDefender());
+        transcript.startGame();
+        
+        Team winner;
+        while((winner = board.isEndState()) == null) {
+            // Put a temporary hard limit for the moves.
+            if(totalMoves >= 20) { //100) {
+                System.out.println("Game exceeded 100 moves, terminate.");
+                break;
+            }
+            
+            // Request a move from the AI bot.
+            // It is important to clone the game state to prevent corruption
+            // of the game state, because when search algorithms timeout they
+            // have not been able to undo the already applied moves and thereby
+            // the game state gets corrupted. However game state corruption
+            // should not happen if search algorithm finish in time before the
+            // computation time expires.
+            MoveAction move = timedAIMove((GameState) state.clone(), 
+                    currentTurn, computationTime);
+            
+            // Player did not provide a move, this should never happen.
+            if(move == null) {
+                throw new RuntimeException("BattleEngine.battle():"
+                        + " player has no move: " + currentTurn.getTeam());
+            }
+            
+            // Store the move in the battle transcript.
+            transcript.addMove(move);
+            
+            // Print informative information about the move.
+            System.out.println("move#" + totalMoves + " " + move.toString());
+            
+            // Submit the move to the simulation.
+            simulation.processAction(move);
+            
+            // Show the board state after the move.
+            System.out.println(board.transcript());
+            
+            // Swap turns.
+            if(currentTurn == attacker) {
+                currentTurn = defender;
+            } else {
+                currentTurn = attacker;
+            }
+            
+            // Keep track of the number of applied moves (both teams)
+            totalMoves++;
+        }
+        
+        // End the game.
+        state.setRunning(false);
+        transcript.endGame();
+        // Print informative information about the battle result.
+        System.out.println("Game Ended in " + (state.getGameDuration() / 1000d) + " s.");
+        System.out.println("Winner: " + winner);
+        // Print the battle transcript.
+        transcript.print();
+        transcript.setWinner(winner);
+        
+        return transcript;
+    }
+    
     private void battle(GameBoard board, AIBot attacker, AIBot defender, 
             long computationTime) {
         // Wrap around in a GameState
@@ -183,9 +323,15 @@ public class BattleEngine {
         state.setRunning(true);
         int iterations = 0;
         System.out.println("Start Game with computation time: " + computationTime);
-        BattleTranscript transcript = new BattleTranscript(board);
-        while(board.isEndState() == null) {
-            if(iterations >= 30) {
+        BattleTranscript transcript = new BattleTranscript(board, 
+                board.getAttacker(), board.getDefender());
+        
+        System.out.println("Attacking team: " + board.getAttacker());
+        System.out.println("Defending team: " + board.getDefender());
+        
+        Team winner;
+        while((winner = board.isEndState()) == null) {
+            if(iterations >= 40) { //30) {
                 break;
             }
             
@@ -193,6 +339,11 @@ public class BattleEngine {
             MoveAction move = timedAIMove((GameState) state.clone(), 
                     currentTurn, 
                     computationTime);
+            // Player unable to supply a move, should not happen.
+            if(move == null) {
+                throw new RuntimeException("Player has no move: " + currentTurn.getTeam());
+            }
+            
             // Store move in transcript.
             transcript.addMove(move);
             
@@ -221,20 +372,26 @@ public class BattleEngine {
         
         state.setRunning(false);
         System.out.println("Game Ended in " + (state.getGameDuration() / 1000d) + " s.");
+        System.out.println("Winner: " + winner);
         transcript.print();
     }
     
+    private boolean interrupted;
+    
     private MoveAction timedAIMove(GameState state, final AIBot bot, long computationTime) {
+        interrupted = false;
         Timer timer = new Timer();
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
+                interrupted = true;
                 bot.stop();
             }
         };
         
         timer.schedule(task, computationTime);
         MoveAction move = bot.nextMove(state);
+        System.out.println("Interrupted: " + interrupted);
         task.cancel();
         return move;
     }
@@ -243,8 +400,41 @@ public class BattleEngine {
     
     // Make random moves.
     
-    public BattleResult battle() {
+    public BattleTranscript battle() {
         return null;
+    }
+    
+    public void debug() throws InvalidPositionException {
+        SetupGenerator generator = new SetupGenerator();
+        GameBoard board = generator.mirroredSetup();
+        System.out.println("Initial Board");
+        System.out.println(board.transcript());
+        
+        /**
+        GamePiece redCaptain = new GamePiece(Pieces.CAPTAIN, Team.RED, new BoardPosition(0, 1));
+        MoveAction move = new MoveAction(Team.RED, redCaptain, new BoardPosition(0, 1), new BoardPosition(0, 2));
+        board.applyMove(move);
+        System.out.println(board.transcript());
+        System.out.println();
+        
+        GamePiece blueCaptain = new GamePiece(Pieces.CAPTAIN, Team.BLUE, new BoardPosition(0, 3));
+        MoveAction attack = new MoveAction(Team.BLUE, blueCaptain, new BoardPosition(0, 3), new BoardPosition(0, 2));
+        board.applyMove(attack);
+        System.out.println(board.transcript());
+        System.out.println();
+        */
+        
+        GamePiece redCaptain = board.getPiece(new BoardPosition(0, 1));
+        MoveAction move = new MoveAction(Team.RED, redCaptain, redCaptain.getPosition(), new BoardPosition(0,2));
+        board.applyMove(move);
+        System.out.println(board.transcript());
+        System.out.println();
+        
+        GamePiece blueCaptain = board.getPiece(new BoardPosition(0,3));
+        MoveAction attack = new MoveAction(Team.BLUE, blueCaptain, blueCaptain.getPosition(), new BoardPosition(0,2));
+        board.applyMove(attack);
+        System.out.println(board.transcript());
+        System.out.println();
     }
     
     public void testUnequalAttack() {
@@ -375,7 +565,9 @@ public class BattleEngine {
         System.out.println();
         
         // Create transcript.
-        BattleTranscript transcript = new BattleTranscript(board);
+        BattleTranscript transcript = new BattleTranscript(board, 
+                board.getAttacker(), 
+                board.getDefender());
         transcript.addMove(new MoveAction(
                 Team.RED, new GamePiece(
                         Pieces.SERGEANT, Team.RED, new BoardPosition(2,1)), 

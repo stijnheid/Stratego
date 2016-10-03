@@ -14,4 +14,12 @@ public enum Team {
             return RED;
         }
     }
+    
+    public String getSymbol() {
+        if(this == RED) {
+            return "r";
+        } else {
+            return "b";
+        }
+    }
 }

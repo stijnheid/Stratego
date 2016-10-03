@@ -1,5 +1,8 @@
 package Game;
 
+import Renderer.Animation;
+import Renderer.RendererState;
+
 /**
  * Keeps track of the Gameboard and other state information like timers and
  * running animation information objects.
@@ -8,10 +11,24 @@ public class GameState {
     private GameBoard board;
     private boolean isRunning;
     private long startTime;
+    private Team currentTurn;
+    // At most one animation can run at a time.
+    // Simulation must not accept any action commands while an animation plays.
+    private Animation animation;
+    private RendererState rendererState;
 
     public GameState() {
         this.board = null;
         this.isRunning = false;
+        this.animation = null;
+    }
+    
+    public boolean isAnimationPlaying() {
+        return (this.animation != null);
+    }
+    
+    public Animation getAnimation() {
+        return this.animation;
     }
     
     public GameBoard getGameBoard() {
@@ -47,6 +64,22 @@ public class GameState {
 
     public void setStartTime(long startTime) {
         this.startTime = startTime;
+    }
+
+    public Team getCurrentTurn() {
+        return currentTurn;
+    }
+
+    public void setCurrentTurn(Team currentTurn) {
+        this.currentTurn = currentTurn;
+    }
+
+    public RendererState getRendererState() {
+        return rendererState;
+    }
+
+    public void setRendererState(RendererState rState) {
+        this.rendererState = rState;
     }    
     
     @Override

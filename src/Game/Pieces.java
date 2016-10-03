@@ -47,4 +47,35 @@ public enum Pieces {
                 return "X";
         }
     }
+    
+    public static Pieces bySymbol(String symbol) {
+        switch(symbol) {
+            case "B":
+                return BOMB;
+            case "F":
+                return FLAG;
+            case "S":
+                return SPY;
+            case "1":
+                return SCOUT;
+            case "2":
+                return MINER;
+            case "3":
+                return SERGEANT;
+            case "4":
+                return LIEUTENANT;
+            case "5":
+                return CAPTAIN;
+            case "6":
+                return MAJOR;
+            case "7":
+                return COLONEL;
+            case "8":
+                return GENERAL;
+            case "9":
+                return MARSHALL;
+            default:
+                return null;
+        }
+    }
 }

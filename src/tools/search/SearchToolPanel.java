@@ -9,8 +9,17 @@ import Game.InvalidPositionException;
 import Game.Pieces;
 import Game.Team;
 import Logic.Simulation;
+import actions.MoveAction;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.SwingWorker;
+import javax.swing.table.DefaultTableModel;
+import tools.deeplearning.BattleEngine;
+import tools.deeplearning.BattleTranscript;
+import tools.search.ai.AIBot;
+import tools.search.ai.SetupGenerator;
+import tools.search.ai.players.DefaultPlayer;
 
 /**
  *
@@ -109,8 +118,44 @@ public class SearchToolPanel extends javax.swing.JPanel {
         System.out.println("Start Game");
         // Check if the player's setup is valid.
         
+        // Create a simulation object and run the battle engine with two AI bots.
+        GameState state = new GameState();
+        state.setRunning(true);
+        
+        // Setup the Table render.
+        System.out.println("Set renderer");
+        GameBoardCellRenderer renderer = new GameBoardCellRenderer(state, true);
+        this.jTable1.setDefaultRenderer(Object.class, renderer);        
+        
+        // Create a board setup.
+        //GameBoard board = new GameBoard(GlobalSettings.WIDTH, 
+        //        GlobalSettings.HEIGHT, Team.RED, Team.RED);
+        GameBoard board;
+        SetupGenerator generator = new SetupGenerator();
+        //board = generator.generateSetup();
+        board = generator.mirroredSetup();
+        //board = generator.smallSetup();
+        
+        // Set the JTable to the right dimensions.
+        this.jTable1.setModel(new DefaultTableModel(board.getHeight(), 
+                board.getWidth()));
+        
+        // Attach board to game state.
+        state.setGameBoard(board);
+        
+        Simulation simulation = new Simulation(state, this.jTable1);
+        BattleEngine battleEngine = new BattleEngine();
+        
+        AIBot attacker = new DefaultPlayer(Team.RED);
+        AIBot defender = new DefaultPlayer(Team.BLUE);
+        long computationTime = 2000;
+        System.out.println("Invoke Battle Engine");
+        BattleTranscript transcript = battleEngine.battle(state, 
+                attacker, defender, computationTime, simulation);
+        System.out.println("GAME ENDED");
+        
         //flagReachabilityTest();
-        setup();
+        //setup();
     }//GEN-LAST:event_startGameButtonActionPerformed
 
     private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
@@ -119,6 +164,10 @@ public class SearchToolPanel extends javax.swing.JPanel {
         
     }//GEN-LAST:event_resetButtonActionPerformed
 
+    private void runBattle() {
+        
+    }
+    
     private void setup() {
         // Puts a custom renderer for the JTable.
         GameState state = new GameState();
@@ -192,6 +241,25 @@ public class SearchToolPanel extends javax.swing.JPanel {
         
     }
     
+    private class GameTask extends SwingWorker<Void, MoveAction> {
+        
+        @Override
+        protected Void doInBackground() throws Exception {
+            return null;
+        }
+
+        @Override
+        protected void done() {
+            
+        }
+
+        @Override
+        protected void process(List<MoveAction> chunks) {
+            
+        }
+
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
@@ -200,4 +268,6 @@ public class SearchToolPanel extends javax.swing.JPanel {
     private javax.swing.JButton startGameButton;
     private javax.swing.JLabel turnLabel;
     // End of variables declaration//GEN-END:variables
+
 }
+

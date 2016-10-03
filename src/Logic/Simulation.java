@@ -13,6 +13,8 @@ import actions.SelectAction;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JComponent;
+import javax.swing.SwingUtilities;
 
 /**
  * Class which executes Actions performed by a controller, after which it
@@ -33,11 +35,19 @@ public class Simulation {
     private int currentlySelected;
     
     //private final Renderer renderer;
+    private final JComponent uiComponent;
     
     public Simulation(GameState state) {
         this.state = state;
         this.turn = Team.RED;
-    }    
+        this.uiComponent = null;
+    }
+    
+    public Simulation(GameState state, JComponent uiComponent) {
+        this.state = state;
+        this.turn = Team.RED; // Attacker starts.
+        this.uiComponent = uiComponent;
+    }
     
     /**
      * Method to execute a valid Ply.
@@ -149,14 +159,30 @@ public class Simulation {
                 selectedPiece.toggleHighlight();
             }
         } else if(action instanceof MoveAction) {
-            // These type of actions are supplied by the AI algorithm.
-            System.out.println("MoveAction: AI?");
+            // These type of actions are supplied by the AI bots.
+            System.out.println("MoveAction");
             MoveAction move = (MoveAction) action;
             GameBoard board = this.state.getGameBoard();
             // This function takes care of applying the move and incrementing
             // the move counter if the move is made by the attacker.
             board.applyMove(move);
+            
+            // Switch turns.
+            switchTurn();
         }
+        
+        // Update UI interface.
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                System.out.println("Redraw");
+                if(Simulation.this.uiComponent != null) {
+                    Simulation.this.uiComponent.repaint();
+                }
+            }
+        });
+        
     }
     
     private void endGame() {

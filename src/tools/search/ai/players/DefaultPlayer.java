@@ -31,7 +31,7 @@ public class DefaultPlayer implements AIBot {
         // Activate
         this.active = true;
         
-        System.out.println("DefaultPlayer.nextMove()");
+        System.out.println("DefaultPlayer.nextMove() (" + this.team + ")");
         HeuristicEvaluation evaluation = new HeuristicEvaluation() {
 
             @Override
@@ -42,18 +42,24 @@ public class DefaultPlayer implements AIBot {
                 int score = 0;
                 // How should we assign the score to the pieces?
                 for(GamePiece piece : pieces) {
-                    score+= piece.getRank().ordinal();
+                    score+= (piece.getRank().ordinal() + 1);
                 }
                 
                 int opponentScore = 0;
                 for(GamePiece enemy : opponentPieces) {
-                    opponentScore+= enemy.getRank().ordinal();
+                    opponentScore+= (enemy.getRank().ordinal() + 1);
                 }
                 // The order of this heuristic depends if the initial call
                 // is for the maximizing player or the minimizing player.
                 // The minimizingScore wants a lowest possible score, that is
                 //
-                return -1 * (score - opponentScore);
+                if(getTeam() == Team.RED) { // Maximizing player.
+                    return (score - opponentScore);
+                } else { // Minimizing player.
+                    return -1 * (score - opponentScore);
+                }
+                
+                //return -1 * (score - opponentScore);
             }
         };
         this.searchEngine.setHeuristic(evaluation);
@@ -80,12 +86,13 @@ public class DefaultPlayer implements AIBot {
                 1, -1, isAttacker);
         */
         System.out.println("Minimax Searching");
-        int range = 10; //10;
+        // Why does it lose at 1 if both players have the same AI?
+        int range = 10; //4; //3; //4; //1; //1; //3; //10; //1; //10;
         MoveAction move = this.searchEngine.iterativeDeepeningMinimax(node, 1, range, isAttacker);
         System.out.println("Reached Depth: " + this.searchEngine.getDeepestDepth());
         System.out.println("ExploredNodesCount: " + this.searchEngine.getExploredCount());
         if(move == null) {
-            throw new RuntimeException("Move == null");
+            throw new RuntimeException("Move == null (" + team + ")");
         }
         
         //System.out.println("Move: " + move.getPiece());
@@ -120,7 +127,7 @@ public class DefaultPlayer implements AIBot {
     @Override
     public void stop() {
         if(this.active) {
-            System.err.println("TIMEOUT DEFAULTPLAYER");
+            System.err.println("TIMEOUT DEFAULTPLAYER (" + this.team + ")");
         } else {
             System.err.println("Invoked Stop while not active.");
         }

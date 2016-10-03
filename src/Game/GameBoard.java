@@ -439,7 +439,9 @@ public class GameBoard {
         for(int r=0; r<this.height; r++) {
             for(int c=0; c<this.width; c++) {
                 GamePiece piece = this.board[r][c];
-                if(piece != null && piece.getRank() == type) {
+                // If this piece is of the given rank and given team.
+                if(piece != null && piece.getRank() == type 
+                        && piece.getTeam() == team) {
                     pieces.add(piece);
                 }
             }
@@ -463,10 +465,17 @@ public class GameBoard {
             return this.defender;
         }
         
+        // In our game the attacker should not have a flag, but for testing it
+        // is useful to let both teams compete for the flag.
+        List<GamePiece> attackerFlag = getPieces(this.attacker, Pieces.FLAG);
+        if(attackerFlag.isEmpty()) {
+            return this.defender;
+        }
+        
         // Has the flag been captured? Count the # of flags on the defending
         // side.
-        List<GamePiece> flag = getPieces(this.defender, Pieces.FLAG);
-        if(flag.isEmpty()) {
+        List<GamePiece> defenderFlag = getPieces(this.defender, Pieces.FLAG);
+        if(defenderFlag.isEmpty()) {
             return this.attacker;
         }        
         
@@ -480,7 +489,17 @@ public class GameBoard {
             }
         }
         
-        // TODO end game if there are no movable pieces left.
+        // Attacker has no pieces left to move.
+        List<GamePiece> movablePiecesAttacker = getMovablePieces(this.attacker);
+        if(movablePiecesAttacker.isEmpty()) {
+            return this.defender;
+        }
+        
+        // Defender has no pieces left to move.
+        List<GamePiece> movablePiecesDefender = getMovablePieces(this.defender);
+        if(movablePiecesDefender.isEmpty()) {
+            return this.attacker;
+        }
         
         // No end state.
         return null;
@@ -761,9 +780,11 @@ public class GameBoard {
             for(int c=0; c<this.width; c++) {
                 GamePiece piece = this.board[r][c];
                 if(piece != null) {
-                    builder.append(piece.getRank().getPieceSymbol());
+                    builder.append(piece.getTeam().getSymbol())
+                            .append(":")
+                            .append(piece.getRank().getPieceSymbol());
                 } else {
-                    builder.append(" ");
+                    builder.append("   ");
                 }
                 
                 if(c < this.width - 1) {
@@ -774,7 +795,7 @@ public class GameBoard {
             
             if(r < this.height - 1) {
                 for(int i=0; i<this.width; i++) {
-                    builder.append("-");
+                    builder.append("---");
                     if(i < this.width - 1) {
                         builder.append(" ");
                     }
@@ -783,5 +804,51 @@ public class GameBoard {
             }
         }
         return builder.toString();
+    }
+    
+    public static GameBoard loadBoard(String transcript, int w, int h) {
+        GameBoard board = new GameBoard(w, h, Team.RED, Team.BLUE);
+        String[] lines = transcript.split("\n");
+        
+        int row = 0;
+        for(String line : lines) {
+            if(line.contains("---")) {
+                continue;
+            }
+            
+            String[] cells = line.split("\\|");
+            int column = 0;
+            for(String cell : cells) {
+                // Cell is not empty.
+                //if(!cell.contains("\\s*")) {
+                if(!cell.contains("   ")) {
+                    // Parse the team.
+                    char teamSymbol = cell.charAt(0);
+                    Team team;
+                    if(teamSymbol == 'r') {
+                        team = Team.RED;
+                    } else if(teamSymbol == 'b') {
+                        team = Team.BLUE;
+                    } else {
+                        throw new RuntimeException("Bad team identifier for cell: " + cell);
+                    }
+                    
+                    // Parse the piece.
+                    char pieceSymbol = cell.charAt(2);
+                    try {
+                        //GamePiece piece = new GamePiece(Pieces.bySymbol(pieceSymbol + ""), team);
+                        board.setupPiece(column, row,
+                                Pieces.bySymbol(pieceSymbol + ""), team);
+                    } catch (InvalidPositionException ex) {
+                        Logger.getLogger(GameBoard.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                }
+                
+                column++;
+            }
+            row++;
+        }
+        
+        return board;
     }
 }
