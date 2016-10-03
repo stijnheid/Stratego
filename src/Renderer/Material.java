@@ -53,7 +53,7 @@ public enum Material {
     */
     
     GREEN (
-        new float[] {0/255f, 255/255f, 0/255f, 1f},
+        new float[] {0/255f, 255/255f, 0/255f, 0.5f},
         new float[] {1f, 1f, 1f, 1f},
         0f),
    /**

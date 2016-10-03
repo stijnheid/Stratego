@@ -56,17 +56,21 @@ public class Terrain extends Base {
     private final Camera camera;
     
     /** Instances of different textures */
-    public static Texture grass, vakje ,leaves, water;
+    public static Texture grass, vakje ,leaves, water, wood;
     
     private final int boardsize = 8;
     private final int terrainsize = 20;
     
     Skeleton test;
     
+    Tree tree;
+    
     
     public Terrain(){
         
         test = new Skeleton(new Vector(-3.5,-3.5,0));
+        
+        tree = new Tree(0,0,0, gl, this);
                 
         // Initialize the camera
         camera = new Camera();    
@@ -170,6 +174,8 @@ public class Terrain extends Base {
         vakje = loadTexture(pwd + "Vakje.jpg");
         leaves = loadTexture(pwd + "Leaves.jpg");
         water = loadTexture(pwd + "water.jpg");
+        wood = loadTexture(pwd + "water.jpg");
+        
         
         gs.theta = 4.5f;
         gs.phi = 0.5f;
@@ -315,6 +321,7 @@ public class Terrain extends Base {
         drawTerrain();
         drawBoard();
         test.draw(gl, glut);
+        tree.draw(gl, gs.tAnim);
     }
     
     public static void main (String[] args){
