@@ -22,7 +22,6 @@ import tools.search.ai.HeuristicEvaluation;
  */
 public class ModeratePlayer extends AbstractPlayer {
     
-    private AlphaBetaSearch searchEngine;
 
     public ModeratePlayer(Team team) {
         super.team = team;
@@ -39,13 +38,6 @@ public class ModeratePlayer extends AbstractPlayer {
         MoveAction move = this.searchEngine.iterativeDeepeningMinimax(node, 1, -1, false);
         
         return move;
-    }
-
-    @Override
-    public void stop() {
-        super.active = false;
-        // Interrupt algorithm.
-        this.searchEngine.timeout();
     }
     
     private class MyHeuristic implements HeuristicEvaluation {
