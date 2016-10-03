@@ -22,7 +22,6 @@ import java.util.stream.IntStream;
 import tools.search.ai.AIBot;
 import tools.search.ai.players.DefaultPlayer;
 import tools.search.ai.SetupGenerator;
-import tools.search.ai.players.ModeratePlayer;
 
 /**
  * 
@@ -31,15 +30,14 @@ import tools.search.ai.players.ModeratePlayer;
 public class BattleEngine {
     
     public static void main(String[] args) {
-        //new BattleEngine().runTests(); //initialize();
         try {
             //new BattleEngine().runTests(); //initialize();
-        new BattleEngine().initialize();
-        //new BattleEngine().testTranscript();
-        //new BattleEngine().testApplyUndoMove();
-        //new BattleEngine().testUnequalAttack();
-        //new BattleEngine().testAlphaBeta();
-        //new BattleEngine().smallBattle();
+            //new BattleEngine().initialize();
+            //new BattleEngine().testTranscript();
+            //new BattleEngine().testApplyUndoMove();
+            //new BattleEngine().testUnequalAttack();
+            //new BattleEngine().testAlphaBeta();
+            //new BattleEngine().smallBattle();
             //new BattleEngine().test();
             //new BattleEngine().testEndState();
             
@@ -60,7 +58,7 @@ public class BattleEngine {
         /**
         GameBoard board = new GameBoard(GlobalSettings.WIDTH, 
                 GlobalSettings.HEIGHT, Team.RED, Team.BLUE);*/
-        GameBoard board = new GameBoard(6, 6, Team.RED, Team.BLUE);
+        GameBoard board = new GameBoard(4, 6, Team.RED, Team.BLUE);
         loadDefensiveSetup(board);
         
         List<GamePiece> offensiveArmy = new ArrayList<>();
@@ -70,14 +68,14 @@ public class BattleEngine {
         System.out.println(board.transcript());
         
         AIBot attacker = new DefaultPlayer(Team.RED); //new RandomPlayer(Team.RED);
-        AIBot defender = new ModeratePlayer(Team.BLUE);
+        AIBot defender = new DefaultPlayer(Team.BLUE);
         System.out.println("Start Battle");
         battle(board, attacker, defender, 3000); //1500);
         System.out.println("Battle ended");
     }
     
     private void smallBattle() {
-        GameBoard board = new GameBoard(5, 5, Team.RED, Team.BLUE);
+        GameBoard board = new GameBoard(2, 5, Team.RED, Team.BLUE);
         try {
             // Setup the teams.
             board.setupPiece(0, 0, Pieces.SERGEANT, Team.RED);
@@ -85,10 +83,10 @@ public class BattleEngine {
             board.setupPiece(1, 0, Pieces.FLAG, Team.RED);
             board.setupPiece(1, 1, Pieces.CAPTAIN, Team.RED);
             
-            board.setupPiece(1, 4, Pieces.SERGEANT, Team.RED);
-            board.setupPiece(1, 3, Pieces.LIEUTENANT, Team.RED);
-            board.setupPiece(0, 4, Pieces.FLAG, Team.RED);
-            board.setupPiece(0, 3, Pieces.CAPTAIN, Team.RED);
+            board.setupPiece(1, 4, Pieces.SERGEANT, Team.BLUE);
+            board.setupPiece(1, 3, Pieces.LIEUTENANT, Team.BLUE);
+            board.setupPiece(0, 4, Pieces.FLAG, Team.BLUE);
+            board.setupPiece(0, 3, Pieces.CAPTAIN, Team.BLUE);
         } catch (InvalidPositionException ex) {
             Logger.getLogger(BattleEngine.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -109,15 +107,11 @@ public class BattleEngine {
             board.setupPiece(0, 5, Pieces.FLAG, Team.BLUE);
             board.setupPiece(0, 4, Pieces.BOMB, Team.BLUE);
             board.setupPiece(1, 5, Pieces.BOMB, Team.BLUE);
-            board.setupPiece(2, 5, Pieces.MAJOR, Team.BLUE);
-            board.setupPiece(3, 5, Pieces.MARSHALL, Team.BLUE);
+            board.setupPiece(2, 5, Pieces.MINER, Team.BLUE);
+            board.setupPiece(3, 5, Pieces.SERGEANT, Team.BLUE);
             board.setupPiece(1, 4, Pieces.CAPTAIN, Team.BLUE);
-            board.setupPiece(2, 4, Pieces.BOMB, Team.BLUE);
+            board.setupPiece(2, 4, Pieces.SERGEANT, Team.BLUE);
             board.setupPiece(3, 4, Pieces.LIEUTENANT, Team.BLUE);
-            board.setupPiece(4, 5, Pieces.LIEUTENANT, Team.BLUE);
-            board.setupPiece(4, 4, Pieces.COLONEL, Team.BLUE);
-            board.setupPiece(5, 5, Pieces.LIEUTENANT, Team.BLUE);
-            board.setupPiece(5, 4, Pieces.LIEUTENANT, Team.BLUE);
         } catch (InvalidPositionException ex) {
             Logger.getLogger(BattleEngine.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -150,18 +144,14 @@ public class BattleEngine {
         
         // Fixed Setup.
         try {
-            board.setupPiece(0, 0, Pieces.MARSHALL, Team.RED);
-            board.setupPiece(0, 1, Pieces.GENERAL, Team.RED);
-            board.setupPiece(1, 0, Pieces.MINER, Team.RED);
+            board.setupPiece(0, 0, Pieces.FLAG, Team.RED);
+            board.setupPiece(0, 1, Pieces.BOMB, Team.RED);
+            board.setupPiece(1, 0, Pieces.BOMB, Team.RED);
             board.setupPiece(2, 0, Pieces.MINER, Team.RED);
             board.setupPiece(3, 0, Pieces.SERGEANT, Team.RED);
             board.setupPiece(1, 1, Pieces.CAPTAIN, Team.RED);
             board.setupPiece(2, 1, Pieces.SERGEANT, Team.RED);
-            board.setupPiece(3, 1, Pieces.LIEUTENANT, Team.RED);
-            board.setupPiece(4, 1, Pieces.LIEUTENANT, Team.RED);
-            board.setupPiece(5, 0, Pieces.MINER, Team.RED);
-            board.setupPiece(4, 0, Pieces.LIEUTENANT, Team.RED);
-            board.setupPiece(5, 1, Pieces.MINER, Team.RED);
+            board.setupPiece(3, 1, Pieces.LIEUTENANT, Team.RED);            
         } catch (InvalidPositionException ex) {
             Logger.getLogger(BattleEngine.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -333,9 +323,9 @@ public class BattleEngine {
         state.setRunning(true);
         int iterations = 0;
         System.out.println("Start Game with computation time: " + computationTime);
-        BattleTranscript transcript = new BattleTranscript(board);
-        while(board.isEndState() == null) {
-            if(iterations >= 50) {
+        BattleTranscript transcript = new BattleTranscript(board, 
+                board.getAttacker(), board.getDefender());
+        
         System.out.println("Attacking team: " + board.getAttacker());
         System.out.println("Defending team: " + board.getDefender());
         
@@ -410,7 +400,7 @@ public class BattleEngine {
     
     // Make random moves.
     
-    public BattleResult battle() {
+    public BattleTranscript battle() {
         return null;
     }
     
@@ -575,7 +565,9 @@ public class BattleEngine {
         System.out.println();
         
         // Create transcript.
-        BattleTranscript transcript = new BattleTranscript(board);
+        BattleTranscript transcript = new BattleTranscript(board, 
+                board.getAttacker(), 
+                board.getDefender());
         transcript.addMove(new MoveAction(
                 Team.RED, new GamePiece(
                         Pieces.SERGEANT, Team.RED, new BoardPosition(2,1)), 
