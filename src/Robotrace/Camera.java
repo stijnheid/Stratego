@@ -32,9 +32,12 @@ public class Camera {
      * horizon, thus the up vector is equal to the Z vector.
      */
     private void setDefaultMode(CameraState gs) {
-        eye = new Vector(Math.cos(gs.theta) * gs.vDist * Math.cos(gs.phi) + gs.cnt.x(),
-                    Math.sin(gs.theta) * gs.vDist * Math.cos(gs.phi) + gs.cnt.y(),
-                    gs.vDist * Math.sin(gs.phi) + gs.cnt.z());//converting given variables to cartesian coordinates.
+        float theta = gs.theta;
+        float phi = gs.phi;
+        float vDist = gs.vDist;
+        eye = new Vector(Math.cos(theta) * vDist * Math.cos(phi) + gs.cnt.x(),
+                    Math.sin(theta) * vDist * Math.cos(phi) + gs.cnt.y(),
+                    vDist * Math.sin(phi) + gs.cnt.z());//converting given variables to cartesian coordinates.
             center = new Vector(gs.cnt.x(), gs.cnt.y(), gs.cnt.z());
             up = Z;
     }

@@ -45,8 +45,44 @@ public class Animation {
      * @param eye Vector representing the goal location of the camera.
      * @param center Vector representing the goal focus point of the camera.
      */
-    private void moveCamera (Vector eye, Vector center){
-        
+    public void moveCamera (Vector eye, Vector center){
+        Thread pan = new Thread(new Runnable() {
+            public void run() {
+                //current Camera variables.
+                float phi1 = terrain.cs.phi;
+                float theta1 = terrain.cs.theta;
+                float dist1 = terrain.cs.vDist;
+                //goal Camera variables.
+                float phi2 = (float) getPhi(eye, center);
+                float theta2 = (float) getTheta(eye, center);
+                float dist2 = (float) getDist(eye, center);
+                //Camera variables during transit.
+                float phi3 = phi1, theta3 = theta1, dist3 = dist1;
+                //loop over a period of 60 frames.
+                System.out.println("Moving from "+phi1+", "+theta1+", "+dist1+" to "+phi2+", "+theta2+", "+dist2);
+                for (int i=0; i<60; i++){
+                    try {//update on frame refresh.
+                        synchronized(terrain.cs.refresh){
+                            terrain.cs.refresh.wait();  
+                            phi3 += (phi2-phi1)/60;
+                            theta3 += (theta2-theta1)/60;
+                            dist3 += (dist2-dist1)/60;
+                            terrain.cs.setCamera(phi3, theta3, dist3); 
+                            System.out.println("changed to "+phi3+", "+theta3+", "+dist3);
+                        }
+                    }   catch (Exception e){}
+                }
+                //make sure camera is at the final location.
+                terrain.cs.setCamera(phi2, theta2, dist2);  
+                try {
+                                    Thread.sleep(500);
+                }catch (Exception e){
+                    
+                }
+                terrain.cs.setCamera(phi1, theta1, dist1);
+            }
+        });
+        pan.start();
     }
     
     /**

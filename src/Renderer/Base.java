@@ -69,7 +69,7 @@ abstract public class Base {
     static public float CENTER_POINT_CHANGE = 1f;
     
     // Desired frames per second.
-    static public int FPS = 30;
+    static public int FPS = 60;
     
     
     // Global state, created at startup.
@@ -299,18 +299,24 @@ abstract public class Base {
             float dY = e.getY() - dragSourceY;
             
             // Change camera angle when left button is pressed.
-            if(mouseButton == MouseEvent.BUTTON1) {
+            try {// Camera settings are synchronised.
+                cs.varLock.lock();
+                if(mouseButton == MouseEvent.BUTTON1) {
                 cs.theta += dX * DRAG_PIXEL_TO_RADIAN;
                 cs.phi = Math.max(PHI_MIN,
                                     Math.min(PHI_MAX,
                                              cs.phi + dY * DRAG_PIXEL_TO_RADIAN));
+                }
+                // Change vWidth when right button is pressed.
+                else if(mouseButton == MouseEvent.BUTTON3) {
+                    cs.vWidth = Math.max(VWIDTH_MIN,
+                                         Math.min(VWIDTH_MAX,
+                                                  cs.vWidth + dY * DRAG_PIXEL_TO_VWIDTH));
+                }
+            }   finally {
+                cs.varLock.unlock();
             }
-            // Change vWidth when right button is pressed.
-            else if(mouseButton == MouseEvent.BUTTON3) {
-                cs.vWidth = Math.max(VWIDTH_MIN,
-                                     Math.min(VWIDTH_MAX,
-                                              cs.vWidth + dY * DRAG_PIXEL_TO_VWIDTH));
-            }
+
             
             dragSourceX = e.getX();
             dragSourceY = e.getY();

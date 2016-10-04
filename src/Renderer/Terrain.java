@@ -62,16 +62,14 @@ public class Terrain extends Base {
     private final int terrainsize = 20;
     
     Skeleton test;
-    
+    boolean pan;
     
     public Terrain(){
-        
         test = new Skeleton(new Vector(-3.5,-3.5,0));
                 
         // Initialize the camera
         camera = new Camera();    
-        
-
+        pan = true;
     }
     
        /**
@@ -90,7 +88,12 @@ public class Terrain extends Base {
         // Modify this to meet the requirements in the assignment.
         float aspectRatio = (float) cs.w / (float) cs.h;
         double fovy = 60;
-        glu.gluPerspective(fovy, aspectRatio, 0.1 * cs.vDist, 10.0 * cs.vDist);
+        try {/** Since vDist is a synchronised variable. */
+            cs.varLock.lock();
+            glu.gluPerspective(fovy, aspectRatio, 0.1 * cs.vDist, 10.0 * cs.vDist); 
+        }   finally {
+            cs.varLock.unlock();
+        }
         // Set camera.
         gl.glMatrixMode(GL_MODELVIEW);
         gl.glLoadIdentity();
@@ -167,10 +170,6 @@ public class Terrain extends Base {
         vakje = loadTexture(pwd + "Vakje.jpg");
         leaves = loadTexture(pwd + "Leaves.jpg");
         water = loadTexture(pwd + "water.jpg");
-        
-        cs.theta = 4.5f;
-        cs.phi = 0.5f;
-
     }
     
     /**
@@ -181,7 +180,7 @@ public class Terrain extends Base {
         double xmax = terrainsize/2;
         double ymin = -terrainsize/2;
         double ymax = terrainsize/2;
-        double delta = 0.1;
+        double delta = 0.5;
         gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Material.GROUND.diffuse, 0);
         gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.GROUND.specular, 0);
         gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Material.GROUND.shininess);
@@ -194,7 +193,7 @@ public class Terrain extends Base {
 
             for(double y = ymin; y <= ymax; y += delta){
                             
-                if (! ((x > -boardsize/2 && x <boardsize/2) && (y > -boardsize/2 && y <boardsize/2))){
+                if (! ((x > -boardsize/2 && (x-delta) <boardsize/2) && (y > -boardsize/2 && (y-delta) <boardsize/2))){
                     gl.glBegin(GL_TRIANGLE_STRIP);
 
 
@@ -309,10 +308,22 @@ public class Terrain extends Base {
         
         gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         
+        //set camera to current Camera variables.
+        camera.update(cs);
+        
         drawTerrain();
         drawBoard();
         test.draw(gl, glut);
-        System.out.println("current phi: "+cs.phi+" theta: "+cs.theta);
+        if(pan){
+            Animation ani = new Animation(null, 0, null, this);
+            pan=false;
+            ani.moveCamera(new Vector(0,5,5), new Vector(0,0,0));
+        }
+        
+        /**Increment frame count AFTER rendering.*/
+        cs.frameTick();
+        System.out.println("Cumulative fps = "+(cs.frameCount()/(cs.tAnim+1)));
+        
     }
     
     public static void main (String[] args){
