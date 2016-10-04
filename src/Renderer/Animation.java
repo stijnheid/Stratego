@@ -59,7 +59,6 @@ public class Animation {
                 //Camera variables during transit.
                 float phi3 = phi1, theta3 = theta1, dist3 = dist1;
                 //loop over a period of 60 frames.
-                System.out.println("Moving from "+phi1+", "+theta1+", "+dist1+" to "+phi2+", "+theta2+", "+dist2);
                 for (int i=0; i<60; i++){
                     try {//update on frame refresh.
                         synchronized(terrain.cs.refresh){
@@ -68,7 +67,6 @@ public class Animation {
                             theta3 += (theta2-theta1)/60;
                             dist3 += (dist2-dist1)/60;
                             terrain.cs.setCamera(phi3, theta3, dist3); 
-                            System.out.println("changed to "+phi3+", "+theta3+", "+dist3);
                         }
                     }   catch (Exception e){}
                 }
