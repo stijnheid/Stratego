@@ -8,14 +8,17 @@ import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- *  Class holding data regarding opengl viewing (camera, center, etc).
+ *  Class holding data regarding openGL viewing (camera, centre, etc).
  */
 public class CameraState {
     
     public float tAnim;         // Time since start of animation in seconds.
     private long frameCount;     //Amount of frames having been drawn since init.
+    
     public final Object refresh;
     public final Lock varLock;
+    
+    public Skeleton[][] pieces;
     
     public int w;               // Width of window in pixels.
     public int h;               // Height of window in pixels.
@@ -37,6 +40,21 @@ public class CameraState {
         frameCount = 0;
         refresh = new Object();
         varLock = new ReentrantLock();
+        
+        pieces = new Skeleton[6][6];
+        double offset = 2.5;
+        for(double i=0; i < 6; i++){
+            if(i==0 || i==1){
+                for(double j=0; j<6; j++){
+                    pieces[(int)i][(int)j] = new Skeleton(new Vector(j-offset,i-offset,0));
+                }
+            }   else if(i==4 || i==5){
+                for(double j=0;j<6; j++){
+                    pieces[(int)i][(int)j] = new Skeleton(new Vector(j-offset, i-offset,0));
+                    pieces[(int)i][(int)j].rotate(180);
+                }
+            }
+        }
     }
     
     public void setCamera(float phi, float theta, float vDist){

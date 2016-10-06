@@ -58,18 +58,20 @@ public class Terrain extends Base {
     /** Instances of different textures */
     public static Texture grass, vakje ,leaves, water;
     
-    private final int boardsize = 8;
+    private final int boardsize = 6;
     private final int terrainsize = 20;
     
-    Skeleton test;
+    //test stuff
     boolean pan;
+    double lastframe;
+    double thisframe;
     
     public Terrain(){
-        test = new Skeleton(new Vector(-3.5,-3.5,0));
                 
         // Initialize the camera
         camera = new Camera();    
         pan = true;
+        lastframe = System.currentTimeMillis();
     }
     
        /**
@@ -238,11 +240,6 @@ public class Terrain extends Base {
         int delta = 1;
         double z = 0;
         this.vakje.bind(gl);
-        boolean[][] cells = new boolean[8][8];
-        cells[2][3]=true;
-        cells[2][4]=true;
-        cells[5][3]=true;
-        cells[5][4]=true;
         
         gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Material.CONCRETE.diffuse, 0);
         gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.CONCRETE.specular, 0);
@@ -253,29 +250,43 @@ public class Terrain extends Base {
         gl.glNormal3d(0, 0, 1);
         for(double x = xmin; x < xmax; x += delta){
             for(double y = ymin; y < ymax; y += delta){
-                if (!cells[(int)x+4][(int)y+4]){
-                    gl.glBegin(GL_QUAD_STRIP);
-                    gl.glTexCoord2d(0, 0);
-                    gl.glVertex3d(x, y, z);
-                    gl.glTexCoord2d(1, 0);
-                    gl.glVertex3d(x + delta, y, z);
-                    gl.glTexCoord2d(0, 1);
-                    gl.glVertex3d(x, y + delta, z);
-                    gl.glTexCoord2d(1, 1);
-                    gl.glVertex3d(x + delta, y + delta, z);
-                    gl.glEnd();                
-                }
+                gl.glBegin(GL_QUAD_STRIP);
+                gl.glTexCoord2d(0, 0);
+                gl.glVertex3d(x, y, z);
+                gl.glTexCoord2d(1, 0);
+                gl.glVertex3d(x + delta, y, z);
+                gl.glTexCoord2d(0, 1);
+                gl.glVertex3d(x, y + delta, z);
+                gl.glTexCoord2d(1, 1);
+                gl.glVertex3d(x + delta, y + delta, z);
+                gl.glEnd();               
             }
         }
+        //cross signifying tile (0,0).
+        gl.glBegin(GL_TRIANGLE_STRIP);
+        gl.glVertex3d(xmin, ymin, z);
+        gl.glVertex3d(xmin+1, ymin+1, z);
+        gl.glVertex3d(xmin+0.5, ymin+0.5, 0.1);
+        gl.glEnd();
+        
+        gl.glBegin(GL_TRIANGLE_STRIP);
+        gl.glVertex3d(xmin, ymin+1, z);
+        gl.glVertex3d(xmin+1, ymin, z);
+        gl.glVertex3d(xmin+0.5, ymin+0.5, 0.1);
+        gl.glEnd();
     }
     
     /**
-     * Method to draw a single piece at the specified position.
-     * @param x the x coordinate of this piece (on the board).
-     * @param y the y coordinate of this piece (on the board).
+     * Method to draw pieces.
      */
-    public void drawPiece(int x, int y){
-        
+    public void drawPieces(){
+        for(int i=0; i<boardsize; i++){
+            for (int j=0; j<boardsize; j++){
+                if(cs.pieces[i][j] != null){
+                    cs.pieces[i][j].draw(gl, glut);
+                }
+            }
+        }
     }
     
     /**
@@ -313,7 +324,7 @@ public class Terrain extends Base {
         
         drawTerrain();
         drawBoard();
-        test.draw(gl, glut);
+        drawPieces();
         if(pan){
             Animation ani = new Animation(this, null, 0, null);
             pan=false;
@@ -322,8 +333,9 @@ public class Terrain extends Base {
         
         /**Increment frame count AFTER rendering.*/
         cs.frameTick();
-        System.out.println("Cumulative fps = "+(cs.frameCount()/(cs.tAnim+1)));
-        
+        thisframe = System.currentTimeMillis();
+        System.out.println("Currently displaying "+(int)(1000/(thisframe-lastframe))+" frames per second");
+        lastframe = thisframe;
     }
     
     public static void main (String[] args){
