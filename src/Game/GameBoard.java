@@ -467,10 +467,12 @@ public class GameBoard {
         
         // In our game the attacker should not have a flag, but for testing it
         // is useful to let both teams compete for the flag.
+        /*
         List<GamePiece> attackerFlag = getPieces(this.attacker, Pieces.FLAG);
         if(attackerFlag.isEmpty()) {
             return this.defender;
         }
+        */
         
         // Has the flag been captured? Count the # of flags on the defending
         // side.
