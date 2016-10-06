@@ -13,20 +13,35 @@ import Game.GamePiece;
  */
 public class WalkAnimation extends Animation{
     
+    /*Direction of movement.*/
+    private Vector direction;
+       
     public WalkAnimation(GamePiece subject, int AnimType, BoardPosition target, Terrain terrain){
-        super(subject, AnimType, target, terrain);
+        super(terrain, subject, AnimType, target);
     }
     
     @Override
     public void execute(){
-        
+        faceTarget();
+        Thread walk = new Thread(() -> {
+            for(int i=0; i < duration; i++){
+                try {
+                    synchronized(terrain.cs.refresh){
+                        terrain.cs.refresh.wait();
+                        refresh(i);
+                    }
+                }   catch (Exception e){}
+            }
+        });
+        walk.start();
     }
     
-    private void startWalk(){
-        
-    }
-    
-    private void endWalk(){
+    /**
+     * Method to update the rotation and translation variables for the next frame.
+     * Called right after a CameraState.refresh signal.
+     * @param frame which frame of the animation is to be displayed next.
+     */
+    private void refresh(int frame){
         
     }
     

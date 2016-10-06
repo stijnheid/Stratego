@@ -315,7 +315,7 @@ public class Terrain extends Base {
         drawBoard();
         test.draw(gl, glut);
         if(pan){
-            Animation ani = new Animation(null, 0, null, this);
+            Animation ani = new Animation(this, null, 0, null);
             pan=false;
             ani.moveCamera(new Vector(0,5,5), new Vector(0,0,0));
         }

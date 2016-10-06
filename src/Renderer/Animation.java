@@ -17,13 +17,20 @@ public class Animation {
     public static int ATTACK = 1;
     public static int DIE = 2;
     
-    GamePiece subject;
+    /*Duration of the animation (in frames).*/
+    protected final static int duration = 60;
     
-    int AnimType;
+    /*GamePiece on which this animation acts.*/
+    protected final GamePiece subject;
     
-    Terrain terrain;
+    /*Which animation to perform (WALK/ATTACK/DIE).*/
+    protected final int AnimType;//one of [0,1,2].
     
-    BoardPosition target;
+    /*Terrain on which to perform animation (for openGL variables).*/
+    protected final Terrain terrain;
+    
+    /*Goal position of this piece after the animation.*/
+    protected final BoardPosition target;
     
     /**
      * Constructor for an Animation.
@@ -32,7 +39,7 @@ public class Animation {
      * @param target where to move (in the case of walking) or what to attack (otherwise).
      * @param terrain the scene on which to operate (required for passing openGL variables).
      */
-    public Animation(GamePiece subject, int AnimType, BoardPosition target, Terrain terrain){
+    public Animation(Terrain terrain, GamePiece subject, int AnimType, BoardPosition target){
         this.subject = subject;
         this.AnimType = AnimType;
         this.terrain = terrain;
@@ -46,8 +53,7 @@ public class Animation {
      * @param center Vector representing the goal focus point of the camera.
      */
     public void moveCamera (Vector eye, Vector center){
-        Thread pan = new Thread(new Runnable() {
-            public void run() {
+        Thread pan = new Thread(() -> {
                 //current Camera variables.
                 float phi1 = terrain.cs.phi;
                 float theta1 = terrain.cs.theta;
@@ -59,26 +65,19 @@ public class Animation {
                 //Camera variables during transit.
                 float phi3 = phi1, theta3 = theta1, dist3 = dist1;
                 //loop over a period of 60 frames.
-                for (int i=0; i<60; i++){
+                for (int i=0; i<duration; i++){
                     try {//update on frame refresh.
                         synchronized(terrain.cs.refresh){
                             terrain.cs.refresh.wait();  
-                            phi3 += (phi2-phi1)/60;
-                            theta3 += (theta2-theta1)/60;
-                            dist3 += (dist2-dist1)/60;
+                            phi3 += (phi2-phi1)/duration;
+                            theta3 += (theta2-theta1)/duration;
+                            dist3 += (dist2-dist1)/duration;
                             terrain.cs.setCamera(phi3, theta3, dist3); 
                         }
                     }   catch (Exception e){}
                 }
                 //make sure camera is at the final location.
                 terrain.cs.setCamera(phi2, theta2, dist2);  
-                try {
-                                    Thread.sleep(500);
-                }catch (Exception e){
-                    
-                }
-                terrain.cs.setCamera(phi1, theta1, dist1);
-            }
         });
         pan.start();
     }
