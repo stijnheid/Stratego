@@ -30,7 +30,7 @@ public final class MainFrame extends javax.swing.JFrame {
 
         glPanel = new GLJPanel();
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setTitle("RobotRace");
+        setTitle("Stratego");
 
         glPanel.setPreferredSize(new java.awt.Dimension(800, 800));
         glPanel.addMouseListener(new java.awt.event.MouseAdapter() {

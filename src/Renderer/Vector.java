@@ -10,7 +10,7 @@ package Renderer;
  */
 public class Vector {
     
-    public float x,y,z;
+    public double x,y,z;
     
     public Vector(float x, float y, float z){
         this.x=x;
@@ -19,9 +19,9 @@ public class Vector {
     }
     
     public Vector(double x, double y, double z){
-        this.x = (float) x;
-        this.y = (float) y;
-        this.z = (float) z;
+        this.x = x;
+        this.y = y;
+        this.z = z;
     }
     
     public Vector(Vector a){
@@ -74,8 +74,8 @@ public class Vector {
      */
     public void rotate(double deg){
         double rad = Math.toRadians(deg);
-        x = x * (float)Math.cos(rad) - y * (float)Math.sin(rad);
-        y = x * (float)Math.sin(rad) + y * (float)Math.cos(rad);
+        x = x * Math.cos(rad) - y * (float)Math.sin(rad);
+        y = x * Math.sin(rad) + y * (float)Math.cos(rad);
     }
     
     /**
@@ -84,9 +84,9 @@ public class Vector {
      * @return vector perpendicular to this and a.
      */
     public Vector cross(Vector a){
-        float x1 = y * a.z - z * a.y;
-        float y1 = z * a.x - x * a.z;
-        float z1 = x * a.y - y * a.x;
+        double x1 = y * a.z - z * a.y;
+        double y1 = z * a.x - x * a.z;
+        double z1 = x * a.y - y * a.x;
         
         return new Vector(x1,y1,z1);
     }
@@ -97,9 +97,9 @@ public class Vector {
      * @return 
      */
     public Vector between(Vector a){
-        float x1 = (x + a.x) / 2;
-        float y1 = (y + a.y) / 2;
-        float z1 = (z + a.z) / 2;
+        double x1 = (x + a.x) / 2;
+        double y1 = (y + a.y) / 2;
+        double z1 = (z + a.z) / 2;
         
         return new Vector(x1,y1,z1);
     }

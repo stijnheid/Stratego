@@ -18,7 +18,7 @@ public class Animation {
     public static int DIE = 2;
     
     /*Duration of the animation (in frames).*/
-    protected final static int duration = 60;
+    protected final static int duration = 30;
     
     /*GamePiece on which this animation acts.*/
     protected final GamePiece subject;
@@ -32,6 +32,8 @@ public class Animation {
     /*Goal position of this piece after the animation.*/
     protected final BoardPosition target;
     
+    protected Skeleton skel;
+    
     /**
      * Constructor for an Animation.
      * @param subject piece executing the animation.
@@ -44,6 +46,11 @@ public class Animation {
         this.AnimType = AnimType;
         this.terrain = terrain;
         this.target = target;
+        try {
+            this.skel = terrain.cs.pieces[subject.getPosition().getX()][subject.getPosition().getY()];    
+        }   catch (Exception e){
+            this.skel = new Skeleton(new BoardPosition(1,0));
+        }
     }
     
     /**
@@ -64,7 +71,7 @@ public class Animation {
                 float dist2 = (float) getDist(eye, center);
                 //Camera variables during transit.
                 float phi3 = phi1, theta3 = theta1, dist3 = dist1;
-                //loop over a period of 60 frames.
+                //loop over a period of frames.
                 for (int i=0; i<duration; i++){
                     try {//update on frame refresh.
                         synchronized(terrain.cs.refresh){
@@ -94,18 +101,19 @@ public class Animation {
      * Method to make the GamePiece face its target (before starting to walk/attack).
      */
     public void faceTarget(){
-        int x = subject.getPosition().getX();
-        int y = subject.getPosition().getY();
+        BoardPosition pos = skel.getPosition();
+        int x = pos.getX();
+        int y = pos.getY();
         if (target.getX() > x){
-            //rotate to face forward.
+            skel.rotate(0);
         }   else if(target.getX() == x){
                 if(target.getY() > y){
-                    //rotate to face right.
+                    skel.rotate(-90);
                 }   else {
-                    //rotate to face left.
+                    skel.rotate(90);
                 }
         }   else {
-            //rotate to face backwards.
+            skel.rotate(180);
         }
     }
     

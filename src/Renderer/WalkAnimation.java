@@ -15,14 +15,17 @@ public class WalkAnimation extends Animation{
     
     /*Direction of movement.*/
     private Vector direction;
-       
-    public WalkAnimation(GamePiece subject, int AnimType, BoardPosition target, Terrain terrain){
+    
+    public WalkAnimation(Terrain terrain, GamePiece subject, int AnimType, BoardPosition target){
         super(terrain, subject, AnimType, target);
     }
     
     @Override
     public void execute(){
         faceTarget();
+        direction = new Vector(1,0,0);
+        direction.rotate(skel.getRotation());
+        direction.scale(1/(float)duration);
         Thread walk = new Thread(() -> {
             for(int i=0; i < duration; i++){
                 try {
@@ -42,7 +45,9 @@ public class WalkAnimation extends Animation{
      * @param frame which frame of the animation is to be displayed next.
      */
     private void refresh(int frame){
-        
+        skel.move(direction);
+        skel.hipLRotX = (frame*20) % 360;
+        skel.hipRRotX = (frame*-20) % 360;
     }
     
 }

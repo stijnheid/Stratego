@@ -44,7 +44,6 @@ public class CameraState {
         varLock = new ReentrantLock();
         
         pieces = new Skeleton[6][6];
-        double offset = 2.5;
         for(int i=0; i < 6; i++){
             if(i==0 || i==1){
                 for(int j=0; j<6; j++){
@@ -79,6 +78,5 @@ public class CameraState {
     
     public long frameCount(){
         return frameCount;
-    }
-    
+    }    
 }

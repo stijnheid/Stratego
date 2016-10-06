@@ -262,7 +262,7 @@ public class Terrain extends Base {
                 gl.glEnd();               
             }
         }
-        //cross signifying tile (0,0).
+        //cross signifying tile (0,0) (for testing purposes).
         gl.glBegin(GL_TRIANGLE_STRIP);
         gl.glVertex3d(xmin, ymin, z);
         gl.glVertex3d(xmin+1, ymin+1, z);
@@ -326,11 +326,12 @@ public class Terrain extends Base {
         drawBoard();
         drawPieces();
         if(pan){
-            Animation ani = new Animation(this, null, 0, null);
+            Animation ani = new WalkAnimation(this, null, 0, new Game.BoardPosition(2,0));
             pan=false;
             ani.moveCamera(new Vector(0,5,5), new Vector(0,0,0));
+            ani.execute();
         }
-        
+               
         /**Increment frame count AFTER rendering.*/
         cs.frameTick();
         thisframe = System.currentTimeMillis();
