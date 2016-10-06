@@ -21,7 +21,6 @@ import tools.search.ai.HeuristicEvaluation;
  * @author s122041
  */
 public class ModeratePlayer extends AbstractPlayer {
-    
 
     public ModeratePlayer(Team team) {
         super.team = team;

@@ -70,7 +70,7 @@ public class BattleEngine {
         AIBot attacker = new DefaultPlayer(Team.RED); //new RandomPlayer(Team.RED);
         AIBot defender = new DefaultPlayer(Team.BLUE);
         System.out.println("Start Battle");
-        battle(board, attacker, defender, 3000); //1500);
+        battle(board, attacker, defender, 3000, 40); //1500);
         System.out.println("Battle ended");
     }
     
@@ -97,7 +97,7 @@ public class BattleEngine {
         // Execute the battle.
         int computationTime = 2000;
         // Do we also want to limit the search depth?
-        battle(board, attacker, defender, computationTime);
+        battle(board, attacker, defender, computationTime, 40);
     }
     
     // Load the defensive setup for the computer, this is one of the setups
@@ -308,8 +308,8 @@ public class BattleEngine {
         return transcript;
     }
     
-    private void battle(GameBoard board, AIBot attacker, AIBot defender, 
-            long computationTime) {
+    public void battle(GameBoard board, AIBot attacker, AIBot defender, 
+            long computationTime, int maxIterations) {
         // Wrap around in a GameState
         GameState state = new GameState();
         state.setGameBoard(board);
@@ -331,7 +331,8 @@ public class BattleEngine {
         
         Team winner;
         while((winner = board.isEndState()) == null) {
-            if(iterations >= 40) { //30) {
+            if(maxIterations != -1 && iterations >= maxIterations) {
+                System.out.println("ENDED LONG MATCH");
                 break;
             }
             
