@@ -20,8 +20,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
 import tools.search.ai.AIBot;
+import tools.search.ai.AlphaBetaSearch;
+import tools.search.ai.GameNode;
 import tools.search.ai.players.DefaultPlayer;
 import tools.search.ai.SetupGenerator;
+import tools.search.ai.players.Attacker;
+import tools.search.ai.players.ModeratePlayer;
 
 /**
  * 
@@ -30,22 +34,20 @@ import tools.search.ai.SetupGenerator;
 public class BattleEngine {
     
     public static void main(String[] args) {
-        try {
-            //new BattleEngine().runTests(); //initialize();
-            //new BattleEngine().initialize();
-            //new BattleEngine().testTranscript();
-            //new BattleEngine().testApplyUndoMove();
-            //new BattleEngine().testUnequalAttack();
-            //new BattleEngine().testAlphaBeta();
-            //new BattleEngine().smallBattle();
-            //new BattleEngine().test();
-            //new BattleEngine().testEndState();
-            
-            
-            new BattleEngine().debug();
-        } catch (InvalidPositionException ex) {
-            Logger.getLogger(BattleEngine.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        //new BattleEngine().runTests(); //initialize();
+        //new BattleEngine().initialize();
+        //new BattleEngine().testTranscript();
+        //new BattleEngine().testApplyUndoMove();
+        //new BattleEngine().testUnequalAttack();
+        //new BattleEngine().testAlphaBeta();
+        //new BattleEngine().smallBattle();
+        //new BattleEngine().test();
+        //new BattleEngine().testEndState();
+
+
+        //new BattleEngine().debug();
+        //new BattleEngine().testEpicWeirdness();
+        new BattleEngine().testAlphaBeta();
     }
     
     public void runTests() {
@@ -229,6 +231,32 @@ public class BattleEngine {
         // Test end state.
         Team winner = board.isEndState();
         System.out.println("Winner: " + winner);
+    }
+    
+    private void testEpicWeirdness() {
+        String setup = "r:9|r:7|r:2|r:4|r:2|r:S\n" +
+                        "--- --- --- --- --- ---\n" +
+                        "   |r:4|r:5|r:6|r:5|r:2\n" +
+                        "--- --- --- --- --- ---\n" +
+                        "r:8|   |   |   |   |   \n" +
+                        "--- --- --- --- --- ---\n" +
+                        "   |   |   |   |   |   \n" +
+                        "--- --- --- --- --- ---\n" +
+                        "b:B|b:5|b:6|b:4|b:5|b:9\n" +
+                        "--- --- --- --- --- ---\n" +
+                        "b:F|b:B|b:4|b:4|b:B|b:7";
+        
+        GameBoard board = GameBoard.loadBoard(setup, 6, 6);
+        // Print board.
+        System.out.println(board.transcript());
+        
+        // Test move.
+        GamePiece piece = new GamePiece(Pieces.LIEUTENANT, Team.BLUE, new BoardPosition(2, 5));
+        MoveAction move = new MoveAction(Team.BLUE, piece, new BoardPosition(2,5), new BoardPosition(2,4));
+        
+        System.out.println("Apply move.");
+        board.applyMove(move);
+        System.out.println(board.transcript());
     }
     
     public BattleTranscript battle(GameState state, AIBot attacker, AIBot defender, 
@@ -598,6 +626,7 @@ public class BattleEngine {
     
     private void testAlphaBeta() {
         SetupGenerator generator = new SetupGenerator();
+        /**
         GameBoard board = generator.generateSetup();
         
         try {
@@ -606,13 +635,31 @@ public class BattleEngine {
         } catch (InvalidPositionException ex) {
             Logger.getLogger(BattleEngine.class.getName()).log(Level.SEVERE, null, ex);
         }
+        */
+        
+        String setup = "r:9|r:7|r:2|r:4|r:2|r:S\n" +
+                        "--- --- --- --- --- ---\n" +
+                        "r:8|r:4|r:5|r:6|r:5|r:2\n" +
+                        "--- --- --- --- --- ---\n" +
+                        "   |   |   |   |   |   \n" +
+                        "--- --- --- --- --- ---\n" +
+                        "   |   |   |   |   |   \n" +
+                        "--- --- --- --- --- ---\n" +
+                        "b:B|b:5|b:6|b:4|b:5|b:9\n" +
+                        "--- --- --- --- --- ---\n" +
+                        "b:F|b:B|b:4|b:4|b:B|b:7";
+        
+        GameBoard board = GameBoard.loadBoard(setup, 6, 6);
+        
         System.out.println("Initial Board Setup:");
         System.out.println(board.transcript());
         
         GameState state = new GameState();
         state.setGameBoard(board);
         
-        AIBot bot = new DefaultPlayer(Team.BLUE);
+        //AIBot bot = new DefaultPlayer(Team.BLUE);
+        //AIBot bot = new Attacker(Team.RED);
+        AIBot bot = new ModeratePlayer(Team.BLUE);
         MoveAction move = timedAIMove((GameState) state.clone(), 
                 bot, 
                 1500);
@@ -629,5 +676,31 @@ public class BattleEngine {
         System.out.println(board.transcript());
         
         System.out.println("Attacker Moves: " + state.getGameBoard().getMoveCount());
+    }
+    
+    private void testAlphaBet() {
+        AlphaBetaSearch search = new AlphaBetaSearch(null);
+        GameState state = new GameState();
+        String setup = "r:9|r:7|r:2|r:4|r:2|r:S\n" +
+                        "--- --- --- --- --- ---\n" +
+                        "r:8|r:4|r:5|r:6|r:5|r:2\n" +
+                        "--- --- --- --- --- ---\n" +
+                        "   |   |   |   |   |   \n" +
+                        "--- --- --- --- --- ---\n" +
+                        "   |   |   |   |   |   \n" +
+                        "--- --- --- --- --- ---\n" +
+                        "b:B|b:5|b:6|b:4|b:5|b:9\n" +
+                        "--- --- --- --- --- ---\n" +
+                        "b:F|b:B|b:4|b:4|b:B|b:7";
+        
+        GameBoard board = GameBoard.loadBoard(setup, 6, 6);
+        state.setGameBoard(board);
+        
+        GameNode node = new GameNode(state);
+        System.out.println("Happy AlphaBeta");
+        long start = System.currentTimeMillis();
+        search.iterativeDeepeningAlphaBeta(node, 1, 1, true);
+        long end = System.currentTimeMillis();
+        System.out.println("AlphaBeta finished in " + (end - start) + " ms.");
     }
 }

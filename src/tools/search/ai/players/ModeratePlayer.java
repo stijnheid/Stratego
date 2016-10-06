@@ -30,8 +30,7 @@ import tools.search.ai.WeighedHeuristicTerm;
 public class ModeratePlayer extends AbstractPlayer {
 
     public ModeratePlayer(Team team) {
-        super.team = team;
-        this.searchEngine = new AlphaBetaSearch(null);
+        super(team);
     }
 
     @Override
@@ -41,7 +40,8 @@ public class ModeratePlayer extends AbstractPlayer {
         this.searchEngine.setHeuristic(new MyHeuristic());
         
         GameNode node = new GameNode(state);
-        MoveAction move = this.searchEngine.iterativeDeepeningMinimax(node, 1, -1, false);
+        //MoveAction move = this.searchEngine.iterativeDeepeningMinimax(node, 1, -1, false);
+        MoveAction move = this.searchEngine.iterativeDeepeningAlphaBeta(node, 1, -1, false);
         
         return move;
     }
@@ -61,7 +61,7 @@ public class ModeratePlayer extends AbstractPlayer {
     
     private class PieceValue extends WeighedHeuristicTerm {
         HashMap<Pieces, Integer> defender = new HashMap<>();
-        HashMap<Pieces, Integer> attacker          = new HashMap<>();
+        HashMap<Pieces, Integer> attacker = new HashMap<>();
 
         @Override
         public double computeScore(GameState state) {

@@ -9,7 +9,7 @@ import Game.GameBoard;
 import Game.Team;
 import tools.search.ai.AIBot;
 import tools.search.ai.SetupGenerator;
-import tools.search.ai.players.DefaultPlayer;
+import tools.search.ai.players.Attacker;
 import tools.search.ai.players.ModeratePlayer;
 
 /**
@@ -27,11 +27,11 @@ public class BattleTest {
         
         BattleEngine battleEngine = new BattleEngine();
         
-        AIBot attacker = new DefaultPlayer(Team.RED);
+        AIBot attacker = new Attacker(Team.RED); //new DefaultPlayer(Team.RED);
         AIBot defender = new ModeratePlayer(Team.BLUE);
         
         long computationTime = 2000;
-        int maxIterations = 150;
+        int maxIterations = 30; //60; //150;
         
         BattleTranscript transcript = battleEngine.battle(board, attacker, defender, computationTime, maxIterations);
         transcript.print();

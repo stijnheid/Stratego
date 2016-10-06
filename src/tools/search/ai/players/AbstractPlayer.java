@@ -23,6 +23,11 @@ public abstract class AbstractPlayer implements AIBot{
     
     protected AlphaBetaSearch searchEngine;
     
+    public AbstractPlayer(Team team) {
+        this.team = team;
+        this.searchEngine = new AlphaBetaSearch(null);
+    }
+    
     @Override
     public abstract MoveAction nextMove(GameState state);
     

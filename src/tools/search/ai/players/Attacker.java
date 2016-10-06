@@ -51,6 +51,10 @@ public class Attacker extends AbstractPlayer {
         
     }
     
+    public Attacker(Team team) {
+        super(team);
+    }
+    
     @Override
     public MoveAction nextMove(GameState state) {
         this.active = true;
@@ -62,13 +66,17 @@ public class Attacker extends AbstractPlayer {
         GameNode node = new GameNode(state);
         
         // Assumes to be the max player with team RED assigned to it.
-        MoveAction move = this.searchEngine.iterativeDeepeningMinimax(node, 1, -1, true);
+        //MoveAction move = this.searchEngine.iterativeDeepeningMinimax(node, 1, -1, true);
+        MoveAction move = this.searchEngine.iterativeDeepeningAlphaBeta(node, 1, -1, true);
         // Should never happen.
         if(move == null) {
             throw new RuntimeException("Attacker: move == null (" + team + ")");
         }
         
         System.out.println("Attacker.nextMove() -> " + move.toString());
+        System.out.println("Explored Nodes: " + this.searchEngine.getExploredCount());
+        System.out.println("Deepest Depth: " + this.searchEngine.getDeepestDepth());
+        System.out.println("Cutoffs: " + this.searchEngine.getCutoffsCount());
         
         this.active = false;
         
