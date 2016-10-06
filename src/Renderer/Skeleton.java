@@ -4,6 +4,8 @@
  * and open the template in the editor.
  */
 package Renderer;
+import Game.BoardPosition;
+
 import java.util.List;
 import java.util.ArrayList;
 import javax.media.opengl.GL2;
@@ -24,6 +26,9 @@ public class Skeleton {
     
     /**Offset from (0,0) of skeleton.*/
     public Vector offset;
+    
+    /**Position of this skeleton on the board.*/
+    public BoardPosition position;
     
     /**Data Structure holding the joints data.*/
     public List<Vector> joints;
@@ -54,11 +59,12 @@ public class Skeleton {
 
     /**
      * Constructor for a skeleton. Does not yet draw a skeleton.
-     * @param offset from (0,0).
+     * @param p position on the board (in cells).
      */
-    public Skeleton (Vector offset){
+    public Skeleton (BoardPosition p){
         joints = new ArrayList<Vector>();
-        this.offset = offset;
+        this.position = p;
+        offset = new Vector(p.getX()-2.5,p.getY()-2.5,0);
         rotation = 0;
         
         head = new Vector(0, 0, 1.8f);

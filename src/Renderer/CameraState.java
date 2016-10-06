@@ -4,6 +4,8 @@
  * and open the template in the editor.
  */
 package Renderer;
+import Game.BoardPosition;
+
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -43,15 +45,15 @@ public class CameraState {
         
         pieces = new Skeleton[6][6];
         double offset = 2.5;
-        for(double i=0; i < 6; i++){
+        for(int i=0; i < 6; i++){
             if(i==0 || i==1){
-                for(double j=0; j<6; j++){
-                    pieces[(int)i][(int)j] = new Skeleton(new Vector(j-offset,i-offset,0));
+                for(int j=0; j<6; j++){
+                    pieces[i][j] = new Skeleton(new BoardPosition(j,i));
                 }
             }   else if(i==4 || i==5){
-                for(double j=0;j<6; j++){
-                    pieces[(int)i][(int)j] = new Skeleton(new Vector(j-offset, i-offset,0));
-                    pieces[(int)i][(int)j].rotate(180);
+                for(int j=0;j<6; j++){
+                    pieces[i][j] = new Skeleton(new BoardPosition(j,i));
+                    pieces[i][j].rotate(180);
                 }
             }
         }
