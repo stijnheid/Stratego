@@ -11,7 +11,7 @@ public class GameState {
     private GameBoard board;
     private boolean isRunning;
     private long startTime;
-    private Team currentTurn;
+    //private Team currentTurn;
     // At most one animation can run at a time.
     // Simulation must not accept any action commands while an animation plays.
     private Animation animation;
@@ -29,6 +29,10 @@ public class GameState {
     
     public Animation getAnimation() {
         return this.animation;
+    }
+    
+    public void setAnimation(Animation animation) {
+        this.animation = animation;
     }
     
     public GameBoard getGameBoard() {
@@ -65,7 +69,7 @@ public class GameState {
     public void setStartTime(long startTime) {
         this.startTime = startTime;
     }
-
+/**
     public Team getCurrentTurn() {
         return currentTurn;
     }
@@ -73,14 +77,16 @@ public class GameState {
     public void setCurrentTurn(Team currentTurn) {
         this.currentTurn = currentTurn;
     }
-
+*/
     public RendererState getRendererState() {
         return rendererState;
     }
 
     public void setRendererState(RendererState rState) {
         this.rendererState = rState;
-    }    
+    }
+    
+    
     
     @Override
     public Object clone() {
@@ -90,6 +96,8 @@ public class GameState {
         // Copy the start time, be aware that this must be done after setRunning
         // since setRunning also modifies the start time.
         clone.setStartTime(getStartTime());
+        clone.setRendererState(getRendererState());
+        clone.setAnimation(getAnimation());
         return clone;
     }
 }

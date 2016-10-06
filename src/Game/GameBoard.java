@@ -31,6 +31,8 @@ public class GameBoard {
     private int offensiveMoves;
     private final int offensiveMovesLimit = GlobalSettings.MAXIMUM_MOVES;
     
+    private Team currentTurn;
+    
     // Keep track of water cells.
     List<BoardPosition> waterCells;
     
@@ -594,6 +596,10 @@ public class GameBoard {
         // Set flag to true on move object.
         move.setApplied(true);
         
+        // Switch turns.
+        setCurrentTurn(move.getTeam().opposite());
+        //switchTurns(move.getTeam());
+        
         try {
             // Is it an attack?
             GamePiece opponent = getPiece(destination);
@@ -666,6 +672,8 @@ public class GameBoard {
         GamePiece deadAttacker = move.getDeadAttacker();
         GamePiece deadOpponent = move.getDeadOpponent();
         
+        // Switch turn back to original.
+        setCurrentTurn(move.getTeam()); 
         
         if(deadAttacker != null && deadOpponent != null) {
             // Both died.
@@ -699,7 +707,7 @@ public class GameBoard {
             decrementMoveCount();
         }        
     }
-    
+
     /**
      * Shortcut method used to setup the initial board positions in a convenient
      * way.
@@ -769,6 +777,18 @@ public class GameBoard {
     
     public Team getDefender() {
         return this.defender;
+    }
+
+    public Team getCurrentTurn() {
+        return currentTurn;
+    }
+
+    public void setCurrentTurn(Team currentTurn) {
+        this.currentTurn = currentTurn;
+    }
+    
+    private void switchTurns(Team current) {
+        this.currentTurn = current.opposite();
     }
     
     /**

@@ -28,7 +28,6 @@ import tools.search.ai.WeighedHeuristicTerm;
  * @author s122041
  */
 public class ModeratePlayer extends AbstractPlayer {
-    
 
     public ModeratePlayer(Team team) {
         super.team = team;

@@ -295,6 +295,7 @@ public class AlphaBetaSearch {
         this.initialPlayer = isMaxPlayer;
         
         MoveAction bestMove = null;
+        System.out.println("isMaxPlayer: " + isMaxPlayer);
         // Apply iterative deepening.
         try {
             while(!this.timeout) {
@@ -309,7 +310,6 @@ public class AlphaBetaSearch {
                 
                 // Reset explored nodes count.
                 this.exploredNodes = 0;
-                System.out.println("isMaxPlayer: " + isMaxPlayer);
                 
                 double value = miniMax(node, maxDepth, isMaxPlayer);
                 
@@ -324,7 +324,18 @@ public class AlphaBetaSearch {
                     if(bestMove == null) {
                         throw new RuntimeException("bestMove was never set.");
                     }
-                    
+                    System.out.println("Inevitable Loss");
+                    break;
+                }
+                
+                // If the best possible value occurs for a player, it means that
+                // the player can force a win.
+                if(isMaxPlayer && value == Double.POSITIVE_INFINITY ||
+                        !isMaxPlayer && value == Double.NEGATIVE_INFINITY) {
+                    if(bestMove == null) {
+                        throw new RuntimeException("bestMove was never set.");
+                    }
+                    System.out.println("Inevitable Win");
                     break;
                 }
                 
@@ -406,6 +417,8 @@ public class AlphaBetaSearch {
                 }
             }*/
             
+            // The end state should be evaluated with respect to the perspective
+            // of the max player. The max player is to be assumed the RED player.
             if(this.initialPlayer) { // Initial call was for the maxiziming player.
                 if(winner == Team.RED) {
                     return Double.POSITIVE_INFINITY;
@@ -433,6 +446,8 @@ public class AlphaBetaSearch {
         if(maxPlayer) { // Maximizing player.
             bestValue = Double.NEGATIVE_INFINITY; // Worst case for maximizing player.
             List<MoveAction> moves = board.getMoves(Team.RED);
+            // Sort the moves.
+            
             for(MoveAction move : moves) {
                 // Apply move.
                 board.applyMove(move);
@@ -689,6 +704,105 @@ public class AlphaBetaSearch {
         }
         // Store the best move in the node.
         node.setBestMove(bestMove);
+        return bestValue;
+    }
+    
+    public MoveAction iterativeDeepeningNegamax(GameNode node, 
+            int initialDepth, 
+            int range, 
+            boolean isMaxPlayer) {
+        if(initialDepth < 1) {
+            throw new IllegalArgumentException("initialDepth must be >= 1");
+        }
+        
+        if(range < -1) {
+            throw new IllegalArgumentException("Range must be >= 0 or equal the special value -1 for infinity");
+        }
+        
+        // Reset counters.
+        reset();
+        
+        int depth = initialDepth;
+        MoveAction move = null;
+        while(!this.timeout) {
+            // Confine to range constraint.
+            if(range != -1 && initialDepth + range < depth) {
+                break;
+            }
+            
+            // Run a search algorithm.
+            double value; 
+            if(isMaxPlayer) {
+                value = negaMax(node, depth, 1);
+            } else {
+                value = -1 * negaMax(node, depth, -1);
+            }
+            
+            System.out.println("NegaMaxValue: " + value);
+            
+            // Store move.
+            MoveAction bestMove = node.getBestMove();
+            if(bestMove == null) {
+                throw new RuntimeException("negaMax: bestMove == null");
+            }
+            move = bestMove;
+                
+            // Increment depth.
+            depth++;
+        }
+        
+        // Reset timeout.
+        this.timeout = false;
+        
+        // Return best move.
+        return move;
+    }
+    
+    private double negaMax(GameNode node, int depth, int teamColor) {
+        
+        GameState state = node.getState();
+        GameBoard board = state.getGameBoard();        
+        Team winner = board.isEndState();
+        // Reach an end state.
+        if(winner != null) {
+            //return (teamColor * Double.POSITIVE_INFINITY);
+            if(winner == Team.RED) {
+                
+            } else {
+                
+            }
+        }
+        
+        // Reached maximum search depth.
+        if(depth == 0) {
+            return (teamColor * this.evaluation.score(state));
+        }
+        
+        double bestValue = Double.NEGATIVE_INFINITY;
+        // Check whose to move.
+        //Team currentTurn = state.getCurrentTurn();
+        
+        // Fetch the moves for the player with the current turn.
+        List<MoveAction> moves = board.getMoves(board.getCurrentTurn());
+        MoveAction bestMove = null;
+        for(MoveAction move : moves) {
+            // Apply the move.
+            board.applyMove(move);
+            
+            // Recursive call.
+            double value = -1 * negaMax(node, depth - 1, -1 * teamColor);
+            if(value > bestValue) {
+                bestValue = value;
+                bestMove = move;
+            }
+            
+            // Undo the move.
+            board.undoMove(move);
+        }
+        
+        // Set best move to the node.
+        node.setBestMove(bestMove);
+        // Return best value.
         return bestValue;
     }
     

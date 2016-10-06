@@ -332,6 +332,7 @@ public class BattleEngine {
         Team winner;
         while((winner = board.isEndState()) == null) {
             if(maxIterations != -1 && iterations >= maxIterations) {
+                System.out.println("ENDED LONG MATCH");
                 break;
             }
             
