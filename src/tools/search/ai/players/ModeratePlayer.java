@@ -115,14 +115,14 @@ public class ModeratePlayer extends AbstractPlayer {
                         + attacker.get(Pieces.MAJOR) * getPiecesAmount(state, ModeratePlayer.super.team.opposite(), Pieces.MAJOR)
                         + attacker.get(Pieces.CAPTAIN) * getPiecesAmount(state, ModeratePlayer.super.team.opposite(), Pieces.CAPTAIN)
                         + attacker.get(Pieces.MINER) * getPiecesAmount(state, ModeratePlayer.super.team.opposite(), Pieces.MINER) 
-                          * (1 / getPiecesAmount(state, ModeratePlayer.super.team, Pieces.BOMB))
+                          * (1 / (getPiecesAmount(state, ModeratePlayer.super.team, Pieces.BOMB) + 1))
                         + attacker.get(Pieces.SPY) * getPiecesAmount(state, ModeratePlayer.super.team.opposite(), Pieces.SPY)
                         + attacker.get(Pieces.LIEUTENANT) * getPiecesAmount(state, ModeratePlayer.super.team.opposite(), Pieces.LIEUTENANT);
             }
             else {
                score =  2520 * getPiecesAmount(state, ModeratePlayer.super.team, Pieces.FLAG) 
                         + defender.get(Pieces.BOMB) * getPiecesAmount(state, ModeratePlayer.super.team, Pieces.BOMB) 
-                          * (1 / getPiecesAmount(state, ModeratePlayer.super.team.opposite(), Pieces.MINER))
+                          * (1 / (getPiecesAmount(state, ModeratePlayer.super.team.opposite(), Pieces.MINER) + 1))
                         + defender.get(Pieces.MARSHALL) * getPiecesAmount(state, ModeratePlayer.super.team, Pieces.MARSHALL)
                         + defender.get(Pieces.CAPTAIN) * getPiecesAmount(state, ModeratePlayer.super.team, Pieces.CAPTAIN)
                         + defender.get(Pieces.LIEUTENANT) * getPiecesAmount(state, ModeratePlayer.super.team, Pieces.LIEUTENANT)
@@ -134,7 +134,7 @@ public class ModeratePlayer extends AbstractPlayer {
                         + attacker.get(Pieces.MAJOR) * getPiecesAmount(state, ModeratePlayer.super.team.opposite(), Pieces.MAJOR)
                         + attacker.get(Pieces.CAPTAIN) * getPiecesAmount(state, ModeratePlayer.super.team.opposite(), Pieces.CAPTAIN)
                         + attacker.get(Pieces.SPY) * getPiecesAmount(state, ModeratePlayer.super.team.opposite(), Pieces.MINER)
-                          * (1 / getPiecesAmount(state, ModeratePlayer.super.team, Pieces.BOMB))
+                          * (1 / (getPiecesAmount(state, ModeratePlayer.super.team, Pieces.BOMB) + 1))
                         + attacker.get(Pieces.SPY) * getPiecesAmount(state, ModeratePlayer.super.team.opposite(), Pieces.SPY)
                         + attacker.get(Pieces.LIEUTENANT) * getPiecesAmount(state, ModeratePlayer.super.team.opposite(), Pieces.LIEUTENANT);
             }
@@ -188,24 +188,24 @@ public class ModeratePlayer extends AbstractPlayer {
             cellValue.put(new BoardPosition(2, 3), 100);
             cellValue.put(new BoardPosition(2, 4), 100);
             cellValue.put(new BoardPosition(2, 5), 100);
-            cellValue.put(new BoardPosition(3, 0), 150);
-            cellValue.put(new BoardPosition(3, 1), 150);
-            cellValue.put(new BoardPosition(3, 2), 150);
-            cellValue.put(new BoardPosition(3, 3), 150);
-            cellValue.put(new BoardPosition(3, 4), 150);
-            cellValue.put(new BoardPosition(3, 5), 150);
-            cellValue.put(new BoardPosition(4, 0), 200);
-            cellValue.put(new BoardPosition(4, 1), 200);
-            cellValue.put(new BoardPosition(4, 2), 200);
-            cellValue.put(new BoardPosition(4, 3), 200);
-            cellValue.put(new BoardPosition(4, 4), 200);
-            cellValue.put(new BoardPosition(4, 5), 200);
-            cellValue.put(new BoardPosition(5, 0), 200);
-            cellValue.put(new BoardPosition(5, 1), 200);
-            cellValue.put(new BoardPosition(5, 2), 200);
-            cellValue.put(new BoardPosition(5, 3), 200);
-            cellValue.put(new BoardPosition(5, 4), 200);
-            cellValue.put(new BoardPosition(5, 5), 200);
+//            cellValue.put(new BoardPosition(3, 0), 150);
+//            cellValue.put(new BoardPosition(3, 1), 150);
+//            cellValue.put(new BoardPosition(3, 2), 150);
+//            cellValue.put(new BoardPosition(3, 3), 150);
+//            cellValue.put(new BoardPosition(3, 4), 150);
+//            cellValue.put(new BoardPosition(3, 5), 150);
+//            cellValue.put(new BoardPosition(4, 0), 200);
+//            cellValue.put(new BoardPosition(4, 1), 200);
+//            cellValue.put(new BoardPosition(4, 2), 200);
+//            cellValue.put(new BoardPosition(4, 3), 200);
+//            cellValue.put(new BoardPosition(4, 4), 200);
+//            cellValue.put(new BoardPosition(4, 5), 200);
+//            cellValue.put(new BoardPosition(5, 0), 200);
+//            cellValue.put(new BoardPosition(5, 1), 200);
+//            cellValue.put(new BoardPosition(5, 2), 200);
+//            cellValue.put(new BoardPosition(5, 3), 200);
+//            cellValue.put(new BoardPosition(5, 4), 200);
+//            cellValue.put(new BoardPosition(5, 5), 200);
             
             for (Map.Entry<BoardPosition, Integer> entrys: cellValue.entrySet()) {
                 BoardPosition position = entrys.getKey();
@@ -231,6 +231,65 @@ public class ModeratePlayer extends AbstractPlayer {
             return -score;
         }
         
+    }
+    
+    public static void main(String[] args) {
+        //new ModeratePlayer().printMap();
+        
+        HashMap<BoardPosition, Integer> cellValue = new HashMap<>();
+        cellValue.put(new BoardPosition(0, 0), 0);
+        cellValue.put(new BoardPosition(0, 1), 0);
+        cellValue.put(new BoardPosition(0, 2), 0);
+        cellValue.put(new BoardPosition(0, 3), 0);
+        cellValue.put(new BoardPosition(0, 4), 0);
+        cellValue.put(new BoardPosition(0, 5), 0);
+        cellValue.put(new BoardPosition(1, 0), 0);
+        cellValue.put(new BoardPosition(1, 1), 0);
+        cellValue.put(new BoardPosition(1, 2), 0);
+        cellValue.put(new BoardPosition(1, 3), 0);
+        cellValue.put(new BoardPosition(1, 4), 0);
+        cellValue.put(new BoardPosition(1, 5), 0);
+        cellValue.put(new BoardPosition(2, 0), 100);
+        cellValue.put(new BoardPosition(2, 1), 100);
+        cellValue.put(new BoardPosition(2, 2), 100);
+        cellValue.put(new BoardPosition(2, 3), 100);
+        cellValue.put(new BoardPosition(2, 4), 100);
+        cellValue.put(new BoardPosition(2, 5), 100);
+        new ModeratePlayer(Team.RED).printMap(cellValue, 3, 6);
+    }
+    
+    private void printMap(HashMap<BoardPosition, Integer> map, int w, int h) {
+        StringBuilder builder = new StringBuilder();
+        for(int r=0; r<h; r++) {
+            for(int c=0; c<w; c++) {
+                BoardPosition pos = new BoardPosition(c, r);
+                Integer value = map.get(pos);
+                if(value != null) {
+                    int val = (int) value;
+                    builder.append(val);
+                } else {
+                    builder.append(" ");
+                }
+                
+                if(c < (w - 1)) {
+                    builder.append("|");
+                }
+            }
+            
+            builder.append("\n");
+            
+            if(r < (h - 1)) {
+                for(int i=0; i<w; i++) {
+                    builder.append("-");
+                    if(i < w - 1) {
+                        builder.append(" ");
+                    }
+                }
+                builder.append("\n");
+            }
+        }
+        
+        System.out.println("CellMap:\n" + builder.toString());
     }
     
 }

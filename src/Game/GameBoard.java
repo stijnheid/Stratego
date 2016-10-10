@@ -41,6 +41,14 @@ public class GameBoard {
             throw new IllegalArgumentException("Attacker equals Defender");
         }
         
+        if(attacker == null) {
+            throw new IllegalArgumentException("Attacker cannot be null.");
+        }
+        
+        if(defender == null) {
+            throw new IllegalArgumentException("Defender cannot be null.");
+        }
+        
         this.width = w;
         this.height = h;
         this.attacker = attacker;
@@ -478,10 +486,12 @@ public class GameBoard {
         
         // Has the flag been captured? Count the # of flags on the defending
         // side.
+        /*
         List<GamePiece> defenderFlag = getPieces(this.defender, Pieces.FLAG);
         if(defenderFlag.isEmpty()) {
+            System.out.println("Defender has no flag.");
             return this.attacker;
-        }        
+        }*/       
         
         // The game is in an end state if the attacker has no miners left and
         // the defending side has the flag completely surrounded with bombs.
@@ -489,6 +499,7 @@ public class GameBoard {
         if(miners.isEmpty()) {
             // No miners left, check if the flag is surrounded by bombs.
             if(isFlagUnreachable()) {
+                System.out.println("No miners left and flag unreachable.");
                 return this.defender;
             }
         }
@@ -496,12 +507,14 @@ public class GameBoard {
         // Attacker has no pieces left to move.
         List<GamePiece> movablePiecesAttacker = getMovablePieces(this.attacker);
         if(movablePiecesAttacker.isEmpty()) {
+            //System.out.println("Attacker has no more movable pieces.");
             return this.defender;
         }
         
         // Defender has no pieces left to move.
         List<GamePiece> movablePiecesDefender = getMovablePieces(this.defender);
         if(movablePiecesDefender.isEmpty()) {
+            //System.out.println("Defender has no more movable pieces.");
             return this.attacker;
         }
         
