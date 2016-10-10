@@ -69,7 +69,7 @@ public class Vector {
     }
     
     /**
-     * Rotate Vector around the Z axis (horizontal).
+     * Rotate Vector around the Z axis.
      * @param deg degrees of rotation.
      */
     public void rotate(double deg){
@@ -109,16 +109,25 @@ public class Vector {
      * @param a operand.
      * @return distance between this and a in 3D space.
      */
-    public float distance(Vector a){
-        return (float)Math.sqrt(Math.pow(x - a.x, 2)+ Math.pow(y - a.y, 2)+ Math.pow(z - a.z, 2));
+    public double distance(Vector a){
+        return Math.sqrt(Math.pow(x - a.x, 2)+ Math.pow(y - a.y, 2)+ Math.pow(z - a.z, 2));
     }
     
     /**
      * Scale this vector by a factor of t.
-     * @param t scaling factor (t \in [0,1]).
+     * @param t scaling factor.
      * @return 
      */
-    public Vector scale(float t){
+    public Vector scale(double t){
         return new Vector(x*t,y*t,z*t);
+    }
+    
+    /**
+     * Return the sum of this and another vector.
+     * @param a addition operand
+     * @return Vector that is this+a.
+     */
+    public Vector sum(Vector a){
+        return new Vector(x+a.x, y+a.y, z+a.z);
     }
 }

@@ -325,10 +325,10 @@ public class Terrain extends Base {
         drawTerrain();
         drawBoard();
         drawPieces();
-        if(pan){
-            Animation ani = new WalkAnimation(this, null, 0, new Game.BoardPosition(2,0));
+        if(cs.tAnim > 5 && pan){
+            Animation ani = new WalkAnimation(this, null, new Game.BoardPosition(2,0));
             pan=false;
-            ani.moveCamera(new Vector(0,5,5), new Vector(0,0,0));
+            //ani.moveCamera(new Vector(0,5,5), new Vector(0,0,0));
             ani.execute();
         }
                

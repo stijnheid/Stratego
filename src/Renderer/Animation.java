@@ -13,18 +13,11 @@ import Game.Team;
  */
 public class Animation {
     
-    public static int WALK = 0;
-    public static int ATTACK = 1;
-    public static int DIE = 2;
-    
     /*Duration of the animation (in frames).*/
     protected final static int duration = 30;
     
     /*GamePiece on which this animation acts.*/
     protected final GamePiece subject;
-    
-    /*Which animation to perform (WALK/ATTACK/DIE).*/
-    protected final int AnimType;//one of [0,1,2].
     
     /*Terrain on which to perform animation (for openGL variables).*/
     protected final Terrain terrain;
@@ -37,19 +30,17 @@ public class Animation {
     /**
      * Constructor for an Animation.
      * @param subject piece executing the animation.
-     * @param AnimType which animation to execute.
      * @param target where to move (in the case of walking) or what to attack (otherwise).
      * @param terrain the scene on which to operate (required for passing openGL variables).
      */
-    public Animation(Terrain terrain, GamePiece subject, int AnimType, BoardPosition target){
+    public Animation(Terrain terrain, GamePiece subject, BoardPosition target){
         this.subject = subject;
-        this.AnimType = AnimType;
         this.terrain = terrain;
         this.target = target;
         try {
             this.skel = terrain.cs.pieces[subject.getPosition().getX()][subject.getPosition().getY()];    
         }   catch (Exception e){
-            this.skel = new Skeleton(new BoardPosition(1,0));
+            this.skel = terrain.cs.pieces[1][0];
         }
     }
     
