@@ -87,7 +87,7 @@ public class DefaultPlayer implements AIBot {
         */
         System.out.println("Minimax Searching");
         // Why does it lose at 1 if both players have the same AI?
-        int range = 10; //4; //3; //4; //1; //1; //3; //10; //1; //10;
+        int range = -1; //10; //4; //3; //4; //1; //1; //3; //10; //1; //10;
         MoveAction move = this.searchEngine.iterativeDeepeningMinimax(node, 1, range, isAttacker);
         System.out.println("Reached Depth: " + this.searchEngine.getDeepestDepth());
         System.out.println("ExploredNodesCount: " + this.searchEngine.getExploredCount());

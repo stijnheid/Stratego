@@ -127,4 +127,30 @@ public class SetupGenerator {
         }
         return board;
     }
+
+    public GameBoard generateSmallBoard() {
+        String setup = "r:4|r:5\n" +
+                       "--- ---\n" +
+                       "   |   \n" + 
+                       "--- ---\n" + 
+                       "b:6|b:5\n";
+        
+        GameBoard board = GameBoard.loadBoard(setup, 2, 3);
+        return board;
+    }
+    
+    public GameBoard generateShowcase() {
+        String setup = "r:3|r:3|r:9\n" +
+                        "--- --- ---\n" + 
+                        "r:3|r:3|r:3\n" + 
+                        "--- --- ---\n" + 
+                        "   |   |   \n" +
+                        "--- --- ---\n" +
+                        "   |   |   \n" +
+                        "--- --- ---\n" +
+                        "b:S|b:8|b:3\n" +
+                        "--- --- ---\n" +
+                        "b:3|b:3|b:3\n";
+        return GameBoard.loadBoard(setup, 3, 6);
+    }
 }
