@@ -295,8 +295,8 @@ abstract public class Base {
 
         @Override
         public void mouseDragged(MouseEvent e) {
-            float dX = e.getX() - dragSourceX;
-            float dY = e.getY() - dragSourceY;
+            double dX = e.getX() - dragSourceX;
+            double dY = e.getY() - dragSourceY;
             
             // Change camera angle when left button is pressed.
             try {// Camera settings are synchronised.

@@ -69,7 +69,7 @@ public class Terrain extends Base {
     public Terrain(){
                 
         // Initialize the camera
-        camera = new Camera();    
+        camera = new Camera();
         pan = true;
         lastframe = System.currentTimeMillis();
     }
@@ -92,7 +92,7 @@ public class Terrain extends Base {
         double fovy = 60;
         try {/** Since vDist is a synchronised variable. */
             cs.varLock.lock();
-            glu.gluPerspective(fovy, aspectRatio, 0.1 * cs.vDist, 10.0 * cs.vDist); 
+            glu.gluPerspective(fovy, aspectRatio, 0.1 * (float)cs.vDist, 10.0 * (float)cs.vDist); 
         }   finally {
             cs.varLock.unlock();
         }
@@ -325,18 +325,18 @@ public class Terrain extends Base {
         drawTerrain();
         drawBoard();
         drawPieces();
-        if(cs.tAnim > 5 && pan){
+        if(pan){
             Animation ani = new WalkAnimation(this, null, new Game.BoardPosition(2,0));
             pan=false;
-            //ani.moveCamera(new Vector(0,5,5), new Vector(0,0,0));
             ani.execute();
         }
                
         /**Increment frame count AFTER rendering.*/
         cs.frameTick();
-        thisframe = System.currentTimeMillis();
+        /*thisframe = System.currentTimeMillis();
         System.out.println("Currently displaying "+(int)(1000/(thisframe-lastframe))+" frames per second");
-        lastframe = thisframe;
+        lastframe = thisframe;*/
+        System.out.println(camera.eye.x+" "+camera.eye.y+" "+camera.eye.z);
     }
     
     public static void main (String[] args){

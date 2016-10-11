@@ -26,18 +26,18 @@ public class CameraState {
     public int h;               // Height of window in pixels.
     
     public Vector cnt;          // Center point.
-    public float vDist;         // Distance eye point to center point.
-    public float vWidth;        // Width of scene to be shown.
-    public float theta;         // Azimuth angle in radians.
-    public float phi;           // Inclination angle in radians.
+    public double vDist;         // Distance eye point to center point.
+    public double vWidth;        // Width of scene to be shown.
+    public double theta;         // Azimuth angle in radians.
+    public double phi;           // Inclination angle in radians.
     
     /** Constructor with default settings.*/
     public CameraState(){
-        vDist = 10f;
-        vWidth = 10f;
+        vDist = 10d;
+        vWidth = 10d;
         cnt = new Vector(0,0,0);
-        theta = (float)-Math.PI/2;
-        phi = 0.5f;
+        theta = 0d;// camera starts at (0, vDist/sqrt(2), vDist/sqrt(2)).
+        phi = Math.PI/4;// 45 degree angle.
         tAnim = -1;
         frameCount = 0;
         refresh = new Object();
@@ -58,12 +58,13 @@ public class CameraState {
         }
     }
     
-    public void setCamera(float phi, float theta, float vDist){
+    public void setCamera(double phi, double theta, double vDist, Vector cnt){
         try {
             varLock.lock();
             this.phi = phi;
             this.theta = theta;
-            this.vDist = vDist;        
+            this.vDist = vDist;  
+            this.cnt = cnt;
         } finally {
             varLock.unlock();        
         }

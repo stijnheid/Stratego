@@ -51,17 +51,21 @@ public class Animation {
      * @param center Vector representing the goal focus point of the camera.
      */
     public void moveCamera (Vector eye, Vector center){
-        Thread pan = new Thread(() -> {
                 //current Camera variables.
-                float phi1 = terrain.cs.phi;
-                float theta1 = terrain.cs.theta;
-                float dist1 = terrain.cs.vDist;
+                double phi1 = terrain.cs.phi;
+                double theta1 = terrain.cs.theta;
+                double dist1 = terrain.cs.vDist;
+                Vector cnt1 = terrain.cs.cnt;
                 //goal Camera variables.
-                float phi2 = (float) getPhi(eye, center);
-                float theta2 = (float) getTheta(eye, center);
-                float dist2 = (float) getDist(eye, center);
+                double phi2 = (float) getPhi(eye, center);
+                double theta2 = (float) getTheta(eye, center);
+                double dist2 = (float) getDist(eye, center);
+                Vector cnt2 = terrain.cs.cnt;
                 //Camera variables during transit.
-                float phi3 = phi1, theta3 = theta1, dist3 = dist1;
+                double phi3 = phi1, theta3 = theta1, dist3 = dist1;
+                Vector cnt3 = new Vector(center);
+                cnt3.subtract(cnt1);
+                cnt3 = cnt3.scale(1d/(double)duration);
                 //loop over a period of frames.
                 for (int i=0; i<duration; i++){
                     try {//update on frame refresh.
@@ -70,14 +74,13 @@ public class Animation {
                             phi3 += (phi2-phi1)/duration;
                             theta3 += (theta2-theta1)/duration;
                             dist3 += (dist2-dist1)/duration;
-                            terrain.cs.setCamera(phi3, theta3, dist3); 
+                            cnt2.add(cnt3);
+                            terrain.cs.setCamera(phi3, theta3, dist3, cnt2); 
                         }
                     }   catch (Exception e){}
                 }
                 //make sure camera is at the final location.
-                terrain.cs.setCamera(phi2, theta2, dist2);  
-        });
-        pan.start();
+                terrain.cs.setCamera(phi2, theta2, dist2, cnt2);  
     }
     
     /**
@@ -117,7 +120,7 @@ public class Animation {
     private double getTheta(Vector eye, Vector center){
         double theta;
         eye.subtract(center);
-        theta = Math.atan(eye.x/eye.y);
+        theta = Math.atan(eye.y/eye.x);
         eye.add(center);
         return theta;
     }
@@ -137,7 +140,7 @@ public class Animation {
     }
     
     /**
-     * Returns distance from eye to center vectors.
+     * Returns distance from eye to centre vectors.
      * @param eye camera eye.
      * @param center camera centre.
      * @return 

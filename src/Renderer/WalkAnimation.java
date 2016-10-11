@@ -30,6 +30,13 @@ public class WalkAnimation extends Animation{
         direction = new Vector(0,1,0);
         direction.rotate(skel.getRotation());
         Thread walk = new Thread(() -> {
+            //Current camera location.
+            Vector center = terrain.camera.center;
+            Vector eye = terrain.camera.eye;
+            //move Camera to location.
+            moveCamera(new Vector(skel.offset.x+5, skel.offset.y, skel.offset.z+5)
+                    ,new Vector(skel.offset.x, skel.offset.y, skel.offset.z+1));
+            //execute animation (through refresh call).
             for(int i=1; i <= duration; i++){
                 try {
                     synchronized(terrain.cs.refresh){
@@ -38,6 +45,8 @@ public class WalkAnimation extends Animation{
                     }
                 }   catch (Exception e){}
             }
+            //move Camera back to original location.
+            moveCamera(eye, center);
         });
         walk.start();
     }
