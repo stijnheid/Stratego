@@ -22,7 +22,7 @@ public class Skeleton {
     
     /**Vectors for every joint in the skeleton. */
     public Vector head, neck, shoulderL, shoulderR, elbow, wrist,
-            spine, hipL, hipR, knee, heel, foot;
+            spine, hipL, hipR, knee, heel, foot, sword;
     
     /**Offset from (0,0) of skeleton.*/
     public Vector offset;
@@ -38,6 +38,11 @@ public class Skeleton {
     
     /** Thickness of bones in skeleton. */
     private final double boneWidth = 0.05f;
+    
+    /** Material properties of sword.*/
+    private float[] swordDiffuse;
+    private float[] swordSpecular;
+    private float swordShine;
     
     /**Rotations of vital joints in X and Y dimensions.*/
     double shoulderLRotX = 0;
@@ -56,6 +61,8 @@ public class Skeleton {
     double kneeLRotY = 0;
     double kneeRRotX = 0;
     double kneeRRotY = 0;
+    double swordRotX = 0;
+    float swordOpacity = 0;
 
     /**
      * Constructor for a skeleton. Does not yet draw a skeleton.
@@ -67,30 +74,37 @@ public class Skeleton {
         offset = new Vector(p.getX()-2.5,p.getY()-2.5,0);
         rotation = 0;
         
-        head = new Vector(0, 0, 1.8f);
+        head = new Vector(0, 0, 1.8);
         joints.add(head);
-        neck = new Vector(0, 0, 1.6f);
+        neck = new Vector(0, 0, 1.6);
         joints.add(neck);
-        shoulderL = new Vector (-0.2f, 0, 1.6f);
+        shoulderL = new Vector (-0.2, 0, 1.6);
         joints.add(shoulderL);
-        shoulderR = new Vector (0.2f, 0, 1.6f);
+        shoulderR = new Vector (0.2, 0, 1.6);
         joints.add(shoulderR);
-        elbow = new Vector (0.1f, 0, -0.3f);//RELATIVE TO SHOULDER
+        elbow = new Vector (0.1, 0, -0.3);//RELATIVE TO SHOULDER
         joints.add(elbow);
-        wrist = new Vector (0, 0, -0.3f);//RELATIVE TO ELBOW
+        wrist = new Vector (0, 0, -0.3);//RELATIVE TO ELBOW
         joints.add(wrist);
         spine = new Vector (0, 0, 1);
         joints.add(spine);
-        hipL = new Vector (-0.15f, 0, 0.8f);
+        hipL = new Vector (-0.15, 0, 0.8);
         joints.add(hipL);
-        hipR = new Vector (0.15f, 0, 0.8f);
+        hipR = new Vector (0.15, 0, 0.8);
         joints.add(hipR);
-        knee = new Vector (0, 0, -0.4f);//RELATIVE TO HIP
+        knee = new Vector (0, 0, -0.4);//RELATIVE TO HIP
         joints.add(knee);
-        heel = new Vector (0, 0, -0.4f);//RELATIVE TO KNEE
+        heel = new Vector (0, 0, -0.4);//RELATIVE TO KNEE
         joints.add(heel);
-        foot = new Vector (0, 0.1f, 0);//RELATIVE TO HEEL
+        foot = new Vector (0, 0.1, 0);//RELATIVE TO HEEL
         joints.add(foot);
+        sword = new Vector(0, 0.8, 0);///RELATIVE TO WRIST
+        joints.add(sword);
+        
+        swordDiffuse = new float[] {139/255f, 69/255f, 19/255f, 0};
+        swordSpecular = new float[] {139/255f, 69/255f, 19/255f, 0};
+        swordShine = 0.93f;
+        
     }
     
     /**
@@ -107,10 +121,10 @@ public class Skeleton {
         gl.glRotated(rotation, 0, 0, 1);
         gl.glTranslated(offset.x, offset.y, offset.z);
         drawTorso(gl, glut);
-        drawArm(gl, glut, true);// left arm
-        drawArm(gl, glut, false);//right arm
         drawLeg(gl, glut, true);//left leg
         drawLeg(gl, glut, false);//right leg
+        drawArm(gl, glut, true);// left arm
+        drawArm(gl, glut, false);//right arm
         gl.glEnable(GL2.GL_TEXTURE_2D);
         gl.glPopMatrix();
     }
@@ -233,7 +247,20 @@ public class Skeleton {
             gl.glPopMatrix();
             gl.glTranslated(wrist.x/2, wrist.y/2, wrist.z/2);
             drawSphere(glut);
-            gl.glPopMatrix();            
+            //Draw sword in right hand.
+            gl.glRotated(swordRotX, 1, 0, 0);
+            gl.glTranslated(sword.x/2, sword.y/2, sword.z/2);
+            gl.glScaled(boneWidth/2, sword.y, boneWidth/2);
+            
+            swordDiffuse[3] = swordOpacity;
+            swordSpecular[3] = swordOpacity;
+            
+            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, swordDiffuse, 0);
+            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, swordSpecular, 0);
+            gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, swordShine);
+            
+            glut.glutSolidCube(1f);
+            gl.glPopMatrix();
         }
     }
     
