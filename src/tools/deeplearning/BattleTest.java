@@ -47,7 +47,6 @@ public class BattleTest {
         
         BattleEngine battleEngine = new BattleEngine();
         
-        
         // Behaves slightly different than the new attacker.
         // Why does miniMax currently visit more nodes or is that a distorted
         // count?
@@ -56,7 +55,6 @@ public class BattleTest {
         
         //AIBot attacker = new Attacker(Team.RED);
         //AIBot defender = new Attacker(Team.BLUE);
-        
         
         long computationTime = 2000;
         int maxIterations = 10; //30;
@@ -75,9 +73,10 @@ public class BattleTest {
         AIBot attacker = new Attacker(Team.RED);
         //AIBot defender = new Attacker(Team.BLUE);
         AIBot defender = new ModeratePlayer(Team.BLUE);
+        //AIBot defender = new Attacker(Team.BLUE);
         
         long computationTime = 2000;
-        int maxIterations = 100; //40;
+        int maxIterations = 20; //20; //28; //40; //100; //40;
         
         BattleTranscript transcript = engine.battle(board, attacker, defender, computationTime, maxIterations);
         transcript.print();

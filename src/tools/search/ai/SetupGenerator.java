@@ -140,17 +140,17 @@ public class SetupGenerator {
     }
     
     public GameBoard generateShowcase() {
-        String setup = "r:3|r:3|r:9\n" +
+        String setup = "r:4|r:4|r:4\n" +
                         "--- --- ---\n" + 
-                        "r:3|r:3|r:3\n" + 
+                        "r:S|r:8|r:4\n" + 
                         "--- --- ---\n" + 
                         "   |   |   \n" +
                         "--- --- ---\n" +
                         "   |   |   \n" +
                         "--- --- ---\n" +
-                        "b:S|b:8|b:3\n" +
+                        "b:9|b:4|b:4\n" +
                         "--- --- ---\n" +
-                        "b:3|b:3|b:3\n";
+                        "b:4|b:4|b:4\n";
         return GameBoard.loadBoard(setup, 3, 6);
     }
 }

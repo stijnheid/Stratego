@@ -172,12 +172,14 @@ public class ModeratePlayer extends AbstractPlayer {
     
     private class BoardValue extends WeighedHeuristicTerm {
         
-        HashMap<BoardPosition, Integer> cellValue = new HashMap<>();
+        //HashMap<BoardPosition, Integer> cellValue = new HashMap<>();
 
         @Override
         public double computeScore(GameState state) {
             double score = 0;
             GameBoard board = state.getGameBoard();
+            
+            /**
             cellValue.put(new BoardPosition(0, 0), 0);
             cellValue.put(new BoardPosition(0, 1), 0);
             cellValue.put(new BoardPosition(0, 2), 100);
@@ -214,8 +216,26 @@ public class ModeratePlayer extends AbstractPlayer {
             cellValue.put(new BoardPosition(5, 3), 150);
 //            cellValue.put(new BoardPosition(5, 4), 200);
 //            cellValue.put(new BoardPosition(5, 5), 200);
+            */
             
-            for (Map.Entry<BoardPosition, Integer> entrys: cellValue.entrySet()) {
+            /**
+            String setup = "0|0|0\n" +
+                            "0|0|0\n" +
+                            "100|100|100\n" +
+                            "150|150|150\n" +
+                            "200|200|200\n" +
+                            "200|200|200";
+            */
+            String setup = "1000|1000|1000\n" +
+                            "0|0|0\n" +
+                            "0|0|0\n" +
+                            "0|0|0\n" +
+                            "0|0|0\n" +
+                            "0|0|0\n";
+            
+            HashMap<BoardPosition, Integer> map = loadMap(setup);
+            
+            for (Map.Entry<BoardPosition, Integer> entrys: map.entrySet()) {
                 BoardPosition position = entrys.getKey();
                 Integer value = entrys.getValue();
                 
@@ -237,33 +257,21 @@ public class ModeratePlayer extends AbstractPlayer {
             }
             
             return -score;
-        }
-        
+        } 
     }
     
     public static void main(String[] args) {
-        //new ModeratePlayer().printMap();
+        ModeratePlayer player = new ModeratePlayer(Team.BLUE);
         
-        HashMap<BoardPosition, Integer> cellValue = new HashMap<>();
-        cellValue.put(new BoardPosition(0, 0), 0);
-        cellValue.put(new BoardPosition(0, 1), 0);
-        cellValue.put(new BoardPosition(0, 2), 0);
-        cellValue.put(new BoardPosition(0, 3), 0);
-        cellValue.put(new BoardPosition(0, 4), 0);
-        cellValue.put(new BoardPosition(0, 5), 0);
-        cellValue.put(new BoardPosition(1, 0), 0);
-        cellValue.put(new BoardPosition(1, 1), 0);
-        cellValue.put(new BoardPosition(1, 2), 0);
-        cellValue.put(new BoardPosition(1, 3), 0);
-        cellValue.put(new BoardPosition(1, 4), 0);
-        cellValue.put(new BoardPosition(1, 5), 0);
-        cellValue.put(new BoardPosition(2, 0), 100);
-        cellValue.put(new BoardPosition(2, 1), 100);
-        cellValue.put(new BoardPosition(2, 2), 100);
-        cellValue.put(new BoardPosition(2, 3), 100);
-        cellValue.put(new BoardPosition(2, 4), 100);
-        cellValue.put(new BoardPosition(2, 5), 100);
-        new ModeratePlayer(Team.RED).printMap(cellValue, 3, 6);
+        String setup = "0|0|0\n" +
+                        "0|0|0\n" +
+                        "100|100|100\n" +
+                        "150|150|150\n" +
+                        "200|200|200\n" +
+                        "200|200|200";
+        
+        HashMap<BoardPosition, Integer> map = player.loadMap(setup);
+        player.printMap(map, 3, 6);
     }
     
     private void printMap(HashMap<BoardPosition, Integer> map, int w, int h) {
@@ -300,4 +308,21 @@ public class ModeratePlayer extends AbstractPlayer {
         System.out.println("CellMap:\n" + builder.toString());
     }
     
+    private HashMap<BoardPosition, Integer> loadMap(String values) {
+        HashMap<BoardPosition, Integer> map = new HashMap<>();
+        
+        String[] lines = values.split("\n");
+        for(int row=0; row<lines.length; row++) {
+            String line = lines[row];
+            
+            String[] vals = line.split("\\|");
+            for(int column=0; column<vals.length; column++) {
+                int value = Integer.parseInt(vals[column]);
+                BoardPosition pos = new BoardPosition(column, row);
+                map.put(pos, value);
+            }
+        }
+        
+        return map;
+    }
 }

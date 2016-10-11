@@ -354,8 +354,10 @@ public class BattleEngine {
         BattleTranscript transcript = new BattleTranscript(board, 
                 board.getAttacker(), board.getDefender());
         
-        System.out.println("Attacking team: " + board.getAttacker());
-        System.out.println("Defending team: " + board.getDefender());
+        System.out.println("Attacking team: " + board.getAttacker() 
+                + " (" + attacker.getClass().getSimpleName() + ")");
+        System.out.println("Defending team: " + board.getDefender() 
+                + " (" + defender.getClass().getSimpleName() + ")");
         
         Team winner;
         while((winner = board.isEndState()) == null) {

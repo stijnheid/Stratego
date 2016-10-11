@@ -68,11 +68,11 @@ public class Attacker extends AbstractPlayer {
         // Assumes to be the max player with team RED assigned to it.
         //MoveAction move = this.searchEngine.iterativeDeepeningMinimax(node, 1, -1, true);
         MoveAction move;
-        int range = 5; //-1;
+        int range = -1; //5; //-1;
         if(this.team == Team.RED) {
             move = this.searchEngine.iterativeDeepeningAlphaBeta(node, 1, range, true);
         } else {
-            move = this.searchEngine.iterativeDeepeningAlphaBeta(node, 1, range, false);
+            move = this.searchEngine.iterativeDeepeningMinimax(node, 1, range, false);
         }
         // Should never happen.
         if(move == null) {

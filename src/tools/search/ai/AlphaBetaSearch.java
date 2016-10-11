@@ -347,6 +347,7 @@ public class AlphaBetaSearch {
                 }
                 
                 bestMove = node.getBestMove();
+                System.out.println("Best Move for max depth: " + maxDepth + " is " + bestMove.toString());
                 System.out.println("Explored in Iteration: " + this.exploredNodes);
                 System.out.println("Value: " + value);
                 this.deepestDepth = maxDepth;
@@ -557,8 +558,8 @@ public class AlphaBetaSearch {
                 node.setBestMove(null);
                 // Run minimax.
                 System.out.println("Run IterativeDeepening alphaBeta with max depth: " + maxDepth);
-                System.out.println("Current BoardState: \n" + node.getState().getGameBoard().transcript());
-                System.out.println();
+                //System.out.println("Current BoardState: \n" + node.getState().getGameBoard().transcript());
+                //System.out.println();
                 
                 // Reset explored nodes count.
                 this.exploredNodes = 0;
@@ -739,7 +740,8 @@ public class AlphaBetaSearch {
                 //System.out.println("MAX UNDO MOVE");
                 
                 // Cutoff.
-                if(beta <= alpha) {
+                // Should not be <=! TODO Why?
+                if(beta < alpha) {
                     this.cutoffs++;
                     break;
                 }
@@ -780,7 +782,7 @@ public class AlphaBetaSearch {
                 // maximizing player will never allow the minimizing player
                 // to choose this move and so there is no reason in exploring
                 // this branch.
-                if(alpha >= beta) {
+                if(alpha > beta) {
                     this.cutoffs++;
                     break;
                 }

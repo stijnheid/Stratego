@@ -172,8 +172,8 @@ public class GameBoard {
             throw new IllegalArgumentException("Given position is not free");
         }
         
-        System.out.println("Set Piece: (" + position.getX() + "," 
-                + position.getY() + ") -> " + piece.getRank().name() + " (" + piece.getTeam() + ")");
+        //System.out.println("Set Piece: (" + position.getX() + "," 
+        //        + position.getY() + ") -> " + piece.getRank().name() + " (" + piece.getTeam() + ")");
         
         BoardPosition old = piece.getPosition();
         // If position is set for the first time it will not have an old position.
