@@ -5,7 +5,6 @@
  */
 package tools.search.ai.players;
 
-import Game.GamePiece;
 import Game.GameState;
 import Game.Team;
 import actions.MoveAction;
@@ -34,7 +33,7 @@ public abstract class AbstractPlayer implements AIBot{
     @Override
     public void stop() {
         this.active = false;
-        searchEngine.timeout();
+        this.searchEngine.timeout();
     };
 
     @Override

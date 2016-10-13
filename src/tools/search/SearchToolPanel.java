@@ -19,7 +19,7 @@ import tools.deeplearning.BattleEngine;
 import tools.deeplearning.BattleTranscript;
 import tools.search.ai.AIBot;
 import tools.search.ai.SetupGenerator;
-import tools.search.ai.players.DefaultPlayer;
+import tools.search.ai.players.Attacker;
 
 /**
  *
@@ -146,8 +146,11 @@ public class SearchToolPanel extends javax.swing.JPanel {
         Simulation simulation = new Simulation(state, this.jTable1);
         BattleEngine battleEngine = new BattleEngine();
         
-        AIBot attacker = new DefaultPlayer(Team.RED);
-        AIBot defender = new DefaultPlayer(Team.BLUE);
+        //AIBot attacker = new DefaultPlayer(Team.RED);
+        //AIBot defender = new DefaultPlayer(Team.BLUE);
+        AIBot attacker = new Attacker(Team.RED);
+        AIBot defender = new Attacker(Team.BLUE);
+        
         long computationTime = 2000;
         System.out.println("Invoke Battle Engine");
         BattleTranscript transcript = battleEngine.battle(state, 

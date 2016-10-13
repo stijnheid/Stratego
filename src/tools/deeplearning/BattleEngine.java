@@ -34,20 +34,25 @@ import tools.search.ai.players.ModeratePlayer;
 public class BattleEngine {
     
     public static void main(String[] args) {
-        //new BattleEngine().runTests(); //initialize();
-        //new BattleEngine().initialize();
-        //new BattleEngine().testTranscript();
-        //new BattleEngine().testApplyUndoMove();
-        //new BattleEngine().testUnequalAttack();
-        //new BattleEngine().testAlphaBeta();
-        //new BattleEngine().smallBattle();
-        //new BattleEngine().test();
-        //new BattleEngine().testEndState();
-
-
-        //new BattleEngine().debug();
-        //new BattleEngine().testEpicWeirdness();
-        new BattleEngine().testAlphaBeta();
+        try {
+            //new BattleEngine().runTests(); //initialize();
+            //new BattleEngine().initialize();
+            //new BattleEngine().testTranscript();
+            //new BattleEngine().testApplyUndoMove();
+            //new BattleEngine().testUnequalAttack();
+            //new BattleEngine().testAlphaBeta();
+            //new BattleEngine().smallBattle();
+            //new BattleEngine().test();
+            //new BattleEngine().testEndState();
+            
+            
+            //new BattleEngine().debug();
+            //new BattleEngine().testEpicWeirdness();
+            //new BattleEngine().testAlphaBeta();
+            new BattleEngine().testBuggyAttack();
+        } catch (InvalidPositionException ex) {
+            Logger.getLogger(BattleEngine.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public void runTests() {
@@ -276,11 +281,12 @@ public class BattleEngine {
                 board.getAttacker(), board.getDefender());
         transcript.startGame();
         
+        int moveLimit = 20; // 100;
         Team winner;
         while((winner = board.isEndState()) == null) {
             // Put a temporary hard limit for the moves.
-            if(totalMoves >= 20) { //100) {
-                System.out.println("Game exceeded 100 moves, terminate.");
+            if(totalMoves >= moveLimit) {
+                System.out.println("Game exceeded " + moveLimit + " moves, terminate.");
                 break;
             }
             
@@ -384,6 +390,16 @@ public class BattleEngine {
             System.out.println(iterations + ": " + team.name() + " moved " 
                     + move.getPiece().getRank().name() + " to (" 
                     + destination.getX() + "," + destination.getY() + ")");
+            
+            // DEBUG Check if the move is incorrect.
+            GamePiece pieceToMove = move.getPiece();
+            if(!pieceToMove.getPosition().equals(move.getOrigin())) {
+                throw new RuntimeException("Incorrect MoveAction: " 
+                        + pieceToMove.getPosition().toString() 
+                        + " != " + move.getOrigin().toString() 
+                        + " Original Move: " + move.toString()
+                        + " Applied: " + move.isApplied());
+            }
             
             // Apply move.
             state.getGameBoard().applyMove(move);
@@ -704,5 +720,56 @@ public class BattleEngine {
         search.iterativeDeepeningAlphaBeta(node, 1, 1, true);
         long end = System.currentTimeMillis();
         System.out.println("AlphaBeta finished in " + (end - start) + " ms.");
+    }
+    
+    private void testBuggyAttack() throws InvalidPositionException {
+        GameState state = new GameState();
+        String setup = "r:4|r:4|r:4\n" +
+                        "--- --- ---\n" +
+                        "r:S|r:8|r:4\n" +
+                        "--- --- ---\n" +
+                        "   |   |   \n" +
+                        "--- --- ---\n" +
+                        "   |   |   \n" +
+                        "--- --- ---\n" +
+                        "b:9|b:4|b:4\n" +
+                        "--- --- ---\n" +
+                        "b:4|b:4|b:4";
+        
+        GameBoard board = GameBoard.loadBoard(setup, 3, 6);
+        state.setGameBoard(board);
+        
+        //MoveAction{piece=LIEUTENANT, team=RED, origin=BoardPosition{x=2, y=1}, destination=BoardPosition{x=2, y=2}}
+        //MoveAction{piece=LIEUTENANT, team=BLUE, origin=BoardPosition{x=2, y=4}, destination=BoardPosition{x=2, y=3}}
+        //MoveAction{piece=LIEUTENANT, team=RED, origin=BoardPosition{x=2, y=2}, destination=BoardPosition{x=2, y=3}}
+        
+        System.out.println("Move red forward.");
+        GamePiece redLieutenant = board.getPiece(new BoardPosition(2,1));
+        MoveAction moveRed = new MoveAction(Team.RED, redLieutenant, new BoardPosition(2,1), new BoardPosition(2,2));
+        board.applyMove(moveRed);
+        System.out.println(board.transcript());
+        System.out.println();
+        
+        System.out.println("Move blue forward.");
+        GamePiece blueLieutenant = board.getPiece(new BoardPosition(2,4));
+        MoveAction moveBlue = new MoveAction(Team.BLUE, blueLieutenant, new BoardPosition(2,4), new BoardPosition(2,3));
+        board.applyMove(moveBlue);
+        System.out.println(board.transcript());
+        System.out.println();
+        
+        System.out.println("Move red forward.");
+        //GamePiece redL = board.getPiece(new BoardPosition(2,2));
+        // Set the dummy's position to an empy board position on purpose.
+        // Some how the reference to a copied piece contains a different board position
+        // than the original piece, this causes the bug to exist.
+        GamePiece dummy = new GamePiece(Pieces.LIEUTENANT, Team.RED, new BoardPosition(2,3));
+        
+        System.out.println("Dummy Move");
+        MoveAction move = new MoveAction(Team.RED, dummy, new BoardPosition(2,2), new BoardPosition(2,3));
+        board.applyMove(move);
+        System.out.println(board.transcript());
+        System.out.println();
+        
+        System.out.println("Test Buggy Attack Ended.");
     }
 }

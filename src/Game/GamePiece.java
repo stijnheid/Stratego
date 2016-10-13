@@ -132,4 +132,11 @@ public class GamePiece {
         }
         return clone;
     }
+
+    @Override
+    public String toString() {
+        return "GamePiece{" + "rank=" + rank + ", team=" + team 
+                + ", isHighlighted=" + isHighlighted + ", position=" 
+                + position.toString() + ", isAlive=" + isAlive + '}';
+    }    
 }
