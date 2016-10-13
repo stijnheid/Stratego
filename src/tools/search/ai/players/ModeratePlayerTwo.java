@@ -84,10 +84,12 @@ public class ModeratePlayerTwo extends AbstractPlayer{
             List<GamePiece> attackerSpies = board.getPieces(ModeratePlayerTwo.super.team.opposite(), Pieces.SPY);
             if(attackerSpies.isEmpty()) {
                 // Spy of attacker died.
-                defender.put(Pieces.MARSHALL, 400);
+                score = defender.get(Pieces.MARSHALL) * 0.8;
             }
-            
-            score = defender.get(Pieces.MARSHALL);
+            else {
+                score = defender.get(Pieces.MARSHALL);
+            }
+           
             return score;
         }        
     }
@@ -99,8 +101,47 @@ public class ModeratePlayerTwo extends AbstractPlayer{
             double score = 0;
             GameBoard board = state.getGameBoard();
             
-            return score;
+            List<GamePiece> attackerMiner = board.getPieces(ModeratePlayerTwo.super.team.opposite(), Pieces.MINER);
+            if (attackerMiner.size() < 3) {
+                score = attacker.get(Pieces.MINER) * (4 - (getPiecesAmount(state, ModeratePlayerTwo.super.team.opposite(), Pieces.MINER)));
+            }
+            else {
+                score = defender.get(Pieces.MINER);
+            }
+            
+            return score * getPiecesAmount(state, ModeratePlayerTwo.super.team.opposite(), Pieces.MINER);
         }
         
+    }
+    
+    private class BombValue extends WeighedHeuristicTerm {
+
+        @Override
+        public double computeScore(GameState state) {
+            double score;
+            return score = (HighestValue(state, ModeratePlayerTwo.super.team)/2) * getPiecesAmount(state, ModeratePlayerTwo.super.team, Pieces.BOMB);
+        }
+        
+    }
+    
+    //get the amount of pieces of a specific unit
+    public int getPiecesAmount(GameState state, Team team, Pieces unit) {
+        GameBoard board = state.getGameBoard();
+        List<GamePiece> pieces = board.getPieces(team, unit);
+        return pieces.size();
+    }
+    
+    public int HighestValue(GameState state, Team team) {
+        GameBoard board = state.getGameBoard();
+        List<GamePiece> army = board.getTeam(ModeratePlayerTwo.super.team);
+        
+        int maxValue = Integer.MIN_VALUE;
+        for (GamePiece pieces : army) {
+            if (attacker.get(army) > maxValue) {
+                maxValue = attacker.get(army);
+            }
+        }
+        
+        return maxValue;
     }
 }

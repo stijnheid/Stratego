@@ -22,8 +22,8 @@ public class BattleTest {
     public static void main (String[] args) {
         //new BattleTest().testHeuristic();
         //new BattleTest().testSmallBoard();
-        //new BattleTest().showCase();
-        new BattleTest().alphaBetaTest();
+        new BattleTest().showCase();
+        //new BattleTest().alphaBetaTest();
     }
     
     private void testHeuristic() {

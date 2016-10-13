@@ -134,7 +134,7 @@ public class ModeratePlayer extends AbstractPlayer {
             score = blueScore + redScore;
             
             return -score;
-            //return -score * (red.size()/blue.size());
+            //return -score * (blue.size()/red.size());
         }
         
         //check if the flag are surrounded by bombs
@@ -148,11 +148,6 @@ public class ModeratePlayer extends AbstractPlayer {
             GameBoard board = state.getGameBoard();
             List<GamePiece> pieces = board.getPieces(team, unit);
             return pieces.size();
-        }
-        
-        public void getHighestValue(GameState state, Team team) {
-            GameBoard board = state.getGameBoard();
-            List<GamePiece> army = board.getTeam(team);
         }
         
     }
