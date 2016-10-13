@@ -74,8 +74,11 @@ public class Vector {
      */
     public void rotate(double deg){
         double rad = Math.toRadians(deg);
-        x = x * Math.cos(rad) - y * (float)Math.sin(rad);
-        y = x * Math.sin(rad) + y * (float)Math.cos(rad);
+        double x1,y1;
+        x1 = x * Math.cos(rad) - y * (float)Math.sin(rad);
+        y1 = x * Math.sin(rad) + y * (float)Math.cos(rad);
+        this.x = x1;
+        this.y = y1;
     }
     
     /**
