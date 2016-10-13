@@ -31,6 +31,9 @@ public class Skeleton {
     /**Position of this skeleton on the board.*/
     public BoardPosition position;
     
+    /**Mapindex of this skeleton on the board (relates to BoardPosition).*/
+    public int mapindex;
+    
     /**Team on which this skeleton resides.
      (Red Attacks, Blue Defends)*/
     public Team team;
@@ -83,7 +86,8 @@ public class Skeleton {
         joints = new ArrayList<Vector>();
         this.position = p;
         this.team = t;
-        offset = new Vector(-2.5+p.getX(),2.5-p.getY(),0); 
+        offset = new Vector(-2.5+p.getX(),2.5-p.getY(),0);
+        mapindex =  p.getX() + 6 * p.getY();
         if (team == Team.BLUE){
             rotate(180);
             skelDiffuse = new float[]{0,0,1,1};

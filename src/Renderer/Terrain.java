@@ -70,11 +70,7 @@ public class Terrain extends Base {
     
     Tree tree; 
     
-    public Terrain(){
-        
-      
-        
-
+    public Terrain(GameState gs){ 
         
         List<Vector> input = new ArrayList<Vector>();
         input.add(new Vector( 2, 2, 0));
@@ -306,9 +302,7 @@ public class Terrain extends Base {
      * int key represents position on the board in reading order (starting top left at 0).
      */
     public void drawPieces(){
-        for(int key : cs.pieces.keySet()){
-            cs.pieces.get(key).draw(gl, glut);
-        }
+        
     }
     
     /**
@@ -348,9 +342,9 @@ public class Terrain extends Base {
         drawBoard();
         drawPieces();
         if(pan){
-            Animation ani = new WalkAnimation(this, null, new BoardPosition(3,0));
+            Animation ani = new WalkAnimation(this, new BoardPosition(4,0), new BoardPosition(3,0), null);
             pan=false;
-            ani.execute();
+            playAnimation(ani);
         }
                
         /**Increment frame count AFTER rendering.*/
@@ -363,7 +357,7 @@ public class Terrain extends Base {
     }
     
     public static void main (String[] args){
-        Terrain terrain = new Terrain();
+        Terrain terrain = new Terrain(null);
         terrain.run();
     }
     

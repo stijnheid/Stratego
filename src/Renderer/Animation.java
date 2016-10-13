@@ -16,8 +16,8 @@ public class Animation {
     /*Duration of the animation (in frames).*/
     protected final static int duration = 30;
     
-    /*GamePiece on which this animation acts.*/
-    protected final GamePiece subject;
+    /*Position of Skeleton on which this animation acts.*/
+    protected final BoardPosition subject;
     
     /*Terrain on which to perform animation (for openGL variables).*/
     protected final Terrain terrain;
@@ -27,21 +27,34 @@ public class Animation {
     
     protected Skeleton skel;
     
+    /*Direction of animation.*/
+    protected Vector direction;
+    
+    /*Start location of animation.*/
+    protected Vector startloc;
+    
+    protected AnimationCallback call;
+    
     /**
      * Constructor for an Animation.
      * @param subject piece executing the animation.
      * @param target where to move (in the case of walking) or what to attack (otherwise).
      * @param terrain the scene on which to operate (required for passing openGL variables).
      */
-    public Animation(Terrain terrain, GamePiece subject, BoardPosition target){
+    public Animation(Terrain terrain, BoardPosition subject, BoardPosition target, AnimationCallback callback){
         this.subject = subject;
         this.terrain = terrain;
         this.target = target;
+        this.call = callback;
         try {
-            this.skel = terrain.cs.pieces.get(6*subject.getPosition().getX() + subject.getPosition().getY());
+            this.skel = terrain.cs.pieces.get(6*subject.getX() + subject.getY());
         }   catch (Exception e){
+            //get the piece at cell (4,0).
             this.skel = terrain.cs.pieces.get(24);
         }
+        startloc = skel.offset;
+        direction = new Vector(0,1,0);
+        direction.rotate(skel.getRotation());
     }
     
     /**
@@ -91,6 +104,12 @@ public class Animation {
         
     }
     
+    public void endAnimation(){
+        if (call != null){
+            call.animationEnded();        
+        }
+    }
+    
     /**
      * Method to make the GamePiece face its target (before starting to walk/attack).
      */
@@ -106,6 +125,14 @@ public class Animation {
                 }   else {
                     skel.rotate(90);
                 }
+        }   else {
+            skel.rotate(180);
+        }
+    }
+    
+    public void faceForward(){
+        if (skel.team == Team.RED){
+            skel.rotate(0);
         }   else {
             skel.rotate(180);
         }
