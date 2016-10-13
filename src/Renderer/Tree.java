@@ -64,21 +64,16 @@ public class Tree {
     * function can be used to determine these doubles. If they were used
     * in the draw method, the trees would vary with every drawn frame
     */
-    public Tree(double x, double y, double z, GL2 gl, Terrain terrain, int branches, long seed) {
+    public Tree(double X, double Y, double Z, GL2 gl, Terrain terrain, int branches, long seed) {
 
-
-        
-
-        
-        
         Vector length =  new Vector(0,0,0);
-        this.x = x;             
-        this.y = y; 
-        this.z = z; 
+        this.x = X;             
+        this.y = Y; 
+        this.z = Z; 
         this.offset = 1;   
-        this.height= 4; 
+        this.height= 5.5; 
         Random randomVar = new Random(seed);
-        
+               System.out.println(x);  
         
         
         for (int i =0; i<branches; i++){
@@ -112,7 +107,7 @@ public class Tree {
     
      void draw( GL2 gl, float tAnim)   
      {
-         
+
                  
         for (int i =0; i<18; i++){
             Vector mands = (Vector)pointsSphere.get(i);
@@ -149,9 +144,11 @@ public class Tree {
         // shure the tree touches the ground.
         
         
-        // start recursion
+        // start recursionv
+        gl.glPushMatrix();
+        gl.glTranslated(x, y, z);
         drawBranch(basewidth, height, gl, tAnim, 0, 0, 0);
-        
+        gl.glPopMatrix();        
         
      }
      
@@ -170,6 +167,8 @@ public class Tree {
         // Defenition of the texture
         wood = terrain.vakje;
         wood.bind(gl);
+        
+        
 
         
             gl.glBegin(GL_TRIANGLE_FAN);
@@ -204,7 +203,7 @@ public class Tree {
                     if (iteration == 2){
                     
                     }
-                                    
+                                     
                     gl.glPopMatrix(); 
                 
 
@@ -213,6 +212,7 @@ public class Tree {
               
                 
             }
+
             
 
             }

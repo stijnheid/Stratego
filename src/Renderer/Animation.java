@@ -6,36 +6,42 @@
 package Renderer;
 import Game.GamePiece;
 import Game.BoardPosition;
+import Game.Team;
 
 /**
  *  Class to represent an animation.
  */
 public class Animation {
     
-    public static int WALK = 0;
-    public static int ATTACK = 1;
-    public static int DIE = 2;
+    /*Duration of the animation (in frames).*/
+    protected final static int duration = 30;
     
-    GamePiece subject;
+    /*GamePiece on which this animation acts.*/
+    protected final GamePiece subject;
     
-    int AnimType;
+    /*Terrain on which to perform animation (for openGL variables).*/
+    protected final Terrain terrain;
     
-    Terrain terrain;
+    /*Goal position of this piece after the animation.*/
+    protected final BoardPosition target;
     
-    BoardPosition target;
+    protected Skeleton skel;
     
     /**
      * Constructor for an Animation.
      * @param subject piece executing the animation.
-     * @param AnimType which animation to execute.
      * @param target where to move (in the case of walking) or what to attack (otherwise).
      * @param terrain the scene on which to operate (required for passing openGL variables).
      */
-    public Animation(GamePiece subject, int AnimType, BoardPosition target, Terrain terrain){
+    public Animation(Terrain terrain, GamePiece subject, BoardPosition target){
         this.subject = subject;
-        this.AnimType = AnimType;
         this.terrain = terrain;
         this.target = target;
+        try {
+            this.skel = terrain.cs.pieces[subject.getPosition().getX()][subject.getPosition().getY()];    
+        }   catch (Exception e){
+            this.skel = terrain.cs.pieces[1][0];
+        }
     }
     
     /**
@@ -44,32 +50,37 @@ public class Animation {
      * @param eye Vector representing the goal location of the camera.
      * @param center Vector representing the goal focus point of the camera.
      */
-    private void moveCamera (Vector eye, Vector center){
-        /*
-        Vector currenteye = new Vector(terrain.camera.eye);
-        Vector currentorigin = new Vector(terrain.camera.center);
-        Vector eyepath = new Vector(currenteye);
-        eyepath.subtract(eye);
-        Vector centerpath = new Vector(currentorigin);
-        centerpath.subtract(center);
-        float index;
-        
-        //move towards goal over a period of 2 seconds.
-        float start = System.currentTimeMillis();
-        float now = start;
-        while(now - start < 2000){
-            now = System.currentTimeMillis();
-            index = (now-start)/2000;
-            currenteye.x = eye.x - (1-index) * eyepath.x;
-            currenteye.y = eye.y - (1-index) * eyepath.y;
-            currenteye.z = eye.z - (1-index) * eyepath.z;
-            currentorigin.x = center.x - (1-index) * centerpath.x;
-            currentorigin.y = center.y - (1-index) * centerpath.y;
-            currentorigin.z = center.z - (1-index) * centerpath.z;
-            terrain.adjustCamera(currenteye,currentorigin);
-        }
-        //just to make sure it's in place correctly.
-        terrain.adjustCamera(eye, center);*/
+    public void moveCamera (Vector eye, Vector center){
+                //current Camera variables.
+                double phi1 = terrain.cs.phi;
+                double theta1 = terrain.cs.theta;
+                double dist1 = terrain.cs.vDist;
+                Vector cnt1 = terrain.cs.cnt;
+                //goal Camera variables.
+                double phi2 = (float) getPhi(eye, center);
+                double theta2 = (float) getTheta(eye, center);
+                double dist2 = (float) getDist(eye, center);
+                Vector cnt2 = terrain.cs.cnt;
+                //Camera variables during transit.
+                double phi3 = phi1, theta3 = theta1, dist3 = dist1;
+                Vector cnt3 = new Vector(center);
+                cnt3.subtract(cnt1);
+                cnt3 = cnt3.scale(1d/(double)duration);
+                //loop over a period of frames.
+                for (int i=0; i<duration; i++){
+                    try {//update on frame refresh.
+                        synchronized(terrain.cs.refresh){
+                            terrain.cs.refresh.wait();  
+                            phi3 += (phi2-phi1)/duration;
+                            theta3 += (theta2-theta1)/duration;
+                            dist3 += (dist2-dist1)/duration;
+                            cnt2.add(cnt3);
+                            terrain.cs.setCamera(phi3, theta3, dist3, cnt2); 
+                        }
+                    }   catch (Exception e){}
+                }
+                //make sure camera is at the final location.
+                terrain.cs.setCamera(phi2, theta2, dist2, cnt2);  
     }
     
     /**
@@ -84,18 +95,60 @@ public class Animation {
      * Method to make the GamePiece face its target (before starting to walk/attack).
      */
     public void faceTarget(){
-        int x = subject.getPosition().getX();
-        int y = subject.getPosition().getY();
+        BoardPosition pos = skel.getPosition();
+        int x = pos.getX();
+        int y = pos.getY();
         if (target.getX() > x){
-            //rotate to face forward.
+            skel.rotate(0);
         }   else if(target.getX() == x){
                 if(target.getY() > y){
-                    //rotate to face right.
+                    skel.rotate(-90);
                 }   else {
-                    //rotate to face left.
+                    skel.rotate(90);
                 }
         }   else {
-            //rotate to face backwards.
+            skel.rotate(180);
         }
+    }
+    
+    /**
+     * Returns the theta for the vector eye.
+     * @param eye camera eye.
+     * @param center camera centre;
+     * @return 
+     */
+    private double getTheta(Vector eye, Vector center){
+        double theta;
+        eye.subtract(center);
+        theta = Math.atan(eye.y/eye.x);
+        eye.add(center);
+        return theta;
+    }
+    
+    /**
+     * Returns the phi for the vector eye.
+     * @param eye camera eye.
+     * @param center camera centre;
+     * @return 
+     */
+    private double getPhi(Vector eye, Vector center){
+        double phi;
+        eye.subtract(center);
+        phi = Math.asin(eye.z()/eye.length());
+        eye.add(center);
+        return phi;
+    }
+    
+    /**
+     * Returns distance from eye to centre vectors.
+     * @param eye camera eye.
+     * @param center camera centre.
+     * @return 
+     */
+    private double getDist(Vector eye, Vector center){
+        eye.subtract(center);
+        Vector diff = new Vector(eye);
+        eye.add(center);
+        return diff.length();
     }
 }

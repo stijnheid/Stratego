@@ -104,21 +104,21 @@ public class FitSphere {
                 }
                 }
             }
-            
+            /*
             System.out.print("spherepoint =" );
             System.out.println(p);
             System.out.println(v.x +","+ v.y +","+ v.z);
             System.out.println("Weightthing "+WeightPoints.size());  
-            
+            */
             
             for(int i =0; i< WeightPoints.size(); i++){
-                System.out.println(WeightPoints.get(i).x +","+ WeightPoints.get(i).y +","+ WeightPoints.get(i).z);
+                //System.out.println(WeightPoints.get(i).x +","+ WeightPoints.get(i).y +","+ WeightPoints.get(i).z);
                 Vector u = new Vector(WeightPoints.get(i));  
                 u.subtract(v);
                 Difference.add(u);
             }
             for (Vector u : Difference){
-                System.out.println(u.x +","+ u.y +","+ u.z);
+                //System.out.println(u.x +","+ u.y +","+ u.z);
                 v.add(u.scale(adaption));
             }
                 
@@ -149,7 +149,7 @@ public class FitSphere {
             
             
             
-            gl.glNormal3f(vector3.x, vector3.y, vector3.z);
+            gl.glNormal3d(vector3.x, vector3.y, vector3.z);
             
             
             gl.glTexCoord2d(0, 0);
@@ -162,7 +162,7 @@ public class FitSphere {
             i-=(NodesOnRing);
             
             
-            gl.glNormal3f(vector3.x, vector3.y, vector3.z);
+            gl.glNormal3d(vector3.x, vector3.y, vector3.z);
             gl.glTexCoord2d(1, 1);
             gl.glVertex3d(PointsSphere.get(i).x, PointsSphere.get(i).y, PointsSphere.get(i).z);
             i+=NodesOnRing+1;

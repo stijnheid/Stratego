@@ -59,19 +59,19 @@ public class Terrain extends Base {
     /** Instances of different textures */
     public static Texture grass, vakje ,leaves, water, wood;
     
-    private final int boardsize = 8;
+    private final int boardsize = 6;
     private final int terrainsize = 20;
     
-    Skeleton test;
+    //test stuff
+    boolean pan;
+    double lastframe;
+    double thisframe;
     
-    Tree tree;
-    
-    FitSphere sphere;
-    
+    Tree tree; 
     
     public Terrain(){
         
-        test = new Skeleton(new Vector(-3.5,-3.5,0));
+      
         
 
         
@@ -87,11 +87,12 @@ public class Terrain extends Base {
 
 
         //sphere = new FitSphere(input, 0.1f);
+
                 
         // Initialize the camera
-        camera = new Camera();    
-        
-
+        camera = new Camera();
+        pan = true;
+        lastframe = System.currentTimeMillis();
     }
     
        /**
@@ -110,7 +111,12 @@ public class Terrain extends Base {
         // Modify this to meet the requirements in the assignment.
         float aspectRatio = (float) cs.w / (float) cs.h;
         double fovy = 60;
-        glu.gluPerspective(fovy, aspectRatio, 0.1 * cs.vDist, 10.0 * cs.vDist);
+        try {/** Since vDist is a synchronised variable. */
+            cs.varLock.lock();
+            glu.gluPerspective(fovy, aspectRatio, 0.1 * (float)cs.vDist, 10.0 * (float)cs.vDist); 
+        }   finally {
+            cs.varLock.unlock();
+        }
         // Set camera.
         gl.glMatrixMode(GL_MODELVIEW);
         gl.glLoadIdentity();
@@ -137,7 +143,9 @@ public class Terrain extends Base {
      */
     @Override
     public void initialize() {
-        tree = new Tree(0,0,0, gl, this, 20, 6456);   
+        
+        
+        tree = new Tree(5,5,heightAt(5,5), gl, this, 20, 6456);   
 
         gl.glEnable(GL_LIGHTING);
         gl.glEnable(GL_LIGHT0);
@@ -187,12 +195,6 @@ public class Terrain extends Base {
         vakje = loadTexture(pwd + "Vakje.jpg");
         leaves = loadTexture(pwd + "Leaves.jpg");
         water = loadTexture(pwd + "water.jpg");
-        wood = loadTexture(pwd + "water.jpg");
-        
-        
-        cs.theta = 4.5f;
-        cs.phi = 0.5f;
-
     }
     
     /**
@@ -203,7 +205,7 @@ public class Terrain extends Base {
         double xmax = terrainsize/2;
         double ymin = -terrainsize/2;
         double ymax = terrainsize/2;
-        double delta = 0.1;
+        double delta = 0.5;
         gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Material.GROUND.diffuse, 0);
         gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.GROUND.specular, 0);
         gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Material.GROUND.shininess);
@@ -216,7 +218,7 @@ public class Terrain extends Base {
 
             for(double y = ymin; y <= ymax; y += delta){
                             
-                if (! ((x > -boardsize/2 && x <boardsize/2) && (y > -boardsize/2 && y <boardsize/2))){
+                if (! ((x > -boardsize/2 && (x-delta) <boardsize/2) && (y > -boardsize/2 && (y-delta) <boardsize/2))){
                     gl.glBegin(GL_TRIANGLE_STRIP);
 
 
@@ -261,11 +263,6 @@ public class Terrain extends Base {
         int delta = 1;
         double z = 0;
         this.vakje.bind(gl);
-        boolean[][] cells = new boolean[8][8];
-        cells[2][3]=true;
-        cells[2][4]=true;
-        cells[5][3]=true;
-        cells[5][4]=true;
         
         gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Material.CONCRETE.diffuse, 0);
         gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.CONCRETE.specular, 0);
@@ -276,29 +273,43 @@ public class Terrain extends Base {
         gl.glNormal3d(0, 0, 1);
         for(double x = xmin; x < xmax; x += delta){
             for(double y = ymin; y < ymax; y += delta){
-                if (!cells[(int)x+4][(int)y+4]){
-                    gl.glBegin(GL_QUAD_STRIP);
-                    gl.glTexCoord2d(0, 0);
-                    gl.glVertex3d(x, y, z);
-                    gl.glTexCoord2d(1, 0);
-                    gl.glVertex3d(x + delta, y, z);
-                    gl.glTexCoord2d(0, 1);
-                    gl.glVertex3d(x, y + delta, z);
-                    gl.glTexCoord2d(1, 1);
-                    gl.glVertex3d(x + delta, y + delta, z);
-                    gl.glEnd();                
-                }
+                gl.glBegin(GL_QUAD_STRIP);
+                gl.glTexCoord2d(0, 0);
+                gl.glVertex3d(x, y, z);
+                gl.glTexCoord2d(1, 0);
+                gl.glVertex3d(x + delta, y, z);
+                gl.glTexCoord2d(0, 1);
+                gl.glVertex3d(x, y + delta, z);
+                gl.glTexCoord2d(1, 1);
+                gl.glVertex3d(x + delta, y + delta, z);
+                gl.glEnd();               
             }
         }
+        //cross signifying tile (0,0) (for testing purposes).
+        gl.glBegin(GL_TRIANGLE_STRIP);
+        gl.glVertex3d(xmin, ymin, z);
+        gl.glVertex3d(xmin+1, ymin+1, z);
+        gl.glVertex3d(xmin+0.5, ymin+0.5, 0.1);
+        gl.glEnd();
+        
+        gl.glBegin(GL_TRIANGLE_STRIP);
+        gl.glVertex3d(xmin, ymin+1, z);
+        gl.glVertex3d(xmin+1, ymin, z);
+        gl.glVertex3d(xmin+0.5, ymin+0.5, 0.1);
+        gl.glEnd();
     }
     
     /**
-     * Method to draw a single piece at the specified position.
-     * @param x the x coordinate of this piece (on the board).
-     * @param y the y coordinate of this piece (on the board).
+     * Method to draw pieces.
      */
-    public void drawPiece(int x, int y){
-        
+    public void drawPieces(){
+        for(int i=0; i<boardsize; i++){
+            for (int j=0; j<boardsize; j++){
+                if(cs.pieces[i][j] != null){
+                    cs.pieces[i][j].draw(gl, glut);
+                }
+            }
+        }
     }
     
     /**
@@ -331,9 +342,24 @@ public class Terrain extends Base {
         
         gl.glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         
+        //set camera to current Camera variables.
+        camera.update(cs);
+        
         drawTerrain();
         drawBoard();
-        test.draw(gl, glut);
+        drawPieces();
+        if(pan){
+            Animation ani = new WalkAnimation(this, null, new Game.BoardPosition(2,0));
+            pan=false;
+            //ani.execute();
+        }
+               
+        /**Increment frame count AFTER rendering.*/
+        cs.frameTick();
+        thisframe = System.currentTimeMillis();
+        System.out.println("Currently displaying "+(int)(1000/(thisframe-lastframe))+" frames per second");
+        lastframe = thisframe;
+        //System.out.println(camera.eye.x+" "+camera.eye.y+" "+camera.eye.z);
         tree.draw(gl, cs.tAnim);
         //sphere.draw(gl);
     }
