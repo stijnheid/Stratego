@@ -5,6 +5,7 @@
  */
 package Renderer;
 
+import Game.GamePiece;
 import Game.BoardPosition;
 
 /**
@@ -12,7 +13,7 @@ import Game.BoardPosition;
  */
 public class WalkAnimation extends Animation{
     
-    public WalkAnimation(Terrain terrain, BoardPosition subject, BoardPosition target, AnimationCallback call){
+    public WalkAnimation(Terrain terrain, GamePiece subject, BoardPosition target, AnimationCallback call){
         super(terrain, subject, target, call);
     }
     
@@ -44,12 +45,6 @@ public class WalkAnimation extends Animation{
         });
         walk.start();
         //update CameraState variable to account for moved piece.
-        synchronized (terrain.cs.pieces){
-            terrain.cs.pieces.remove(skel.mapindex);
-            int index =  skel.position.getX() + 6 * skel.position.getY();
-            terrain.cs.pieces.put(index,skel);
-            skel.mapindex = index;        
-        }
     }
     
     /**

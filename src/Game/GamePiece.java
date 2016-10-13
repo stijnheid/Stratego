@@ -1,6 +1,7 @@
 package Game;
 
 import static Game.Pieces.*;
+import Renderer.Skeleton;
 
 /**
  * This object represents a piece on the game board. A piece has a rank and team.
@@ -15,6 +16,7 @@ public class GamePiece {
     private boolean isHighlighted;
     private BoardPosition position;
     private boolean isAlive;
+    private Skeleton skeleton;
     
     public GamePiece(Pieces rank, Team team) {
         this.rank = rank;
@@ -29,6 +31,7 @@ public class GamePiece {
         this.team = team;
         this.isAlive = true;
         this.position = position;
+        this.skeleton = new Skeleton(position, team);
     }
     
     public boolean isStatic() {
@@ -57,6 +60,10 @@ public class GamePiece {
 
     public BoardPosition getPosition() {
         return this.position;
+    }
+    
+    public Skeleton getSkeleton(){
+        return this.skeleton;
     }
 
     public void setPosition(BoardPosition position) {

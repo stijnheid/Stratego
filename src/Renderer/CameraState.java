@@ -23,10 +23,6 @@ public class CameraState {
     public final Object refresh;
     public final Lock varLock;
     
-    /*Variable containing the skeletons of the teams.
-    Board cells are counted in reading order starting top left = 0.*/
-    public Map<Integer,Skeleton> pieces;
-    
     public int w;               // Width of window in pixels.
     public int h;               // Height of window in pixels.
     
@@ -47,27 +43,6 @@ public class CameraState {
         frameCount = 0;
         refresh = new Object();
         varLock = new ReentrantLock();
-        
-        pieces = new HashMap();
-        BoardPosition pos;
-        int mapindex;
-        for(int y=0; y < 6; y++){
-            if(y==4 || y==5){
-                for(int x=0; x<6; x++){
-                    //Attackers
-                    mapindex = 6*y + x;
-                    pos = new BoardPosition(x,y);
-                    pieces.put(mapindex,new Skeleton(pos, Team.RED));
-                }
-            }   else if(y==0 || y==1){
-                for(int x=0;x<6; x++){
-                    //Defenders
-                    mapindex = 6*y + x;
-                    pos = new BoardPosition(x,y);
-                    pieces.put(mapindex,new Skeleton(pos, Team.BLUE));
-                }
-            }
-        }
     }
     
     public void setCamera(double phi, double theta, double vDist, Vector cnt){

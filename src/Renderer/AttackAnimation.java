@@ -4,6 +4,7 @@
  * and open the template in the editor.
  */
 package Renderer;
+import Game.GamePiece;
 import Game.BoardPosition;
 
 /**
@@ -11,7 +12,7 @@ import Game.BoardPosition;
  */
 public class AttackAnimation extends Animation {
     
-    public AttackAnimation(Terrain terrain, BoardPosition subject, BoardPosition target, AnimationCallback call){
+    public AttackAnimation(Terrain terrain, GamePiece subject, BoardPosition target, AnimationCallback call){
         super(terrain, subject, target, call);
     }
     
@@ -21,7 +22,7 @@ public class AttackAnimation extends Animation {
         faceTarget();
         direction = new Vector(0,1,0);
         direction.rotate(skel.getRotation());
-        Thread walk = new Thread(() -> {
+        Thread attack = new Thread(() -> {
             //Current camera location.
             Vector center = terrain.camera.center;
             Vector eye = terrain.camera.eye;
@@ -52,14 +53,7 @@ public class AttackAnimation extends Animation {
             //move Camera back to original location.
             moveCamera(eye, center);
         });
-        walk.start();
-        //update CameraState variable to account for moved piece.
-        synchronized (terrain.cs.pieces){
-            terrain.cs.pieces.remove(skel.mapindex);
-            int index =  skel.position.getX() + 6 * skel.position.getY();
-            terrain.cs.pieces.put(index,skel);
-            skel.mapindex = index;        
-        }
+        attack.start();
     }
     
     /**

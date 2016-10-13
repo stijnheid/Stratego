@@ -5,29 +5,19 @@
  */
 package Renderer;
 
-import robotrace.*;
-import Game.GameState;
-import Game.GamePiece;
+import robotrace.Camera;
 import Game.BoardPosition;
-import com.jogamp.newt.opengl.GLWindow;
+import Game.GameBoard;
+import Game.GamePiece;
+import Game.GameState;
+import Game.Team;
+import tools.search.ai.SetupGenerator;
+
 import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.gl2.GLUT;
-import java.io.File;
 import static java.lang.Math.*;
 import java.util.ArrayList;
 import java.util.List;
-import javax.media.opengl.*;
-import javax.media.opengl.glu.GLU;
-import static javax.media.opengl.GL.GL_BLEND;
-import static javax.media.opengl.GL.GL_COLOR_BUFFER_BIT;
-import static javax.media.opengl.GL.GL_DEPTH_BUFFER_BIT;
-import static javax.media.opengl.GL.GL_DEPTH_TEST;
-import static javax.media.opengl.GL.GL_FRONT_AND_BACK;
-import static javax.media.opengl.GL.GL_LESS;
-import static javax.media.opengl.GL.GL_NICEST;
-import static javax.media.opengl.GL.GL_ONE_MINUS_SRC_ALPHA;
-import static javax.media.opengl.GL.GL_SRC_ALPHA;
-import static javax.media.opengl.GL.GL_TEXTURE_2D;
+
 import static javax.media.opengl.GL2.*;
 import static javax.media.opengl.GL2ES1.GL_PERSPECTIVE_CORRECTION_HINT;
 import static javax.media.opengl.GL2GL3.GL_FILL;
@@ -68,9 +58,14 @@ public class Terrain extends Base {
     double lastframe;
     double thisframe;
     
-    Tree tree; 
+    Tree tree;
     
-    public Terrain(GameState gs){ 
+    //package Game variables.
+    GameState gamestate;
+    GameBoard board;
+    GamePiece piece;
+    
+    public Terrain(){ 
         
         List<Vector> input = new ArrayList<Vector>();
         input.add(new Vector( 2, 2, 0));
@@ -85,7 +80,11 @@ public class Terrain extends Base {
 
         //sphere = new FitSphere(input, 0.1f);
 
-                
+        //form game setup.
+        gamestate = new GameState();
+        SetupGenerator setup = new SetupGenerator();
+        gamestate.setGameBoard(setup.generateSetup());
+        
         // Initialize the camera
         camera = new Camera();
         pan = true;
@@ -295,6 +294,19 @@ public class Terrain extends Base {
         gl.glVertex3d(xmin+1, ymin, z);
         gl.glVertex3d(xmin+0.5, ymin+0.5, 0.1);
         gl.glEnd();
+        
+        //tile at (4,0)
+        gl.glBegin(GL_TRIANGLE_STRIP);
+        gl.glVertex3d(xmin, ymin+1, z);
+        gl.glVertex3d(xmin+1, ymin+2, z);
+        gl.glVertex3d(xmin+0.5, ymin+1.5, 0.1);
+        gl.glEnd();
+        
+        gl.glBegin(GL_TRIANGLE_STRIP);
+        gl.glVertex3d(xmin, ymin+2, z);
+        gl.glVertex3d(xmin+1, ymin+1, z);
+        gl.glVertex3d(xmin+0.5, ymin+1.5, 0.1);
+        gl.glEnd();
     }
     
     /**
@@ -302,7 +314,19 @@ public class Terrain extends Base {
      * int key represents position on the board in reading order (starting top left at 0).
      */
     public void drawPieces(){
-        
+        board = gamestate.getGameBoard();
+        try {
+            for (int y=0; y < board.getHeight(); y++){
+                for (int x=0; x < board.getWidth(); x++){                  
+                piece = board.getPiece(new BoardPosition(x,y));
+                    if (piece != null){
+                        piece.getSkeleton().draw(gl, glut);
+                    }
+                }
+            }        
+        }   catch (Exception e){
+            //stuff's wrong.
+        }
     }
     
     /**
@@ -342,9 +366,13 @@ public class Terrain extends Base {
         drawBoard();
         drawPieces();
         if(pan){
-            Animation ani = new WalkAnimation(this, new BoardPosition(4,0), new BoardPosition(3,0), null);
-            pan=false;
-            playAnimation(ani);
+            try {
+                Animation ani = new WalkAnimation(this, 
+                    board.getPiece(new BoardPosition(0,4)), 
+                    new BoardPosition(0,3), null);
+                pan=false;
+                playAnimation(ani);            
+            }   catch (Exception e){}
         }
                
         /**Increment frame count AFTER rendering.*/
@@ -357,7 +385,7 @@ public class Terrain extends Base {
     }
     
     public static void main (String[] args){
-        Terrain terrain = new Terrain(null);
+        Terrain terrain = new Terrain();
         terrain.run();
     }
     

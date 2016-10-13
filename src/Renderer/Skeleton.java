@@ -89,12 +89,12 @@ public class Skeleton {
         offset = new Vector(-2.5+p.getX(),2.5-p.getY(),0);
         mapindex =  p.getX() + 6 * p.getY();
         if (team == Team.BLUE){
-            rotate(180);
+            rotation = 0;
             skelDiffuse = new float[]{0,0,1,1};
             skelSpecular = new float[]{0,0,1,0.5f};
             skelShine = 1f;
         }   else {
-            rotation = 0;
+            rotate(180);
             skelDiffuse = new float[]{1,0,0,1};
             skelSpecular = new float[]{1,0,0,0.5f};
             skelShine = 1f;

@@ -16,13 +16,13 @@ public class Animation {
     /*Duration of the animation (in frames).*/
     protected final static int duration = 30;
     
-    /*Position of Skeleton on which this animation acts.*/
-    protected final BoardPosition subject;
+    /*GamePiece on which this animation acts.*/
+    protected final GamePiece subject;
     
     /*Terrain on which to perform animation (for openGL variables).*/
     protected final Terrain terrain;
     
-    /*Goal position of this piece after the animation.*/
+    /*BoardPosition of this piece after the animation.*/
     protected final BoardPosition target;
     
     protected Skeleton skel;
@@ -40,21 +40,16 @@ public class Animation {
      * @param subject piece executing the animation.
      * @param target where to move (in the case of walking) or what to attack (otherwise).
      * @param terrain the scene on which to operate (required for passing openGL variables).
+     * @param callback callback to AI.
      */
-    public Animation(Terrain terrain, BoardPosition subject, BoardPosition target, AnimationCallback callback){
+    public Animation(Terrain terrain, GamePiece subject, BoardPosition target, AnimationCallback callback){
         this.subject = subject;
         this.terrain = terrain;
         this.target = target;
         this.call = callback;
         try {
-            this.skel = terrain.cs.pieces.get(6*subject.getX() + subject.getY());
-        }   catch (Exception e){
-            //get the piece at cell (4,0).
-            this.skel = terrain.cs.pieces.get(24);
-        }
-        startloc = skel.offset;
-        direction = new Vector(0,1,0);
-        direction.rotate(skel.getRotation());
+            this.skel = subject.getSkeleton();        
+        }   catch (Exception e){}
     }
     
     /**
@@ -114,13 +109,13 @@ public class Animation {
      * Method to make the GamePiece face its target (before starting to walk/attack).
      */
     public void faceTarget(){
-        BoardPosition pos = skel.getPosition();
+        BoardPosition pos = subject.getPosition();
         int x = pos.getX();
         int y = pos.getY();
-        if (target.getX() > x){
+        if (target.getY() < y){
             skel.rotate(0);
         }   else if(target.getX() == x){
-                if(target.getY() > y){
+                if(target.getX() < x){
                     skel.rotate(-90);
                 }   else {
                     skel.rotate(90);
@@ -131,7 +126,7 @@ public class Animation {
     }
     
     public void faceForward(){
-        if (skel.team == Team.RED){
+        if (skel.team == Team.BLUE){
             skel.rotate(0);
         }   else {
             skel.rotate(180);
