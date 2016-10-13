@@ -38,9 +38,9 @@ public class Animation {
         this.terrain = terrain;
         this.target = target;
         try {
-            this.skel = terrain.cs.pieces[subject.getPosition().getX()][subject.getPosition().getY()];    
+            this.skel = terrain.cs.pieces.get(6*subject.getPosition().getX() + subject.getPosition().getY());
         }   catch (Exception e){
-            this.skel = terrain.cs.pieces[1][0];
+            this.skel = terrain.cs.pieces.get(24);
         }
     }
     

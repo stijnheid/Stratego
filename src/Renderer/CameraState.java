@@ -5,9 +5,12 @@
  */
 package Renderer;
 import Game.BoardPosition;
+import Game.Team;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  *  Class holding data regarding openGL viewing (camera, centre, etc).
@@ -20,7 +23,9 @@ public class CameraState {
     public final Object refresh;
     public final Lock varLock;
     
-    public Skeleton[][] pieces;
+    /*Variable containing the skeletons of the teams.
+    Board cells are counted in reading order starting top left = 0.*/
+    public Map<Integer,Skeleton> pieces;
     
     public int w;               // Width of window in pixels.
     public int h;               // Height of window in pixels.
@@ -43,16 +48,23 @@ public class CameraState {
         refresh = new Object();
         varLock = new ReentrantLock();
         
-        pieces = new Skeleton[6][6];
-        for(int i=0; i < 6; i++){
-            if(i==0 || i==1){
-                for(int j=0; j<6; j++){
-                    pieces[i][j] = new Skeleton(new BoardPosition(j,i));
+        pieces = new HashMap();
+        BoardPosition pos;
+        int mapindex;
+        for(int y=0; y < 6; y++){
+            if(y==4 || y==5){
+                for(int x=0; x<6; x++){
+                    //Attackers
+                    mapindex = 6*y + x;
+                    pos = new BoardPosition(x,y);
+                    pieces.put(mapindex,new Skeleton(pos, Team.RED));
                 }
-            }   else if(i==4 || i==5){
-                for(int j=0;j<6; j++){
-                    pieces[i][j] = new Skeleton(new BoardPosition(j,i));
-                    pieces[i][j].rotate(180);
+            }   else if(y==0 || y==1){
+                for(int x=0;x<6; x++){
+                    //Defenders
+                    mapindex = 6*y + x;
+                    pos = new BoardPosition(x,y);
+                    pieces.put(mapindex,new Skeleton(pos, Team.BLUE));
                 }
             }
         }

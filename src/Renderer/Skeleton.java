@@ -5,6 +5,7 @@
  */
 package Renderer;
 import Game.BoardPosition;
+import Game.Team;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -30,6 +31,10 @@ public class Skeleton {
     /**Position of this skeleton on the board.*/
     public BoardPosition position;
     
+    /**Team on which this skeleton resides.
+     (Red Attacks, Blue Defends)*/
+    public Team team;
+    
     /**Data Structure holding the joints data.*/
     public List<Vector> joints;
     
@@ -39,10 +44,15 @@ public class Skeleton {
     /** Thickness of bones in skeleton. */
     private final double boneWidth = 0.05f;
     
+    /**Material properties of skeleton (depending on team).*/
+    private final float[] skelDiffuse;
+    private final float[] skelSpecular;
+    private final float skelShine;
+    
     /** Material properties of sword.*/
-    private float[] swordDiffuse;
-    private float[] swordSpecular;
-    private float swordShine;
+    private final float[] swordDiffuse;
+    private final float[] swordSpecular;
+    private final float swordShine;
     
     /**Rotations of vital joints in X and Y dimensions.*/
     double shoulderLRotX = 0;
@@ -67,13 +77,24 @@ public class Skeleton {
     /**
      * Constructor for a skeleton. Does not yet draw a skeleton.
      * @param p position on the board (in cells).
+     * @param t team on which this skeleton resides.
      */
-    public Skeleton (BoardPosition p){
+    public Skeleton (BoardPosition p, Team t){
         joints = new ArrayList<Vector>();
         this.position = p;
-        offset = new Vector(p.getX()-2.5,p.getY()-2.5,0);
-        rotation = 0;
-        
+        this.team = t;
+        offset = new Vector(-2.5+p.getX(),2.5-p.getY(),0); 
+        if (team == Team.BLUE){
+            rotate(180);
+            skelDiffuse = new float[]{0,0,1,1};
+            skelSpecular = new float[]{0,0,1,0.5f};
+            skelShine = 1f;
+        }   else {
+            rotation = 0;
+            skelDiffuse = new float[]{1,0,0,1};
+            skelSpecular = new float[]{1,0,0,0.5f};
+            skelShine = 1f;
+        }       
         head = new Vector(0, 0, 1.8);
         joints.add(head);
         neck = new Vector(0, 0, 1.6);
@@ -115,9 +136,9 @@ public class Skeleton {
     public void draw(GL2 gl, GLUT glut){
         gl.glPushMatrix();
         gl.glDisable(GL2.GL_TEXTURE_2D);
-        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Material.GOLD.diffuse, 0);
-        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.GOLD.specular, 0);
-        gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Material.GOLD.shininess);
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, skelDiffuse, 0);
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, skelSpecular, 0);
+        gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, skelShine);
         gl.glRotated(rotation, 0, 0, 1);
         gl.glTranslated(offset.x, offset.y, offset.z);
         drawTorso(gl, glut);
@@ -248,19 +269,21 @@ public class Skeleton {
             gl.glTranslated(wrist.x/2, wrist.y/2, wrist.z/2);
             drawSphere(glut);
             //Draw sword in right hand.
-            gl.glRotated(swordRotX, 1, 0, 0);
-            gl.glTranslated(sword.x/2, sword.y/2, sword.z/2);
-            gl.glScaled(boneWidth/2, sword.y, boneWidth/2);
-            
-            swordDiffuse[3] = swordOpacity;
-            swordSpecular[3] = swordOpacity;
-            
-            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, swordDiffuse, 0);
-            gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, swordSpecular, 0);
-            gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, swordShine);
-            
-            glut.glutSolidCube(1f);
-            gl.glPopMatrix();
+            if (swordOpacity > 0){
+                gl.glRotated(swordRotX, 1, 0, 0);
+                gl.glTranslated(sword.x/2, sword.y/2, sword.z/2);
+                gl.glScaled(boneWidth/2, sword.y, boneWidth/2);
+
+                swordDiffuse[3] = swordOpacity;
+                swordSpecular[3] = swordOpacity;
+
+                gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, swordDiffuse, 0);
+                gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, swordSpecular, 0);
+                gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, swordShine);
+
+                glut.glutSolidCube(1f);               
+            }
+            gl.glPopMatrix(); 
         }
     }
     

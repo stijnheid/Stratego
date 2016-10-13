@@ -8,6 +8,7 @@ package Renderer;
 import robotrace.*;
 import Game.GameState;
 import Game.GamePiece;
+import Game.BoardPosition;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.gl2.GLUT;
@@ -285,7 +286,8 @@ public class Terrain extends Base {
                 gl.glEnd();               
             }
         }
-        //cross signifying tile (0,0) (for testing purposes).
+        //cross signifying tile (5,0) (for testing purposes).
+        //tile (5,0) meaning bottom left.
         gl.glBegin(GL_TRIANGLE_STRIP);
         gl.glVertex3d(xmin, ymin, z);
         gl.glVertex3d(xmin+1, ymin+1, z);
@@ -301,14 +303,11 @@ public class Terrain extends Base {
     
     /**
      * Method to draw pieces.
+     * int key represents position on the board in reading order (starting top left at 0).
      */
     public void drawPieces(){
-        for(int i=0; i<boardsize; i++){
-            for (int j=0; j<boardsize; j++){
-                if(cs.pieces[i][j] != null){
-                    cs.pieces[i][j].draw(gl, glut);
-                }
-            }
+        for(int key : cs.pieces.keySet()){
+            cs.pieces.get(key).draw(gl, glut);
         }
     }
     
@@ -319,7 +318,7 @@ public class Terrain extends Base {
      * @param a the Animation that should be played.
      */
     public void playAnimation(Animation a){
-        
+        a.execute();
     }
     
         /**
@@ -349,9 +348,9 @@ public class Terrain extends Base {
         drawBoard();
         drawPieces();
         if(pan){
-            Animation ani = new WalkAnimation(this, null, new Game.BoardPosition(2,0));
+            Animation ani = new WalkAnimation(this, null, new BoardPosition(3,0));
             pan=false;
-            //ani.execute();
+            ani.execute();
         }
                
         /**Increment frame count AFTER rendering.*/
@@ -359,7 +358,6 @@ public class Terrain extends Base {
         thisframe = System.currentTimeMillis();
         System.out.println("Currently displaying "+(int)(1000/(thisframe-lastframe))+" frames per second");
         lastframe = thisframe;
-        //System.out.println(camera.eye.x+" "+camera.eye.y+" "+camera.eye.z);
         tree.draw(gl, cs.tAnim);
         //sphere.draw(gl);
     }
