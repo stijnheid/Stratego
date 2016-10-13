@@ -9,6 +9,8 @@ import com.jogamp.opengl.util.gl2.GLUT;
 import com.jogamp.opengl.util.texture.Texture;
 import java.io.File;
 import java.util.Random;
+import java.util.List;
+import java.util.ArrayList;
 import static javax.media.opengl.GL.GL_FRONT_AND_BACK;
 import static javax.media.opengl.GL.GL_TRIANGLE_FAN;
 import javax.media.opengl.GL2;
@@ -21,7 +23,7 @@ import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_SPECULAR;
  */
 public class Tree {
     
-    private static Texture leaves, wood;
+   private static Texture leaves, wood;
    // used to calculate the height of the bottom of the upper leaves
    double offset;
    
@@ -39,15 +41,21 @@ public class Tree {
    
    double basewidth = 0.2;
    
-   double scalefactor = 0.001;
+   double scalefactor = 0.00001;
    
    Terrain terrain;
    
-   Random randomVar = new Random(System.currentTimeMillis());
-   double position1 = 0.35+ randomVar.nextDouble() *0.25;
-   double position2 = 0.35+ randomVar.nextDouble() *0.25;
-   double position3 = 0.35+ randomVar.nextDouble() *0.25;
-   double position4 = 0.35+ randomVar.nextDouble() *0.25;
+    List position = new ArrayList(); ;
+    List rotation = new ArrayList(); ;
+    List pointsSphere = new ArrayList(); ;
+    FitSphere sphere;
+   //double position[] = new double[4];
+   //double rotation[] = new double[4];
+   
+
+           
+         
+         
    
    
    /**
@@ -56,12 +64,38 @@ public class Tree {
     * function can be used to determine these doubles. If they were used
     * in the draw method, the trees would vary with every drawn frame
     */
-    public Tree(double x, double y, double z, GL2 gl, Terrain terrain) {
+    public Tree(double x, double y, double z, GL2 gl, Terrain terrain, int branches, long seed) {
+
+
+        
+
+        
+        
+        Vector length =  new Vector(0,0,0);
         this.x = x;             
         this.y = y; 
         this.z = z; 
         this.offset = 1;   
         this.height= 4; 
+        Random randomVar = new Random(seed);
+        
+        
+        
+        for (int i =0; i<branches; i++){
+            
+            rotation.add(randomVar.nextDouble() *360);
+            position.add(0.35+ randomVar.nextDouble() *0.25); 
+            
+            length = new Vector(1f,1f,1f);//(double)position.get(i)*height + height/4*Math.cos(70/360*2*Math.PI)       
+            length.rotate((double)rotation.get(i));
+            System.out.println(length.x +","+ length.y +","+ length.z);
+            pointsSphere.add(length);
+            
+
+        }
+        pointsSphere.add(new Vector(0, 0, 0.35*height));
+        sphere = new FitSphere(pointsSphere, 0.2f);
+        
         
 
         
@@ -78,8 +112,34 @@ public class Tree {
     
      void draw( GL2 gl, float tAnim)   
      {
+         
+                 
+        for (int i =0; i<18; i++){
+            Vector mands = (Vector)pointsSphere.get(i);
+            double length1 = 0.1;
+            double base1 = 0.1;
+        
+            
+            gl.glPushMatrix();
+            gl.glTranslated(mands.x, mands.y, mands.z);
+            gl.glBegin(GL_TRIANGLE_FAN);
+            gl.glTexCoord2d(1, 0);
+            gl.glVertex3d(0,0,length1);
+            gl.glTexCoord2d(0, 1);
+            gl.glVertex3d(-base1,-base1,0);
+            gl.glTexCoord2d(0, 0);
+            gl.glVertex3d(base1,-base1,0);
+            gl.glTexCoord2d(0, 1);
+            gl.glVertex3d(base1,base1,0);
+            gl.glTexCoord2d(0, 0);            
+            gl.glVertex3d(-base1,base1,0);
+            gl.glTexCoord2d(0, 1);
+            gl.glVertex3d(-base1,-base1,0);
+            gl.glEnd();
+            gl.glPopMatrix();
+        }
 
-
+        //sphere.draw(gl);
         double rotationfactor = 1;
 
         
@@ -89,112 +149,16 @@ public class Tree {
         // shure the tree touches the ground.
         
         
-        // base
-        drawBranch(basewidth, height, gl, tAnim, 0, 0);
+        // start recursion
+        drawBranch(basewidth, height, gl, tAnim, 0, 0, 0);
         
         
-        //
-
-
-
-        /*
-        gl.glPushMatrix();
-        gl.glTranslated(0, 0, position*height);
-        gl.glRotated(rotation, 0, 0, 1);
-    	gl.glRotated(70-60*1/(1+tAnim*rotationfactor), 1, 0, 0);
-        drawBranch(base, length, gl, tAnim);
-    	gl.glPopMatrix();
-        
-        rotation = 90; position = 0.45;base = (1-position)*basewidth; length = 1+tAnim * scalefactor*position;
-        gl.glPushMatrix();
-        gl.glTranslated(0, 0, position*height);
-        gl.glRotated(rotation, 0, 0, 1);
-    	gl.glRotated(70-60*1/(1+tAnim*rotationfactor), 1, 0, 0);
-        drawBranch(base, length, gl, tAnim);
-    	gl.glPopMatrix();
-        
-        rotation = 210; position = 0.55; base = (1-position)*basewidth; length = 1+tAnim * scalefactor*position;
-        gl.glPushMatrix();
-        gl.glTranslated(0, 0, position*height);
-        gl.glRotated(rotation, 0, 0, 1);
-    	gl.glRotated(70-60*1/(1+tAnim*rotationfactor), 1, 0, 0);
-        drawBranch(base, length, gl, tAnim);
-    	gl.glPopMatrix();
-        
-        rotation = 160; position = 0.5;base = (1-position)*basewidth; length = 1+tAnim * scalefactor*position;
-        gl.glPushMatrix();
-        gl.glTranslated(0, 0, position*height);
-        gl.glRotated(rotation, 0, 0, 1);
-    	gl.glRotated(70-60*1/(1+tAnim*rotationfactor), 1, 0, 0);
-        drawBranch(base, length, gl, tAnim);
-    	gl.glPopMatrix();
-        
-        rotation = 10; position = 0.35;base = (1-position)*basewidth; length = 1+tAnim * scalefactor*position;
-        gl.glPushMatrix();
-        gl.glTranslated(0, 0, position*height);
-        gl.glRotated(rotation, 0, 0, 1);
-    	gl.glRotated(70-60*1/(1+tAnim*rotationfactor), 1, 0, 0);
-        drawBranch(base, length, gl, tAnim);
-    	gl.glPopMatrix();
-        
-*/
-
-        
-        
-        
-
-
-        
-
-
-
-
-
-
-        
-
-
-
-
-/*
-        // Draws the leaves
-        gl.glBegin(GL_TRIANGLE_FAN);
-            gl.glTexCoord2d(1, 0);
-            gl.glVertex3d(0+x,0+y,z+height-1);
-            gl.glTexCoord2d(0, 1);
-            gl.glVertex3d(-0.7+x,-0.7+y,z+height-2);
-            gl.glTexCoord2d(0, 0);
-            gl.glVertex3d(0.7+x,-0.7+y,z+height-2);
-            gl.glTexCoord2d(0, 1);
-            gl.glVertex3d(0.7+x,0.7+y,z+height-2);
-            gl.glTexCoord2d(0, 0);
-            gl.glVertex3d(-0.7+x,0.7+y,z+height-2);
-            gl.glTexCoord2d(0, 1);
-            gl.glVertex3d(-0.7+x,-0.7+y,z+height-2);
-        gl.glEnd();
-        
-        gl.glBegin(GL_TRIANGLE_FAN);
-            gl.glTexCoord2d(1, 0);
-            gl.glVertex3d(0+x,0+y,z+height);
-            gl.glTexCoord2d(0, 1);
-            gl.glVertex3d(-0.5+x,-0.5+y,z+height-offset);
-            gl.glTexCoord2d(0, 0);
-            gl.glVertex3d(0.5+x,-0.5+y,z+height-offset);
-            gl.glTexCoord2d(0, 1);
-            gl.glVertex3d(0.5+x,0.5+y,z+height-offset);
-            gl.glTexCoord2d(0, 0);            
-            gl.glVertex3d(-0.5+x,0.5+y,z+height-offset);
-            gl.glTexCoord2d(0, 1);
-            gl.glVertex3d(-0.5+x,-0.5+y,z+height-offset);
-        gl.glEnd();
-        */
-
      }
      
      
      
-        void drawBranch(double base, double length, GL2 gl, double tAnim, double position,double rotation) {
-            
+        void drawBranch(double base, double length, GL2 gl, double tAnim, double localposition,double localrotation, int iteration) {
+        iteration = iteration + 1;    
         // Defenition of Materials 
         gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Material.WOOD.diffuse, 0);   
         gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.WOOD.specular, 0);
@@ -223,65 +187,39 @@ public class Tree {
             gl.glVertex3d(-base1,-base1,0);
             gl.glEnd();
             
-            if (length1 > 1)
-            {
+            if (length1 > 1 && iteration < 3){
+                for (int i=0; i < position.size()- iteration*2; i++) {
                 
-        position = 0.35 + randomVar.nextDouble() *0.25;
-        rotation = randomVar.nextDouble()*360;
-        base = (1-position)*basewidth;
-        length = length/3+tAnim * scalefactor*position;
+                    localposition = (double) position.get(i);
+                    localrotation = (double) rotation.get(i);
+                    base1 = 0.7*(1-localposition)*base;
+                    length1 = length/2+tAnim * scalefactor*localposition;
         
-        gl.glPushMatrix();
-        gl.glTranslated(0, 0, position*height);
-        gl.glRotated(rotation, 0, 0, 1);
-    	gl.glRotated(70-60*1/(1+tAnim*0.005), 1, 0, 0);
-        drawBranch(base, length, gl, tAnim, position, rotation);
-        gl.glPopMatrix();            
+                    gl.glPushMatrix();
+                    gl.glTranslated(0, 0, localposition*length);
+                    gl.glRotated(localrotation, 0, 0, 1);
+                    gl.glRotated(90-60*1/(1+tAnim*scalefactor), 1, 0, 0);
+                    drawBranch(base1, length1, gl, tAnim, localposition, localrotation, iteration);
+                    
+                    if (iteration == 2){
+                    
+                    }
+                                    
+                    gl.glPopMatrix(); 
                 
+
+                    
+                }
+              
                 
             }
+            
+
             }
         
             
         
-        /*
-        if (tAnim > 1)
-        {
-            
-        // Defenition of the leaf material
-        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Material.GREEN.diffuse, 0);
-        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.GREEN.specular, 0);
-        gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Material.GREEN.shininess);
-        
-        
-        // Defenition of the texture
-        // Defenition of the texture
-        leaves = terrain.leaves;
-        leaves.bind(gl);
-        
-        
-            
-            double time = tAnim - 1;
-            base = 2*(base*3*(1-1/(1+time)));
-            
-            gl.glBegin(GL_TRIANGLE_FAN);
-            gl.glTexCoord2d(1, 0);
-            gl.glVertex3d(0,0,length);
-            gl.glTexCoord2d(0, 1);
-            gl.glVertex3d(-base,-base,length*0.6);
-            gl.glTexCoord2d(0, 0);
-            gl.glVertex3d(base,-base,length*0.6);
-            gl.glTexCoord2d(0, 1);
-            gl.glVertex3d(base,base,length*0.6);
-            gl.glTexCoord2d(0, 0);            
-            gl.glVertex3d(-base,base,length*0.6);
-            gl.glTexCoord2d(0, 1);
-            gl.glVertex3d(-base,-base,length*0.6);
-            gl.glEnd();
-            
-           
-        }
-            */
+      
     }
     
     

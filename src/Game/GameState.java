@@ -1,4 +1,5 @@
 package Game;
+import Renderer.Vector;
 
 /**
  * Keeps track of the Gameboard and other state information like timers and
@@ -21,7 +22,7 @@ public class GameState {
         this.board = board;
     }
     
-    public boolean isRunnning() {
+    public boolean isRunning() {
         return this.isRunning;
     }
     

@@ -7,13 +7,14 @@ package Renderer;
 
 import robotrace.*;
 import Game.GameState;
-import Game.Piece;
+import Game.GamePiece;
 import com.jogamp.newt.opengl.GLWindow;
 import com.jogamp.opengl.util.texture.Texture;
 import com.jogamp.opengl.util.gl2.GLUT;
 import java.io.File;
 import static java.lang.Math.*;
 import java.util.ArrayList;
+import java.util.List;
 import javax.media.opengl.*;
 import javax.media.opengl.glu.GLU;
 import static javax.media.opengl.GL.GL_BLEND;
@@ -53,7 +54,7 @@ import static javax.media.opengl.fixedfunc.GLMatrixFunc.GL_PROJECTION;
 public class Terrain extends Base {	
    
     /** Instance of the camera. */
-    private final Camera camera;
+    public final Camera camera;
     
     /** Instances of different textures */
     public static Texture grass, vakje ,leaves, water, wood;
@@ -65,16 +66,31 @@ public class Terrain extends Base {
     
     Tree tree;
     
+    FitSphere sphere;
+    
     
     public Terrain(){
         
         test = new Skeleton(new Vector(-3.5,-3.5,0));
         
-        tree = new Tree(0,0,0, gl, this);
+
+        
+        List<Vector> input = new ArrayList<Vector>();
+        input.add(new Vector( 2, 2, 0));
+        input.add(new Vector( 2, 3, 0));
+        input.add(new Vector( 3, 4, 0));
+        input.add(new Vector( 2, 2, 2));
+        input.add(new Vector( 3, 2, 2));
+        input.add(new Vector( 3, 3, 2));
+        input.add(new Vector( 2.3, 2.3, 2));
+
+
+
+        //sphere = new FitSphere(input, 0.1f);
                 
         // Initialize the camera
         camera = new Camera();    
-
+        
 
     }
     
@@ -84,7 +100,7 @@ public class Terrain extends Base {
     @Override
     public void setView() {
         // Select part of window.
-        gl.glViewport(0, 0, gs.w, gs.h);
+        gl.glViewport(0, 0, cs.w, cs.h);
 
         // Set projection matrix.
         gl.glMatrixMode(GL_PROJECTION);
@@ -92,9 +108,9 @@ public class Terrain extends Base {
 
         // Set the perspective.
         // Modify this to meet the requirements in the assignment.
-        float aspectRatio = (float) gs.w / (float) gs.h;
+        float aspectRatio = (float) cs.w / (float) cs.h;
         double fovy = 60;
-        glu.gluPerspective(fovy, aspectRatio, 0.1 * gs.vDist, 10.0 * gs.vDist);
+        glu.gluPerspective(fovy, aspectRatio, 0.1 * cs.vDist, 10.0 * cs.vDist);
         // Set camera.
         gl.glMatrixMode(GL_MODELVIEW);
         gl.glLoadIdentity();
@@ -103,8 +119,8 @@ public class Terrain extends Base {
         // For camera modes 1 to 4, determine which robot to focus on.
         
 
-        camera.update(gs);
-        glu.gluLookAt(camera.eye.x(),camera.eye.y(),camera.eye.z(),gs.cnt.x(),gs.cnt.y(),gs.cnt.z(),0,0,1);
+        camera.update(cs);
+        glu.gluLookAt(camera.eye.x(),camera.eye.y(),camera.eye.z(),cs.cnt.x(),cs.cnt.y(),cs.cnt.z(),0,0,1);
         
         //Lighting implementation
 
@@ -121,13 +137,10 @@ public class Terrain extends Base {
      */
     @Override
     public void initialize() {
-        
+        tree = new Tree(0,0,0, gl, this, 20, 6456);   
 
         gl.glEnable(GL_LIGHTING);
         gl.glEnable(GL_LIGHT0);
-
-
-        
         
                 // White color definition
         float[] sunColor = {255/255f, 255/255f, 220/255f, 0.7f};
@@ -169,7 +182,7 @@ public class Terrain extends Base {
         gl.glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
         gl.glBindTexture(GL_TEXTURE_2D, 0);
 		
-        String pwd = "src" + File.separator + "Renderer" + File.separator;
+        String pwd = "src/Textures/";
         grass = loadTexture(pwd + "battlefieldos.jpg");
         vakje = loadTexture(pwd + "Vakje.jpg");
         leaves = loadTexture(pwd + "Leaves.jpg");
@@ -177,8 +190,8 @@ public class Terrain extends Base {
         wood = loadTexture(pwd + "water.jpg");
         
         
-        gs.theta = 4.5f;
-        gs.phi = 0.5f;
+        cs.theta = 4.5f;
+        cs.phi = 0.5f;
 
     }
     
@@ -321,7 +334,8 @@ public class Terrain extends Base {
         drawTerrain();
         drawBoard();
         test.draw(gl, glut);
-        tree.draw(gl, gs.tAnim);
+        tree.draw(gl, cs.tAnim);
+        //sphere.draw(gl);
     }
     
     public static void main (String[] args){
