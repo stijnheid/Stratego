@@ -1,6 +1,7 @@
 package actions;
 
 import Game.BoardPosition;
+import Game.GameBoard;
 import Game.GamePiece;
 import Game.Team;
 
@@ -22,6 +23,19 @@ public class MoveAction extends Action {
             BoardPosition origin, 
             BoardPosition destination) {
         super(team);
+        
+        if(piece == null) {
+            throw new NullPointerException("piece == null");
+        }
+        
+        if(origin == null) {
+            throw new NullPointerException("origin == null");
+        }
+        
+        if(destination == null) {
+            throw new NullPointerException("destination == null");
+        }
+        
         this.piece = piece;
         this.origin = origin;
         this.destination = destination;
@@ -65,11 +79,33 @@ public class MoveAction extends Action {
     public void setApplied(boolean applied) {
         this.isApplied = applied;
     }
+    
+    public boolean isOkay() {
+        if(!this.isApplied && !this.piece.getPosition().equals(this.origin)) {
+            return false;
+        }
+        if(this.isApplied && !this.piece.getPosition().equals(this.destination)) {
+            return false;
+        }
+        // Check if the origin and destination are neighbours.
+        //int xDiff = Math.abs(this.origin.getX() - this.destination.getX());
+        //int yDiff = Math.abs(this.origin.getY() - this.destination.getY());
+        // Does not check if the move was diagonal.
+        
+        //if(xDiff > 1 || yDiff > 1) {
+        //    return false;
+        //}
+        int distance = GameBoard.distance(this.origin, this.destination);
+        if(distance > 1) {
+            return false;
+        }
+        
+        return true;
+    }
 
     @Override
     public String toString() {
-        return "MoveAction{" + "piece=" + piece.getRank() 
-                + ", team=" + piece.getTeam() 
+        return "MoveAction{" + "piece=" + piece.toString()
                 + ", origin=" + origin.toString() 
                 + ", destination=" + destination.toString() + '}';
     }

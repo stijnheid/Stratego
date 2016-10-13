@@ -92,7 +92,7 @@ public class Attacker extends AbstractPlayer {
     /**
      * Assumes to be the maximizing player with team RED assigned to it.
      */ 
-    private class AttackerHeuristic implements HeuristicEvaluation {
+    public static class AttackerHeuristic implements HeuristicEvaluation {
 
         @Override
         public double score(GameState state) {

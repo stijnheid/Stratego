@@ -1,13 +1,13 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package tools.deeplearning;
 
 import Game.GameBoard;
+import Game.GameState;
 import Game.Team;
+import actions.MoveAction;
 import tools.search.ai.AIBot;
+import tools.search.ai.AlphaBetaSearch;
+import tools.search.ai.GameNode;
+import tools.search.ai.HeuristicEvaluation;
 import tools.search.ai.SetupGenerator;
 import tools.search.ai.players.Attacker;
 import tools.search.ai.players.DefaultPlayer;
@@ -22,7 +22,8 @@ public class BattleTest {
     public static void main (String[] args) {
         //new BattleTest().testHeuristic();
         //new BattleTest().testSmallBoard();
-        new BattleTest().showCase();
+        //new BattleTest().showCase();
+        new BattleTest().alphaBetaTest();
     }
     
     private void testHeuristic() {
@@ -81,5 +82,21 @@ public class BattleTest {
         
         BattleTranscript transcript = engine.battle(board, attacker, defender, computationTime, maxIterations);
         transcript.print();
+    }
+    
+    private void alphaBetaTest() {
+        SetupGenerator generator = new SetupGenerator();
+        GameBoard board = generator.generateShowcase();
+        
+        AlphaBetaSearch search = new AlphaBetaSearch(null);
+        HeuristicEvaluation evaluation = new Attacker.AttackerHeuristic();
+        search.setHeuristic(evaluation);
+        
+        GameState state = new GameState();
+        state.setGameBoard(board);
+        
+        GameNode node = new GameNode(state);
+        MoveAction move = search.iterativeDeepeningAlphaBeta(node, 1, 12, true);
+        System.out.println("Move: " + move.toString());
     }
 }

@@ -421,6 +421,10 @@ public class GameBoard {
      * @param piece to be killed.
      */
     public void killPiece(GamePiece piece) {
+        if(!piece.isAlive()) {
+            throw new IllegalStateException("killPiece(): Piece is already dead.");
+        }        
+        
         BoardPosition position = piece.getPosition();
         this.board[position.getY()][position.getX()] = null;
         piece.die();
@@ -432,6 +436,10 @@ public class GameBoard {
      * @param piece to be revied.
      */
     public void revivePiece(GamePiece piece) {
+        if(piece.isAlive()) {
+            throw new IllegalStateException("revivePiece(): Piece is not dead.");
+        }
+        
         BoardPosition position = piece.getPosition();
         this.board[position.getY()][position.getX()] = piece;
         piece.revive();
@@ -589,7 +597,7 @@ public class GameBoard {
      * @param end
      * @return 
      */
-    public int distance(BoardPosition start, BoardPosition end) {
+    public static int distance(BoardPosition start, BoardPosition end) {
         int x = Math.abs(start.getX() - end.getX());
         int y = Math.abs(start.getY() - end.getY());
         return (x + y);
@@ -601,8 +609,49 @@ public class GameBoard {
      * @param move 
      */
     public void applyMove(MoveAction move) {
-        GamePiece piece = move.getPiece();
+        if(move.isApplied()) {
+            throw new RuntimeException("Move: " + move.toString() + " has already been applied.");
+        }
+        
+        //GamePiece piece = move.getPiece();
         BoardPosition origin = move.getOrigin();
+        
+        // Beware that the GamePiece reference stored in the move is a reference
+        // to a copy of the original GamePiece, this copy can have a different
+        // position than the original piece. This happens only if a search
+        // algorithm is interrupted and therefore is not able to undo all moves
+        // and in that case it can happen that the copied GamePieces have 
+        // incorrect positions compared to the original board. That's why it is
+        // now better to get the original GamePiece from the board based on the
+        // origin stored in the MoveAction which is always valid. Rather than
+        // accessing the GamePiece reference stored in the MoveAction which
+        // refers to a copy of the GamePiece not the original.
+        GamePiece piece = null;
+        try {
+            piece = this.getPiece(origin);
+        } catch (InvalidPositionException ex) {
+            Logger.getLogger(GameBoard.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        if(piece == null) {
+            throw new NullPointerException("boardPiece == null, move=" + 
+                    move.toString() + 
+                    ", origin=" +
+                    origin.toString() + "\nBoardState:\n" + transcript());
+        }
+        
+        if(move.getPiece() != piece) {
+            throw new RuntimeException("Apply Move Referrences Differ piece=" + 
+                    piece.toString() + ", movePiece="
+                    + move.getPiece().toString() + ", pieceRef=" + piece + ", movePieceRef=" + move.getPiece());
+        }
+        
+        if(!piece.getPosition().equals(origin)) {
+            throw new RuntimeException(piece.toString() 
+                    + " has incorrect position for applying move " 
+                    + move.toString() + "\nBoardState:\n" + this.transcript());
+        }
+        
         BoardPosition destination = move.getDestination();
         //System.out.println("Execute move: " + move.toString());
         
@@ -615,7 +664,7 @@ public class GameBoard {
         
         try {
             // Is it an attack?
-            GamePiece opponent = getPiece(destination);
+            GamePiece opponent = this.getPiece(destination);
             
             // Increment move count if the piece is from the attacker.
             if(piece.getTeam() == this.attacker) {
@@ -623,6 +672,11 @@ public class GameBoard {
                 incrementMoveCount();
                 //System.out.println("moveCount: " + getMoveCount());
             }
+            
+            // Update the position of the attacking piece to the new position.
+            // We do this always, even if the piece would die, so that we
+            // know the spot from where it died.
+            piece.setPosition(destination);
             
             boolean isAttack = false;
             // Contains an enemy.
@@ -656,7 +710,6 @@ public class GameBoard {
             
             // Empty original position of the piece.
             this.board[origin.getY()][origin.getX()] = null;
-            piece.setPosition(destination);
             // Destination of piece.
             this.board[destination.getY()][destination.getX()] = piece;             
             
@@ -675,18 +728,36 @@ public class GameBoard {
         if(!move.isApplied()) {
             throw new IllegalArgumentException(move.toString() + " has never been applied.");
         }
-        // Reset applied flag to false.
-        move.setApplied(false);
         
         GamePiece piece = move.getPiece();
         BoardPosition origin = move.getOrigin();
         BoardPosition destination = move.getDestination();
         
+        if(!piece.getPosition().equals(destination)) {
+            throw new RuntimeException(piece.toString() 
+                    + " has incorrect position for undoing move " 
+                    + move.toString() + "\nBoardState:\n" + this.transcript());
+        }
+        
+        // Reset applied flag to false.
+        move.setApplied(false);        
+        
         GamePiece deadAttacker = move.getDeadAttacker();
         GamePiece deadOpponent = move.getDeadOpponent();
         
+        // Check if the reference to both GamePiece objects are the same.
+        if(deadAttacker != null && deadAttacker != piece) {
+            throw new RuntimeException("References differ.\n Piece: " 
+                    + piece.toString() + "\n deadAttacker: " + piece.toString());
+        }
+        
         // Switch turn back to original.
-        setCurrentTurn(move.getTeam()); 
+        setCurrentTurn(move.getTeam());
+        
+        // Move piece back to the original position.
+        // Piece and Attacker refer to the same object, so restoring the
+        // position can be done on any.
+        piece.setPosition(origin);
         
         if(deadAttacker != null && deadOpponent != null) {
             // Both died.
@@ -704,21 +775,21 @@ public class GameBoard {
             revivePiece(deadOpponent);
             
             // Move piece back to the original position.
-            piece.setPosition(origin);
+            //piece.setPosition(origin);
             this.board[origin.getY()][origin.getX()] = piece;    
         } else {
             // No one died, so the attacker moved to an empty cell.
             // Remove the piece from the destination.
             this.board[destination.getY()][destination.getX()] = null;
             // Move piece back to the original position.
-            piece.setPosition(origin);
+            //piece.setPosition(origin);
             this.board[origin.getY()][origin.getX()] = piece;    
         }
         
         // Decrement move count if the piece is from the attacker.
         if(piece.getTeam() == this.attacker) {
             decrementMoveCount();
-        }        
+        }
     }
 
     /**

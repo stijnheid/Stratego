@@ -142,7 +142,7 @@ public class SetupGenerator {
     public GameBoard generateShowcase() {
         String setup = "r:4|r:4|r:4\n" +
                         "--- --- ---\n" + 
-                        "r:S|r:8|r:4\n" + 
+                        "r:4|r:8|r:S\n" + 
                         "--- --- ---\n" + 
                         "   |   |   \n" +
                         "--- --- ---\n" +
