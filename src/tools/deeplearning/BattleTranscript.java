@@ -34,6 +34,8 @@ public class BattleTranscript {
     
     public void addMove(MoveAction move) {
         moves.add((MoveAction) move.clone());
+        //MoveAction clone = move.clone();
+        // Want to keep map this move to a GamePiece on this original board.
     }
     
     public List<MoveAction> getMoves() {

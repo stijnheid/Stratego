@@ -426,6 +426,7 @@ public class GameBoard {
         }        
         
         BoardPosition position = piece.getPosition();
+        // Delete the reference of the piece.
         this.board[position.getY()][position.getX()] = null;
         piece.die();
     }
@@ -494,12 +495,11 @@ public class GameBoard {
         
         // Has the flag been captured? Count the # of flags on the defending
         // side.
-        
         List<GamePiece> defenderFlag = getPieces(this.defender, Pieces.FLAG);
         if(defenderFlag.isEmpty()) {
             //System.out.println("Defender has no flag.");
             return this.attacker;
-        }   
+        }
         
         // The game is in an end state if the attacker has no miners left and
         // the defending side has the flag completely surrounded with bombs.
@@ -640,12 +640,16 @@ public class GameBoard {
                     origin.toString() + "\nBoardState:\n" + transcript());
         }
         
+        /** Too strict, complicates the situation where we want to keep 
+         * cloned move objects for the BattleTranscript.
         if(move.getPiece() != piece) {
             throw new RuntimeException("Apply Move Referrences Differ piece=" + 
                     piece.toString() + ", movePiece="
                     + move.getPiece().toString() + ", pieceRef=" + piece + ", movePieceRef=" + move.getPiece());
-        }
+        }*/
         
+        // The internal position of the piece must equal the origin position
+        // of the MoveAction.
         if(!piece.getPosition().equals(origin)) {
             throw new RuntimeException(piece.toString() 
                     + " has incorrect position for applying move " 
@@ -663,9 +667,6 @@ public class GameBoard {
         //switchTurns(move.getTeam());
         
         try {
-            // Is it an attack?
-            GamePiece opponent = this.getPiece(destination);
-            
             // Increment move count if the piece is from the attacker.
             if(piece.getTeam() == this.attacker) {
                 //System.out.println("Increment MoveCount");
@@ -673,10 +674,18 @@ public class GameBoard {
                 //System.out.println("moveCount: " + getMoveCount());
             }
             
+            // Empty original position of the piece.
+            this.board[origin.getY()][origin.getX()] = null;
             // Update the position of the attacking piece to the new position.
             // We do this always, even if the piece would die, so that we
             // know the spot from where it died.
-            piece.setPosition(destination);
+            //piece.setPosition(destination);            
+            
+            // Destination of piece.
+            //this.board[destination.getY()][destination.getX()] = piece;               
+            
+            // Is it an attack?
+            GamePiece opponent = this.getPiece(destination);            
             
             boolean isAttack = false;
             // Contains an enemy.
@@ -688,17 +697,32 @@ public class GameBoard {
                 if(result == 1) { // Piece wins.
                     killPiece(opponent);
                     move.setDeadOpponent(opponent);
+                    this.board[destination.getY()][destination.getX()] = piece;
+                    piece.setPosition(destination);
                 } else if(result == -1) { // Opponents wins.
                     killPiece(piece);
+                    // The position where the attacker dies must be updated
+                    // after is has been killed, else killPiece removes
+                    // the opponent.
+                    piece.setPosition(destination);
+                    
                     move.setDeadAttacker(piece);
                     return;
                 } else { // Both die.
                     killPiece(piece);
+                    // The position where the attacker dies must be updated
+                    // after is has been killed, else killPiece removes
+                    // the opponent.
+                    piece.setPosition(destination);
+                    
                     killPiece(opponent);
                     move.setDeadAttacker(piece);
                     move.setDeadOpponent(opponent);
                     return;
                 }
+            } else {
+                piece.setPosition(destination);
+                this.board[destination.getY()][destination.getX()] = piece;
             }
             
             // If the code reaches this position then the piece either attacked
@@ -707,12 +731,6 @@ public class GameBoard {
             if(!isAttack) {
                 //System.out.println("Move to EMPTY CELL");
             }
-            
-            // Empty original position of the piece.
-            this.board[origin.getY()][origin.getX()] = null;
-            // Destination of piece.
-            this.board[destination.getY()][destination.getX()] = piece;             
-            
         } catch (InvalidPositionException ex) {
             Logger.getLogger(GameBoard.class.getName()).log(Level.SEVERE, null, ex);
         }
