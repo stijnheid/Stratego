@@ -4,9 +4,6 @@
  * and open the template in the editor.
  */
 package Controls;
-import Logic.Action;
-import Game.GameState;
-import java.util.Map;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseEvent;
 
