@@ -381,28 +381,57 @@ public class BattleEngine {
                 throw new RuntimeException("Player has no move: " + currentTurn.getTeam());
             }
             
-            // Store move in transcript.
-            transcript.addMove(move);
-            
             //System.out.println("Received Move");
             Team team = move.getPiece().getTeam();
+            BoardPosition origin = move.getOrigin();
             BoardPosition destination = move.getDestination();
-            System.out.println(iterations + ": " + team.name() + " moved " 
-                    + move.getPiece().getRank().name() + " to (" 
-                    + destination.getX() + "," + destination.getY() + ")");
+            System.out.println(iterations + ": " + team.name() + " moved " +
+                    move.getPiece().getRank().name() + " from (" +
+                    origin.getX() + "," + origin.getY() +
+                    ") to (" +
+                    destination.getX() + "," + destination.getY() + ")");
+            
+            // Apply move.
+            // Put in back the reference to the original GamePiece rather than
+            // the clone GamePiece reference.
+            GamePiece originalPiece = null;
+            try {
+                originalPiece = board.getPiece(move.getOrigin());
+            } catch (InvalidPositionException ex) {
+                Logger.getLogger(BattleEngine.class.getName()).log(Level.SEVERE, null, ex);
+            }            
             
             // DEBUG Check if the move is incorrect.
+            /*
             GamePiece pieceToMove = move.getPiece();
             if(!pieceToMove.getPosition().equals(move.getOrigin())) {
                 throw new RuntimeException("Incorrect MoveAction: " 
                         + pieceToMove.getPosition().toString() 
                         + " != " + move.getOrigin().toString() 
                         + " Original Move: " + move.toString()
-                        + " Applied: " + move.isApplied());
+                        + " Applied: " + move.isApplied()
+                        + " notOriginal: " + (pieceToMove != originalPiece));
+            }*/
+            
+            if(originalPiece == null) {
+                throw new RuntimeException("No original piece at " + 
+                        move.getOrigin().toString() + " for move " + 
+                        move.toString());
             }
             
-            // Apply move.
-            state.getGameBoard().applyMove(move);
+            if(!originalPiece.getPosition().equals(move.getOrigin())) {
+                throw new RuntimeException("Incorrect origin for move: piece=" + 
+                        originalPiece.toString() + ", move=" + move.toString());
+            }
+            
+            MoveAction originalMove = new MoveAction(move.getTeam(), originalPiece, 
+                    move.getOrigin(), move.getDestination());
+            
+            // Store move in transcript.
+            transcript.addMove(originalMove);            
+            
+            // Apply the move.
+            state.getGameBoard().applyMove(originalMove);
             
             System.out.println("BoardState:\n" + state.getGameBoard().transcript());
             

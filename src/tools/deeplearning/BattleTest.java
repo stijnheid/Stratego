@@ -69,6 +69,7 @@ public class BattleTest {
     private void showCase() {
         SetupGenerator generator = new SetupGenerator();
         GameBoard board = generator.generateWholeSetup();
+        System.out.println("BoardState:\n" + board.transcript());
         
         BattleEngine engine = new BattleEngine();
         
@@ -78,7 +79,7 @@ public class BattleTest {
         //AIBot defender = new Attacker(Team.BLUE);
         
         long computationTime = 2000;
-        int maxIterations = 40; //20; //28; //40; //100; //40;
+        int maxIterations = 80; //40; //20; //28; //40; //100; //40;
         
         BattleTranscript transcript = engine.battle(board, attacker, defender, computationTime, maxIterations);
         transcript.print();
@@ -94,6 +95,8 @@ public class BattleTest {
         
         GameState state = new GameState();
         state.setGameBoard(board);
+        
+        System.out.println(board.transcript());
         
         GameNode node = new GameNode(state);
         MoveAction move = search.iterativeDeepeningAlphaBeta(node, 1, 12, true);

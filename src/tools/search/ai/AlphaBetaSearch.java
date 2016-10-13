@@ -569,6 +569,8 @@ public class AlphaBetaSearch {
                         Double.NEGATIVE_INFINITY, 
                         Double.POSITIVE_INFINITY, isMaxPlayer);
                 
+                System.out.println("Value: " + value);
+                
                 // Update best move.
                 bestMove = node.getBestMove();
                 // Check if bestMove is okay.
@@ -714,8 +716,7 @@ public class AlphaBetaSearch {
             // Sort the moves.
             
             for(MoveAction move : moves) {
-                
-                System.out.println("APPLY" + depth + ":::" + move.toString());
+                //System.out.println("APPLY" + depth + ":::" + move.toString());
                 // Apply move.
                 board.applyMove(move);
                 //System.out.println("MaxPlayer Applied move: " + move.toString());
@@ -742,7 +743,7 @@ public class AlphaBetaSearch {
                 }
                 
                 // Undo move. (Important to do this before the cutoff)
-                System.out.println("UNDO " + depth + ":::" + move.toString());
+                //System.out.println("UNDO " + depth + ":::" + move.toString());
                 board.undoMove(move);
                 //System.out.println("MAX UNDO MOVE");
                 
@@ -758,7 +759,7 @@ public class AlphaBetaSearch {
             bestValue = Double.POSITIVE_INFINITY; // Worst case for minimizing player.
             List<MoveAction> moves = board.getMoves(Team.BLUE);
             for(MoveAction move : moves) {
-                System.out.println("APPLY" + depth + ":::" + move.toString());
+                //System.out.println("APPLY" + depth + ":::" + move.toString());
                 // Apply move.
                 board.applyMove(move);
                 //System.out.println("MinPlayer Applied move: " + move.toString());
@@ -782,7 +783,7 @@ public class AlphaBetaSearch {
                 }
                 
                 // Undo move. (Important to do this before the cutoff.
-                System.out.println("UNDO " + depth + ":::" + move.toString());
+                //System.out.println("UNDO " + depth + ":::" + move.toString());
                 board.undoMove(move);
                 //System.out.println("MIN UNDO MOVE");
                 
