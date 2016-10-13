@@ -153,4 +153,49 @@ public class SetupGenerator {
                         "b:4|b:4|b:4\n";
         return GameBoard.loadBoard(setup, 3, 6);
     }
+    
+    public GameBoard generateShowcaseTwo() {
+        String setup = "r:5|r:2|r:5\n" +
+                       "--- --- ---\n" +
+                       "r:2|r:5|r:9\n" +
+                       "--- --- ---\n" +
+                       "   |   |   \n" + 
+                       "--- --- ---\n" +
+                       "   |   |   \n" + 
+                       "--- --- ---\n" +
+                       "b:B|b:6|b:4\n" + 
+                       "--- --- ---\n" +
+                       "b:F|b:B|b:7\n";
+        return GameBoard.loadBoard(setup, 3, 6);
+    }
+    
+    public GameBoard generateShowcaseThree() {
+        String setup = "r:8|r:S|r:7\n" +
+                       "--- --- ---\n" +
+                       "r:2|r:2|r:8\n" +
+                       "--- --- ---\n" +
+                       "   |   |   \n" + 
+                       "--- --- ---\n" +
+                       "   |   |   \n" + 
+                       "--- --- ---\n" +
+                       "b:B|b:6|b:4\n" + 
+                       "--- --- ---\n" +
+                       "b:F|b:5|b:9\n";
+        return GameBoard.loadBoard(setup, 3, 6);
+    }
+    
+    public GameBoard generateWholeSetup() {
+        String setup = "r:8|r:S|r:7|r:6|r:4|r:2\n" +
+                       "--- --- --- --- --- ---\n" +
+                       "r:5|r:2|r:9|r:5|r:4|r:2\n" +
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "b:B|b:6|b:9|b:4|b:5|b:B\n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "b:F|b:B|b:4|b:4|b:5|b:7\n";
+        return GameBoard.loadBoard(setup, 6, 6);
+    }
 }

@@ -11,6 +11,7 @@ import tools.search.ai.AIBot;
 import tools.search.ai.SetupGenerator;
 import tools.search.ai.players.Attacker;
 import tools.search.ai.players.DefaultPlayer;
+import tools.search.ai.players.ModerateAttacker;
 import tools.search.ai.players.ModeratePlayer;
 
 /**
@@ -66,17 +67,17 @@ public class BattleTest {
     
     private void showCase() {
         SetupGenerator generator = new SetupGenerator();
-        GameBoard board = generator.generateShowcase();
+        GameBoard board = generator.generateWholeSetup();
         
         BattleEngine engine = new BattleEngine();
         
-        AIBot attacker = new Attacker(Team.RED);
+        AIBot attacker = new ModerateAttacker(Team.RED);
         //AIBot defender = new Attacker(Team.BLUE);
         AIBot defender = new ModeratePlayer(Team.BLUE);
         //AIBot defender = new Attacker(Team.BLUE);
         
         long computationTime = 2000;
-        int maxIterations = 20; //20; //28; //40; //100; //40;
+        int maxIterations = 40; //20; //28; //40; //100; //40;
         
         BattleTranscript transcript = engine.battle(board, attacker, defender, computationTime, maxIterations);
         transcript.print();

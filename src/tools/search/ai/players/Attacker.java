@@ -72,7 +72,7 @@ public class Attacker extends AbstractPlayer {
         if(this.team == Team.RED) {
             move = this.searchEngine.iterativeDeepeningAlphaBeta(node, 1, range, true);
         } else {
-            move = this.searchEngine.iterativeDeepeningMinimax(node, 1, range, false);
+            move = this.searchEngine.iterativeDeepeningAlphaBeta(node, 1, range, false);
         }
         // Should never happen.
         if(move == null) {
