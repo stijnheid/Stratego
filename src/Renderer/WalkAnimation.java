@@ -42,9 +42,10 @@ public class WalkAnimation extends Animation{
             faceForward();
             //move Camera back to original location.
             moveCamera(eye, center);
+            //signal end of Animation.
+            endAnimation();
         });
         walk.start();
-        //update CameraState variable to account for moved piece.
     }
     
     /**

@@ -31,7 +31,7 @@ public class Skeleton {
     /**Position of this skeleton on the board.*/
     public BoardPosition position;
     
-    /**Mapindex of this skeleton on the board (relates to BoardPosition).*/
+    /**Map index of this skeleton on the board (relates to BoardPosition).*/
     public int mapindex;
     
     /**Team on which this skeleton resides.
@@ -90,14 +90,14 @@ public class Skeleton {
         mapindex =  p.getX() + 6 * p.getY();
         if (team == Team.BLUE){
             rotation = 0;
-            skelDiffuse = new float[]{0,0,1,1};
-            skelSpecular = new float[]{0,0,1,0.5f};
-            skelShine = 1f;
+            skelDiffuse = new float[]{0.05f,0.05f,0.9f,1};
+            skelSpecular = new float[]{0.05f,0.05f,0.9f,1};
+            skelShine = 0.9f;
         }   else {
             rotate(180);
-            skelDiffuse = new float[]{1,0,0,1};
-            skelSpecular = new float[]{1,0,0,0.5f};
-            skelShine = 1f;
+            skelDiffuse = new float[]{0.9f,0.05f,0.05f,1};
+            skelSpecular = new float[]{0.9f,0.05f,0.05f,1};
+            skelShine = 0.9f;
         }       
         head = new Vector(0, 0, 1.8);
         joints.add(head);

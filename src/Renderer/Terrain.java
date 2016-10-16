@@ -10,13 +10,10 @@ import Game.BoardPosition;
 import Game.GameBoard;
 import Game.GamePiece;
 import Game.GameState;
-import Game.Team;
 import tools.search.ai.SetupGenerator;
 
 import com.jogamp.opengl.util.texture.Texture;
 import static java.lang.Math.*;
-import java.util.ArrayList;
-import java.util.List;
 
 import static javax.media.opengl.GL2.*;
 import static javax.media.opengl.GL2ES1.GL_PERSPECTIVE_CORRECTION_HINT;
@@ -57,8 +54,9 @@ public class Terrain extends Base {
     boolean pan;
     double lastframe;
     double thisframe;
-    
     Tree tree;
+    Skeleton test;
+    SkeletonTester skeltest;
     
     //package Game variables.
     GameState gamestate;
@@ -66,29 +64,24 @@ public class Terrain extends Base {
     GamePiece piece;
     
     public Terrain(){ 
-        
-        List<Vector> input = new ArrayList<Vector>();
-        input.add(new Vector( 2, 2, 0));
-        input.add(new Vector( 2, 3, 0));
-        input.add(new Vector( 3, 4, 0));
-        input.add(new Vector( 2, 2, 2));
-        input.add(new Vector( 3, 2, 2));
-        input.add(new Vector( 3, 3, 2));
-        input.add(new Vector( 2.3, 2.3, 2));
-
-
-
-        //sphere = new FitSphere(input, 0.1f);
-
         //form game setup.
         gamestate = new GameState();
         SetupGenerator setup = new SetupGenerator();
-        gamestate.setGameBoard(setup.generateSetup());
+        board = setup.generateSetup();
+        gamestate.setGameBoard(board);
         
         // Initialize the camera
         camera = new Camera();
+        
+        //test/debug stuff.
         pan = true;
         lastframe = System.currentTimeMillis();
+        try {
+            test = board.getPiece(new BoardPosition(0,4)).getSkeleton();
+            skeltest = new SkeletonTester(test);
+        }   catch (Exception e){
+            System.out.println("Test skeleton failed to load.");
+        }
     }
     
        /**
@@ -104,7 +97,6 @@ public class Terrain extends Base {
         gl.glLoadIdentity();
 
         // Set the perspective.
-        // Modify this to meet the requirements in the assignment.
         float aspectRatio = (float) cs.w / (float) cs.h;
         double fovy = 60;
         try {/** Since vDist is a synchronised variable. */
@@ -113,14 +105,10 @@ public class Terrain extends Base {
         }   finally {
             cs.varLock.unlock();
         }
+        
         // Set camera.
         gl.glMatrixMode(GL_MODELVIEW);
-        gl.glLoadIdentity();
-
-        // Update the view according to the camera mode and robot of interest.
-        // For camera modes 1 to 4, determine which robot to focus on.
-        
-
+        gl.glLoadIdentity();      
         camera.update(cs);
         glu.gluLookAt(camera.eye.x(),camera.eye.y(),camera.eye.z(),cs.cnt.x(),cs.cnt.y(),cs.cnt.z(),0,0,1);
         
@@ -128,9 +116,6 @@ public class Terrain extends Base {
 
         gl.glShadeModel(GL_SMOOTH);
         gl.glDisable(GL_COLOR_MATERIAL);
-
-        // White color definition
-
     }
     
         /**
@@ -367,20 +352,20 @@ public class Terrain extends Base {
         drawPieces();
         if(pan){
             try {
-                Animation ani = new WalkAnimation(this, 
+                /*Animation ani = new AttackAnimation(this, 
                     board.getPiece(new BoardPosition(0,4)), 
                     new BoardPosition(0,3), null);
-                pan=false;
-                playAnimation(ani);            
+                playAnimation(ani);*/
+                pan = false;
             }   catch (Exception e){}
         }
                
         /**Increment frame count AFTER rendering.*/
         cs.frameTick();
-        thisframe = System.currentTimeMillis();
+        /*thisframe = System.currentTimeMillis();
         System.out.println("Currently displaying "+(int)(1000/(thisframe-lastframe))+" frames per second");
         lastframe = thisframe;
-        tree.draw(gl, cs.tAnim);
+        tree.draw(gl, cs.tAnim);*/
         //sphere.draw(gl);
     }
     

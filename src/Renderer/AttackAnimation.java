@@ -52,6 +52,8 @@ public class AttackAnimation extends Animation {
             skel.swordOpacity = 0;
             //move Camera back to original location.
             moveCamera(eye, center);
+            //signal to end animation.
+            endAnimation();
         });
         attack.start();
     }
@@ -61,7 +63,7 @@ public class AttackAnimation extends Animation {
      * @param frame frame of the animation (from 1 to 30).
      */
     public void showSword(int frame){
-        skel.swordOpacity += (double)frame / 30;
+        skel.swordOpacity = (float)frame / 30;
     }
     
     /**
@@ -69,6 +71,15 @@ public class AttackAnimation extends Animation {
      * @param frame frame of the animation (from 1 to 30).
      */
     public void attack(int frame){
-        
+        if (frame < 15){//raise sword in the air.
+            skel.elbowRRotX = 6*frame;
+            skel.shoulderRRotY = 3*frame;
+        }   else if (frame < 25){//swing sword at opponent.
+            skel.shoulderRRotY = 45 - 9 * (frame-15);
+            skel.elbowRRotX = 90 - 9* (frame-15);
+        }   else {//return to rest position.
+            skel.shoulderRRotY = 45 - 9 * (frame - 25);
+            skel.elbowRRotX = -45 + 9 * (frame - 25);
+        }
     }
 }
