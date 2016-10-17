@@ -10,6 +10,8 @@ import actions.MoveAction;
 public class GameNode {
     private final GameState state;
     private MoveAction bestMove;
+    private double value; // Heuristic value of the best move in context of the
+    // current board state.
     
     public GameNode(GameState state) {
         this.state = state;
@@ -26,5 +28,13 @@ public class GameNode {
     
     public void setBestMove(MoveAction move) {
         this.bestMove = move;
+    }
+
+    public double getValue() {
+        return value;
+    }
+
+    public void setValue(double value) {
+        this.value = value;
     }
 }

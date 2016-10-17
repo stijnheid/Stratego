@@ -4,6 +4,7 @@ import Game.BoardPosition;
 import Game.GameBoard;
 import Game.GamePiece;
 import Game.Team;
+import java.util.Objects;
 
 /**
  * Action that represents piece movement, if the move is applied and resulted in
@@ -118,4 +119,46 @@ public class MoveAction extends Action {
                 (BoardPosition) destination.clone());
         return clone;
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final MoveAction other = (MoveAction) obj;
+        /**
+        if (!Objects.equals(this.piece, other.piece)) {
+            return false;
+        }
+        if (!Objects.equals(this.deadAttacker, other.deadAttacker)) {
+            return false;
+        }
+        if (!Objects.equals(this.deadOpponent, other.deadOpponent)) {
+            return false;
+        }*/
+        if (this.piece.getRank() != other.piece.getRank()) {
+            return false;
+        }
+        if (!Objects.equals(this.origin, other.origin)) {
+            return false;
+        }
+        if (!Objects.equals(this.destination, other.destination)) {
+            return false;
+        }
+        if (this.isApplied != other.isApplied) {
+            return false;
+        }
+        return true;
+    }
+    
+    
 }

@@ -569,11 +569,12 @@ public class AlphaBetaSearch {
                         Double.NEGATIVE_INFINITY, 
                         Double.POSITIVE_INFINITY, isMaxPlayer);
                 
-                System.out.println("Value: " + value);
+                //System.out.println("Value: " + value);
                 
                 // Update best move.
                 bestMove = node.getBestMove();
                 // Check if bestMove is okay.
+                // TODO remove this check if this function is stable.
                 if(!bestMove.isOkay()) {
                     throw new RuntimeException("Corrupt MoveAction: " + bestMove.toString());
                 }
