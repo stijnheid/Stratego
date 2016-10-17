@@ -68,18 +68,19 @@ public class BattleTest {
     
     private void showCase() {
         SetupGenerator generator = new SetupGenerator();
-        GameBoard board = generator.generateWholeSetup();
+        GameBoard board = generator.generateShowcaseTwo();
         System.out.println("BoardState:\n" + board.transcript());
         
         BattleEngine engine = new BattleEngine();
         
         AIBot attacker = new ModerateAttacker(Team.RED);
+        //AIBot attacker = new Attacker(Team.RED);
         //AIBot defender = new Attacker(Team.BLUE);
         AIBot defender = new ModeratePlayer(Team.BLUE);
         //AIBot defender = new Attacker(Team.BLUE);
         
         long computationTime = 2000;
-        int maxIterations = 80; //40; //20; //28; //40; //100; //40;
+        int maxIterations = 50; //80; //40; //20; //28; //40; //100; //40;
         
         BattleTranscript transcript = engine.battle(board, attacker, defender, computationTime, maxIterations);
         transcript.print();

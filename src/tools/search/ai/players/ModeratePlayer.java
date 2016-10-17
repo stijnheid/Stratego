@@ -161,7 +161,7 @@ public class ModeratePlayer extends AbstractPlayer {
             double score = 0;
             GameBoard board = state.getGameBoard();            
             
-            /*
+            
             String setup = "25|25|25\n" +
                             "50|50|50\n" +
                             "100|100|100\n" +
@@ -177,14 +177,14 @@ public class ModeratePlayer extends AbstractPlayer {
                             "0|0|0\n" +
                             "0|0|0\n";
             */
-            
+            /**
             String setup = "25|25|25|25|25|25\n" +
                             "50|50|50|50|50|50\n" +
                             "100|100|100|100|100|100\n" +
                             "150|150|150|150|150|150\n" +
                             "200|200|200|200|200|200\n" +
                             "200|200|200|200|200|200\n";
-            
+            */
             HashMap<BoardPosition, Integer> map = loadMap(setup);
             
             for (Map.Entry<BoardPosition, Integer> entrys: map.entrySet()) {

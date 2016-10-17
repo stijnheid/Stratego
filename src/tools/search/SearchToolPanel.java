@@ -13,6 +13,7 @@ import actions.MoveAction;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JComponent;
 import javax.swing.SwingWorker;
 import javax.swing.table.DefaultTableModel;
 import tools.deeplearning.BattleEngine;
@@ -20,6 +21,7 @@ import tools.deeplearning.BattleTranscript;
 import tools.search.ai.AIBot;
 import tools.search.ai.SetupGenerator;
 import tools.search.ai.players.Attacker;
+import tools.search.ai.players.DefaultPlayer;
 
 /**
  *
@@ -115,6 +117,10 @@ public class SearchToolPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void startGameButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startGameButtonActionPerformed
+        // Create a GameClock
+        GameClock task = new GameClock(this.jTable1);
+        task.execute();
+        
         System.out.println("Start Game");
         // Check if the player's setup is valid.
         
@@ -133,8 +139,9 @@ public class SearchToolPanel extends javax.swing.JPanel {
         GameBoard board;
         SetupGenerator generator = new SetupGenerator();
         //board = generator.generateSetup();
-        board = generator.mirroredSetup();
-        //board = generator.smallSetup();
+        //board = generator.mirroredSetup();
+        board = generator.generateShowcaseTwo(); //generator.smallSetup();
+        //board = generator.smallSetupTwo();
         
         // Set the JTable to the right dimensions.
         this.jTable1.setModel(new DefaultTableModel(board.getHeight(), 
@@ -143,19 +150,9 @@ public class SearchToolPanel extends javax.swing.JPanel {
         // Attach board to game state.
         state.setGameBoard(board);
         
-        Simulation simulation = new Simulation(state, this.jTable1);
-        BattleEngine battleEngine = new BattleEngine();
-        
-        //AIBot attacker = new DefaultPlayer(Team.RED);
-        //AIBot defender = new DefaultPlayer(Team.BLUE);
-        AIBot attacker = new Attacker(Team.RED);
-        AIBot defender = new Attacker(Team.BLUE);
-        
-        long computationTime = 2000;
-        System.out.println("Invoke Battle Engine");
-        BattleTranscript transcript = battleEngine.battle(state, 
-                attacker, defender, computationTime, simulation);
-        System.out.println("GAME ENDED");
+        // Start the BattleTask
+        BattleTask battleTask = new BattleTask(state, this.jTable1);
+        battleTask.execute();
         
         //flagReachabilityTest();
         //setup();
@@ -244,6 +241,79 @@ public class SearchToolPanel extends javax.swing.JPanel {
         
     }
     
+    private class GameClock extends SwingWorker<Void, Void> {
+
+        private JComponent component;
+        
+        public GameClock(JComponent component) {
+            this.component = component;
+        }
+        
+        @Override
+        protected Void doInBackground() throws Exception {
+            // While the game is playing redraw the game each seconds.
+            while(true) {
+                // How to update the UI Thread here?
+                this.component.repaint();
+                System.out.println("Repaint Component.");
+                
+                Thread.sleep(1000);
+            }
+        }
+
+        @Override
+        protected void process(List<Void> chunks) {
+            
+        }
+    }
+    
+    private void redrawUI() {
+        
+    }
+    
+    private class BattleTask extends SwingWorker<Void, Void> {
+
+        private final GameState state;
+        private final JComponent component;
+        
+        public BattleTask(GameState state, JComponent component) {
+            this.state = state;
+            this.component = component;
+        }
+        
+        @Override
+        protected Void doInBackground() throws Exception {
+            Simulation simulation = new Simulation(state, this.component);
+            BattleEngine battleEngine = new BattleEngine();
+
+            //AIBot attacker = new DefaultPlayer(Team.RED);
+            //AIBot defender = new DefaultPlayer(Team.BLUE);
+            AIBot attacker = new Attacker(Team.RED);
+            AIBot defender = new Attacker(Team.BLUE);
+            //AIBot defender = new DefaultPlayer(Team.BLUE);
+
+            long computationTime = 2000;
+            System.out.println("Invoke Battle Engine");
+            BattleTranscript transcript = battleEngine.battle(state, 
+                    attacker, defender, computationTime, simulation);
+            
+            System.out.println("GAME ENDED");
+            return null;
+        }
+
+        @Override
+        protected void done() {
+            // End the gameEnded function.
+            endGame();
+        }        
+    }
+    
+    private void endGame() {
+        // Stop game.
+        
+        // End GameClock.
+    }
+    
     private class GameTask extends SwingWorker<Void, MoveAction> {
         
         @Override
@@ -260,7 +330,6 @@ public class SearchToolPanel extends javax.swing.JPanel {
         protected void process(List<MoveAction> chunks) {
             
         }
-
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables

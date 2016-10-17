@@ -69,6 +69,25 @@ public class SetupGenerator {
         return board;
     }
     
+    public GameBoard smallSetupTwo() {
+        GameBoard board = new GameBoard(2, 5, Team.RED, Team.BLUE);
+        try {
+            // Setup the teams.
+            board.setupPiece(0, 0, Pieces.LIEUTENANT, Team.RED);
+            board.setupPiece(0, 1, Pieces.CAPTAIN, Team.RED);
+            board.setupPiece(1, 0, Pieces.FLAG, Team.RED);
+            board.setupPiece(1, 1, Pieces.MAJOR, Team.RED);
+            
+            board.setupPiece(1, 4, Pieces.LIEUTENANT, Team.BLUE);
+            board.setupPiece(1, 3, Pieces.CAPTAIN, Team.BLUE);
+            board.setupPiece(0, 4, Pieces.FLAG, Team.BLUE);
+            board.setupPiece(0, 3, Pieces.MAJOR, Team.BLUE);
+        } catch (InvalidPositionException ex) {
+            Logger.getLogger(BattleEngine.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return board;
+    }
+    
     public GameBoard mirroredSetup() {
         GameBoard board = new GameBoard(2, 5, Team.RED, Team.BLUE);
         try {
@@ -140,9 +159,9 @@ public class SetupGenerator {
     }
     
     public GameBoard generateShowcase() {
-        String setup = "r:4|r:4|r:4\n" +
+        String setup = "r:9|r:4|r:4\n" +
                         "--- --- ---\n" + 
-                        "r:4|r:8|r:S\n" + 
+                        "r:4|r:5|r:S\n" + 
                         "--- --- ---\n" + 
                         "   |   |   \n" +
                         "--- --- ---\n" +

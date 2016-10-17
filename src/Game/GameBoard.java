@@ -500,8 +500,7 @@ public class GameBoard {
         if(defenderFlag.isEmpty()) {
             //System.out.println("Defender has no flag.");
             return this.attacker;
-        }
-        */
+        }*/
         
         // The game is in an end state if the attacker has no miners left and
         // the defending side has the flag completely surrounded with bombs.
