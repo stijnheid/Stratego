@@ -13,6 +13,10 @@ public abstract class WeighedHeuristicTerm implements HeuristicEvaluation {
     public void setWeight(double weight) {
         this.weight = weight;
     }
+    
+    public double getWeight() {
+        return this.weight;
+    } 
 
     @Override
     public double score(GameState state) {

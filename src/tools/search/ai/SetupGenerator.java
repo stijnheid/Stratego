@@ -140,8 +140,8 @@ public class SetupGenerator {
     }
     
     public GameBoard generateShowcase() {
-        String setup = "r:4|r:4|r:4\n" +
-                        "--- --- ---\n" + 
+        String setup =  "r:4|r:4|r:4\n" +
+                        "--- --- --- \n" + 
                         "r:4|r:8|r:S\n" + 
                         "--- --- ---\n" + 
                         "   |   |   \n" +
@@ -197,5 +197,20 @@ public class SetupGenerator {
                        "--- --- --- --- --- ---\n" +
                        "b:F|b:B|b:4|b:4|b:5|b:7\n";
         return GameBoard.loadBoard(setup, 6, 6);
+    }
+    
+    public GameBoard generateFourBySix() {
+        String setup = "r:8|r:S|r:7|r:4\n" +
+                       "--- --- --- ---\n" +
+                       "r:2|r:6|r:9|r:5\n" +
+                       "--- --- --- ---\n" +
+                       "   |   |   |   \n" + 
+                       "--- --- --- ---\n" +
+                       "   |   |   |   \n" + 
+                       "--- --- --- ---\n" +
+                       "b:B|b:6|b:4|b:7\n" + 
+                       "--- --- --- ---\n" +
+                       "b:F|b:B|b:9|b:5\n";
+        return GameBoard.loadBoard(setup, 4, 6);
     }
 }

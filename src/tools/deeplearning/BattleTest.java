@@ -68,7 +68,7 @@ public class BattleTest {
     
     private void showCase() {
         SetupGenerator generator = new SetupGenerator();
-        GameBoard board = generator.generateWholeSetup();
+        GameBoard board = generator.generateFourBySix();
         System.out.println("BoardState:\n" + board.transcript());
         
         BattleEngine engine = new BattleEngine();

@@ -119,7 +119,17 @@ public class ModeratePlayerTwo extends AbstractPlayer{
         @Override
         public double computeScore(GameState state) {
             double score;
-            return score = (HighestValue(state, ModeratePlayerTwo.super.team)/2) * getPiecesAmount(state, ModeratePlayerTwo.super.team, Pieces.BOMB);
+            return score = (-HighestValue(state, ModeratePlayerTwo.super.team.opposite())/2) * getPiecesAmount(state, ModeratePlayerTwo.super.team, Pieces.BOMB);
+        }
+        
+    }
+    
+    private class OtherValue extends WeighedHeuristicTerm {
+
+        @Override
+        public double computeScore(GameState state) {
+            double score = 0;
+            return score;
         }
         
     }
