@@ -110,7 +110,7 @@ public class ModeratePlayer extends AbstractPlayer {
             
             //If the flag is surrounded by the bombs, the bombs and the miner of attacker will become much more valueable
             if(FlagSurroundedByBomb(state)) {
-                attacker.put(Pieces.MINER, -300 * (1 / (getPiecesAmount(state, ModeratePlayer.super.team, Pieces.BOMB) + 1)));
+                attacker.put(Pieces.MINER, -300 * getPiecesAmount(state, ModeratePlayer.super.team.opposite(), Pieces.MINER));
             }
             else {
                 defender.put(Pieces.FLAG, 2495);
