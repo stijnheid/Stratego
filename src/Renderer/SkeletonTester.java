@@ -52,15 +52,15 @@ public class SkeletonTester implements ActionListener {
     private void parse(String message){
         String[] contents = message.split(" ");
         switch (contents[0]){
-            case "shoulderL": skeleton.shoulderL = new Vector(
+            case "shoulderL": skeleton.shoulderL.add(new Vector(
                     Double.parseDouble(contents[1]),
                     Double.parseDouble(contents[2]),
-                    Double.parseDouble(contents[3]));
+                    Double.parseDouble(contents[3])));
                 break;
-            case "shoulderR": skeleton.shoulderR = new Vector(
+            case "shoulderR": skeleton.shoulderR.add(new Vector(
                     Double.parseDouble(contents[1]),
                     Double.parseDouble(contents[2]),
-                    Double.parseDouble(contents[3]));
+                    Double.parseDouble(contents[3])));
                 break;
             case "shoulderLRotX": skeleton.shoulderLRotX = Integer.parseInt(contents[1]);
                 break;
@@ -80,7 +80,7 @@ public class SkeletonTester implements ActionListener {
                 break;
             case "swordRotX": skeleton.swordRotX = Integer.parseInt(contents[1]);
                 break;
-            case "swordOpacity": skeleton.swordOpacity = (float)Double.parseDouble(contents[1]);
+            case "swordOpacity": skeleton.swordOpacity = Float.parseFloat(contents[1]);
                 break;
             case "exit": stuff.interrupt();
                 frame.dispose();

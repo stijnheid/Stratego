@@ -62,24 +62,40 @@ public class AttackAnimation extends Animation {
      * Method to fade in sword (from 0 to 1 opacity).
      * @param frame frame of the animation (from 1 to 30).
      */
-    public void showSword(int frame){
-        skel.swordOpacity = (float)frame / 30;
+    public void showSword(float frame){
+        skel.swordOpacity = frame / 30;
     }
     
     /**
      * Method to perform an attack animation.
      * @param frame frame of the animation (from 1 to 30).
      */
-    public void attack(int frame){
-        if (frame < 15){//raise sword in the air.
+    public void attack(double frame){
+        if (frame <= 15){//raise sword in the air.
+            skel.shoulderL = new Vector(-0.2,(frame/150),1.6);
+            skel.shoulderR = new Vector(0.2,-(frame/150),1.6);
             skel.elbowRRotX = 6*frame;
-            skel.shoulderRRotY = 3*frame;
-        }   else if (frame < 25){//swing sword at opponent.
-            skel.shoulderRRotY = 45 - 9 * (frame-15);
-            skel.elbowRRotX = 90 - 9* (frame-15);
+            skel.elbowLRotX = 3*frame;
+            skel.shoulderRRotX = 6*frame;
+            skel.shoulderRRotY = -3*frame;
+        }   else if (frame <= 25){//swing sword at opponent.
+            skel.shoulderL = new Vector(-0.2,0.1-((frame-15)/50),1.6);
+            skel.shoulderR = new Vector(0.2, -0.1+((frame-15)/50),1.6);
+            skel.elbowRRotX = 90 - ((frame-15)*4.5);
+            skel.elbowLRotX = 45 - ((frame-15)*2.5);
+            skel.shoulderRRotX = 90 - ((frame-15)*4.5);
+            skel.shoulderRRotY = -45 + ((frame-15)*9);
+            skel.shoulderLRotX = -2*(frame-15);
+            skel.swordRotX = -6*(frame-15);
         }   else {//return to rest position.
-            skel.shoulderRRotY = 45 - 9 * (frame - 25);
-            skel.elbowRRotX = -45 + 9 * (frame - 25);
+            skel.shoulderL = new Vector(-0.2,-0.1+((frame-25)/50),1.6);
+            skel.shoulderR = new Vector(0.2,0.1-((frame-25)/50),1.6);
+            skel.elbowRRotX = 45 - ((frame-25)*9);
+            skel.elbowLRotX = 20 - ((frame-25)*4);
+            skel.shoulderRRotX = 45 - ((frame-25)*9);
+            skel.shoulderRRotY = 45 - ((frame-25)*9);
+            skel.shoulderLRotX = -20 + ((frame-25)*4);
+            skel.swordRotX = -60 + ((frame-25)*12);
         }
     }
 }

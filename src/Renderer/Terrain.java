@@ -82,6 +82,9 @@ public class Terrain extends Base {
         }   catch (Exception e){
             System.out.println("Test skeleton failed to load.");
         }
+        
+        //get everything going.
+        run();
     }
     
        /**
@@ -352,10 +355,10 @@ public class Terrain extends Base {
         drawPieces();
         if(pan){
             try {
-                /*Animation ani = new AttackAnimation(this, 
+                Animation ani = new AttackAnimation(this, 
                     board.getPiece(new BoardPosition(0,4)), 
                     new BoardPosition(0,3), null);
-                playAnimation(ani);*/
+                playAnimation(ani);
                 pan = false;
             }   catch (Exception e){}
         }
@@ -371,7 +374,6 @@ public class Terrain extends Base {
     
     public static void main (String[] args){
         Terrain terrain = new Terrain();
-        terrain.run();
     }
     
         public double heightAt(double x, double y) {
