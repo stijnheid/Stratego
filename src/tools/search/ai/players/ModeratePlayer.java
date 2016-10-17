@@ -21,6 +21,7 @@ import java.util.logging.Logger;
 import tools.search.ai.AlphaBetaSearch;
 import tools.search.ai.GameNode;
 import tools.search.ai.HeuristicEvaluation;
+import tools.search.ai.WeighedEvaluation;
 import tools.search.ai.WeighedHeuristicTerm;
 
 /**
@@ -70,7 +71,9 @@ public class ModeratePlayer extends AbstractPlayer {
         return move;
     }
     
-    private class MyHeuristic implements HeuristicEvaluation {
+    private class MyHeuristic implements WeighedEvaluation {
+        
+        List<WeighedHeuristicTerm> Term; 
 
         @Override
         public double score(GameState state) {
@@ -81,6 +84,16 @@ public class ModeratePlayer extends AbstractPlayer {
             boardValue.setWeight(0.3);
             score = pieceValue.computeScore(state) + boardValue.computeScore(state);
             return score;
+        }
+
+        
+        @Override
+        public void setWeights(double[] weights) {
+            /*
+            for (Term: term) {
+                
+            }
+            */
         }
         
     }
