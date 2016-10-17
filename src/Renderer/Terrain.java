@@ -14,6 +14,7 @@ import com.jogamp.opengl.util.gl2.GLUT;
 import java.io.File;
 import static java.lang.Math.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import javax.media.opengl.*;
 import javax.media.opengl.glu.GLU;
@@ -57,7 +58,7 @@ public class Terrain extends Base {
     public final Camera camera;
     
     /** Instances of different textures */
-    public static Texture grass, vakje ,leaves, water, wood;
+    public static Texture grass, vakje ,leaves, water, wood, selectvakje, selectedvakje;
     
     private final int boardsize = 6;
     private final int terrainsize = 20;
@@ -67,7 +68,9 @@ public class Terrain extends Base {
     double lastframe;
     double thisframe;
     
-    Tree tree; 
+    Tree tree;
+    
+    FitSphere stone1;
     
     public Terrain(){
         
@@ -76,17 +79,17 @@ public class Terrain extends Base {
 
         
         List<Vector> input = new ArrayList<Vector>();
-        input.add(new Vector( 2, 2, 0));
-        input.add(new Vector( 2, 3, 0));
-        input.add(new Vector( 3, 4, 0));
-        input.add(new Vector( 2, 2, 2));
-        input.add(new Vector( 3, 2, 2));
-        input.add(new Vector( 3, 3, 2));
-        input.add(new Vector( 2.3, 2.3, 2));
-
-
-
-        //sphere = new FitSphere(input, 0.1f);
+        input.add(new Vector( -7, 7, 0));
+        input.add(new Vector( -7, 8, 0));
+        input.add(new Vector( -8, 9, 0));
+        input.add(new Vector( -7, 7, 1));
+        input.add(new Vector( -8, 7, 1));
+        input.add(new Vector( -8, 8, 1));
+        input.add(new Vector( -7.3, 7.3, 1));
+        stone1 = new FitSphere(input, 0.1f, 10);
+        
+        
+        
 
                 
         // Initialize the camera
@@ -193,6 +196,8 @@ public class Terrain extends Base {
         String pwd = "src/Textures/";
         grass = loadTexture(pwd + "battlefieldos.jpg");
         vakje = loadTexture(pwd + "Vakje.jpg");
+        selectvakje = loadTexture(pwd + "SelectVakje.jpg");
+        selectedvakje = loadTexture(pwd + "SelectedVakje.jpg");
         leaves = loadTexture(pwd + "Leaves.jpg");
         water = loadTexture(pwd + "water.jpg");
     }
@@ -262,7 +267,7 @@ public class Terrain extends Base {
         int ymax = boardsize/2;
         int delta = 1;
         double z = 0;
-        this.vakje.bind(gl);
+        
         
         gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Material.CONCRETE.diffuse, 0);
         gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.CONCRETE.specular, 0);
@@ -273,6 +278,17 @@ public class Terrain extends Base {
         gl.glNormal3d(0, 0, 1);
         for(double x = xmin; x < xmax; x += delta){
             for(double y = ymin; y < ymax; y += delta){
+                if (x == selectPiece[0]-3 && y == selectPiece[1]-3){
+                this.selectvakje.bind(gl);    
+                } 
+                else if (x == selectedPiece[0]-3 && y == selectedPiece[1]-3){
+                this.selectedvakje.bind(gl);   
+                }
+                else
+                this.vakje.bind(gl);
+                
+                System.out.println(Arrays.toString(selectedPiece));
+                
                 gl.glBegin(GL_QUAD_STRIP);
                 gl.glTexCoord2d(0, 0);
                 gl.glVertex3d(x, y, z);
@@ -357,11 +373,18 @@ public class Terrain extends Base {
         /**Increment frame count AFTER rendering.*/
         cs.frameTick();
         thisframe = System.currentTimeMillis();
-        System.out.println("Currently displaying "+(int)(1000/(thisframe-lastframe))+" frames per second");
+        //System.out.println("Currently displaying "+(int)(1000/(thisframe-lastframe))+" frames per second");
         lastframe = thisframe;
         //System.out.println(camera.eye.x+" "+camera.eye.y+" "+camera.eye.z);
         tree.draw(gl, cs.tAnim);
-        //sphere.draw(gl);
+        
+        
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Material.CONCRETE.diffuse, 0);   
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.CONCRETE.specular, 0);
+        gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Material.CONCRETE.shininess);
+
+        this.vakje.bind(gl);
+        stone1.draw(gl, 1);
     }
     
     public static void main (String[] args){

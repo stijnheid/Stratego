@@ -71,6 +71,11 @@ abstract public class Base {
     // Desired frames per second.
     static public int FPS = 60;
     
+    // holds the selected square on the board.
+    static public int selectPiece[] = {0,0};
+    
+        // holds the selected square on the board.
+    static public int selectedPiece[] = {0,0};
     
     // Global state, created at startup.
     protected GameState gs;
@@ -396,6 +401,34 @@ abstract public class Base {
                 case 'z':   cs.cnt = new Vector(cs.cnt.x,
                                                 cs.cnt.y,
                                                 cs.cnt.z - CENTER_POINT_CHANGE);
+                            break;
+            }
+                switch(e.getKeyCode()) {
+                            
+                case KeyEvent.VK_UP:
+                            if (selectPiece[1]<5){
+                                selectPiece[1]++; 
+                            }
+                    break;
+                case KeyEvent.VK_DOWN:
+                            if (selectPiece[1]>0){
+                                selectPiece[1]--; 
+                            }
+                            break;
+                case KeyEvent.VK_LEFT:
+                            if (selectPiece[0]<5){
+                                selectPiece[0]++; 
+                            }
+                            break;
+                case KeyEvent.VK_RIGHT :
+                            if (selectPiece[0]>0){
+                                selectPiece[0]--; 
+                            }
+                            break;
+                case KeyEvent.VK_ENTER :
+
+                            selectedPiece = selectPiece.clone(); 
+
                             break;
             }
         }

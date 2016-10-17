@@ -53,8 +53,8 @@ public enum Material {
     */
     
     GREEN (
-        new float[] {30/255f, 180/255f, 10/255f, 0.5f},
-        new float[] {1f, 1f, 1f, 1f},
+        new float[] {30/255f, 180/255f, 10/255f, 1f},
+        new float[] {50/255f, 160/255f, 30/255f, 1f},
         0f),
    /**
     * Blue material properties. 
@@ -102,7 +102,7 @@ public enum Material {
 
     CONCRETE (
 	new float[] {245/255f, 245/255f, 220/255f, 1f},
-	new float[] {1f, 1f, 1f, 1f},
+	new float[] {0.5f, 0.6f, 0.5f, 1f},
 	0.05f),
    /**
     * Ground material properties. 
