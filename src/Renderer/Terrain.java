@@ -60,7 +60,7 @@ public class Terrain extends Base {
     public final Camera camera;
     
     /** Instances of different textures */
-    public static Texture grass, vakje ,leaves, water, wood, selectvakje, selectedvakje, Bomb, Captain, Colonel, General, Lieutenant, Major, Marshall, Miner, Scout, Sergeant, Spy;
+    public static Texture grass, vakje ,leaves, water, wood, selectvakje, selectedvakje, Bomb, Captain, Colonel, General, Lieutenant, Major, Marshall, Miner, Scout, Sergeant, Spy, Flag;
     
     private final int boardsize = 6;
     private final int terrainsize = 20;
@@ -69,13 +69,15 @@ public class Terrain extends Base {
     boolean pan;
     double lastframe;
     double thisframe;
-    Tree tree;
+    Tree tree1, tree2, tree3;
+    Stone stone1, stone2, stone3;
+    
     Skeleton test;
     SkeletonTester skeltest;
     
    
     
-    FitSphere stone1;
+
     //package Game variables.
     GameState gamestate;
     GameBoard board;
@@ -89,23 +91,6 @@ public class Terrain extends Base {
         board = setup.generateSetup();
         gamestate.setGameBoard(board);
         
-      
-        
-
-        
-        List<Vector> input = new ArrayList<Vector>();
-        input.add(new Vector( -7, 7, 0));
-        input.add(new Vector( -7, 8, 0));
-        input.add(new Vector( -8, 9, 0));
-        input.add(new Vector( -7, 7, 1));
-        input.add(new Vector( -8, 7, 1));
-        input.add(new Vector( -8, 8, 1));
-        input.add(new Vector( -7.3, 7.3, 1));
-        stone1 = new FitSphere(input, 0.1f, 10);
-        
-        
-        
-
                 
         // Initialize the camera
         camera = new Camera();
@@ -166,8 +151,14 @@ public class Terrain extends Base {
     public void initialize() {
         
         
-        tree = new Tree(5,5,heightAt(5,5), gl, this, 20, 6456);   
-
+        tree1 = new Tree(7,-7,heightAt(7,-7), gl, this, 20, 6456);   
+        tree2 = new Tree(-8,5,heightAt(-8,5), gl, this, 20, 6456); 
+        tree3 = new Tree(-5,-4,heightAt(-5,-4), gl, this, 20, 6456); 
+        
+        stone1 = new Stone(2,-5,heightAt(0,0));
+        stone2 = new Stone(-4,-3,heightAt(0,0));
+        stone3 = new Stone(-5,4,heightAt(0,0));
+        
         gl.glEnable(GL_LIGHTING);
         gl.glEnable(GL_LIGHT0);
         
@@ -219,19 +210,21 @@ public class Terrain extends Base {
         leaves = loadTexture(pwd + "Leaves.jpg");
         water = loadTexture(pwd + "water.jpg");
         
-        pwd = "src/Textures.Pieces/";
+        pwd = "src/Textures/Pieces/";
         
         Bomb = loadTexture(pwd + "Bomb.jpg");
-        Captain = loadTexture(pwd + "Bomb.jpg");
-        Colonel = loadTexture(pwd + "Bomb.jpg");
-        General = loadTexture(pwd + "Bomb.jpg");
-        Lieutenant = loadTexture(pwd + "Bomb.jpg");
-        Bomb = loadTexture(pwd + "Bomb.jpg");
-        Bomb = loadTexture(pwd + "Bomb.jpg");
-        Bomb = loadTexture(pwd + "Bomb.jpg");
-        Bomb = loadTexture(pwd + "Bomb.jpg");
-        Bomb = loadTexture(pwd + "Bomb.jpg");
-        Bomb = loadTexture(pwd + "Bomb.jpg");
+        Captain = loadTexture(pwd + "Captain.jpg");
+        Colonel = loadTexture(pwd + "Colonel.jpg");
+        General = loadTexture(pwd + "General.jpg");
+        Lieutenant = loadTexture(pwd + "Lieutenant.jpg");
+        Captain = loadTexture(pwd + "Captain.jpg");
+        Major = loadTexture(pwd + "Major.jpg");
+        Marshall = loadTexture(pwd + "Marshall.jpg");
+        Miner = loadTexture(pwd + "Miner.jpg");
+        Scout = loadTexture(pwd + "Scout.jpg");
+        Sergeant = loadTexture(pwd + "Sergeant.jpg");
+        Spy = loadTexture(pwd + "Spy.jpg");
+        Flag = loadTexture(pwd + "Flag.jpg");
         
         
         
@@ -436,15 +429,13 @@ public class Terrain extends Base {
         //System.out.println("Currently displaying "+(int)(1000/(thisframe-lastframe))+" frames per second");
         lastframe = thisframe;
         //System.out.println(camera.eye.x+" "+camera.eye.y+" "+camera.eye.z);
-        tree.draw(gl, cs.tAnim);
-        
-        
-        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Material.CONCRETE.diffuse, 0);   
-        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.CONCRETE.specular, 0);
-        gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Material.CONCRETE.shininess);
-
-        this.vakje.bind(gl);
-        stone1.draw(gl, 1);
+        tree1.draw(gl, cs.tAnim);
+        tree2.draw(gl, cs.tAnim);
+        tree3.draw(gl, cs.tAnim);
+       
+        stone1.draw(gl);
+        stone2.draw(gl);
+        stone3.draw(gl);
     }
     
     public static void main (String[] args){

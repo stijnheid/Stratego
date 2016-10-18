@@ -5,7 +5,11 @@
  */
 package Renderer;
 import Game.BoardPosition;
+import Game.Pieces;
+import static Game.Pieces.BOMB;
+import static Game.Pieces.FLAG;
 import Game.Team;
+import static Renderer.Material.BLANK;
 import Renderer.Terrain;
 
 import java.util.List;
@@ -39,6 +43,10 @@ public class Skeleton {
     /**Team on which this skeleton resides.
      (Red Attacks, Blue Defends)*/
     public Team team;
+    
+    /**Holds the rank of the to be drawn piece*/
+    public Pieces rank; 
+    
     
     /**Data Structure holding the joints data.*/
     public List<Vector> joints;
@@ -87,7 +95,9 @@ public class Skeleton {
      * @param p position on the board (in cells).
      * @param t team on which this skeleton resides.
      */
-    public Skeleton (BoardPosition p, Team t){
+    public Skeleton (BoardPosition p, Team t, Pieces r){
+        rank = r;
+        
         joints = new ArrayList<Vector>();
         this.position = p;
         this.team = t;
@@ -150,11 +160,16 @@ public class Skeleton {
         gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, skelShine);
         gl.glRotated(rotation, 0, 0, 1);
         gl.glTranslated(offset.x, offset.y, offset.z);
+        gl.glScaled(0.8d, 0.8d, 0.8d);
         drawTorso(gl, glut);
         drawLeg(gl, glut, true);//left leg
         drawLeg(gl, glut, false);//right leg
         drawArm(gl, glut, true);// left arm
         drawArm(gl, glut, false);//right arm
+        
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, BLANK.diffuse, 0);
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, BLANK.specular, 0);
+        gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, BLANK.shininess);
         drawRank(gl);
         gl.glEnable(GL2.GL_TEXTURE_2D);
         gl.glPopMatrix();
@@ -360,22 +375,70 @@ public class Skeleton {
     }
         
      private void drawRank (GL2 gl){
-         if (showRank){
+         
+ 
+        if (showRank){
+            
+             gl.glEnable(GL2.GL_TEXTURE_2D);
+            System.out.println(rank);
+                    switch(rank) {
+            case BOMB:
+                Terrain.Bomb.bind(gl);
+                break;
+            case FLAG:
+                Terrain.Flag.bind(gl);
+                break;
+            case SPY:
+                Terrain.Spy.bind(gl);
+                break;
+            case SCOUT:
+                Terrain.Scout.bind(gl);
+                break;
+            case MINER:
+                Terrain.Miner.bind(gl);
+                break;
+            case SERGEANT:
+                Terrain.Sergeant.bind(gl);
+                break;
+            case LIEUTENANT:
+                Terrain.Lieutenant.bind(gl);
+                break;
+            case CAPTAIN:
+                Terrain.Captain.bind(gl);
+                break;
+            case MAJOR:
+                Terrain.Major.bind(gl);
+                break;
+            case COLONEL:
+                Terrain.Colonel.bind(gl);
+                break;
+            case MARSHALL:
+                Terrain.Marshall.bind(gl);
+                break;
+            case GENERAL:
+                Terrain.General.bind(gl);
+                break;
+            default:
+                
+        }
            gl.glBegin(GL_TRIANGLE_STRIP);
                 
                 gl.glTexCoord2d(0, 0);
                 gl.glVertex3d(0, -0.3, 2.5);
                   
-                gl.glTexCoord2d(0, 1);
+                gl.glTexCoord2d(1, 0);
                 gl.glVertex3d(0, 0.3, 2.5);
                     
-                gl.glTexCoord2d(1, 0);
+                gl.glTexCoord2d(0, 1);
                 gl.glVertex3d(0,-0.3,3.5);
 
                 gl.glTexCoord2d(1, 1);
                 gl.glVertex3d(0,0.3,3.5);
-            gl.glEnd();   
+            gl.glEnd(); 
+            
+            gl.glDisable(GL2.GL_TEXTURE_2D);
          }
+         
      }
     /**
      * Draw a sphere at the specified target (relative to current location).

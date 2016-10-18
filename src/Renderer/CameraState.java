@@ -37,8 +37,8 @@ public class CameraState {
         vDist = 10d;
         vWidth = 10d;
         cnt = new Vector(0,0,0);
-        theta = 0d;// camera starts at (0, vDist/sqrt(2), vDist/sqrt(2)).
-        phi = Math.PI/4;// 45 degree angle.
+        theta = Math.PI/2;// camera starts at (0, vDist/sqrt(2), vDist/sqrt(2)).
+        phi = Math.PI/5;// 45 degree angle.
         tAnim = -1;
         frameCount = 0;
         refresh = new Object();
