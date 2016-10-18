@@ -5,22 +5,16 @@
  */
 package Renderer;
 
-import Game.BoardPosition;
 import Game.GamePiece;
+import Game.BoardPosition;
 
 /**
  *  Class to execute a walking animation.
  */
 public class WalkAnimation extends Animation{
     
-    /*Direction of movement.*/
-    private Vector direction;
-    
-    /*Start location of walk.*/
-    private Vector startloc;
-    
-    public WalkAnimation(Terrain terrain, GamePiece subject, BoardPosition target){
-        super(terrain, subject, target);
+    public WalkAnimation(Terrain terrain, GamePiece subject, BoardPosition target, AnimationCallback call){
+        super(terrain, subject, target, call);
     }
     
     @Override
@@ -41,12 +35,15 @@ public class WalkAnimation extends Animation{
                 try {
                     synchronized(terrain.cs.refresh){
                         terrain.cs.refresh.wait();
-                        refresh(i);
+                        walk(i);
                     }
                 }   catch (Exception e){}
             }
+            faceForward();
             //move Camera back to original location.
             moveCamera(eye, center);
+            //signal end of Animation.
+            endAnimation();
         });
         walk.start();
     }
@@ -56,7 +53,7 @@ public class WalkAnimation extends Animation{
      * Called right after a CameraState.refresh signal.
      * @param frame which frame of the animation is to be displayed next.
      */
-    private void refresh(int frame){
+    private void walk(int frame){
         skel.offset = startloc.sum(direction.scale(Math.sin((frame*Math.PI)/(2*duration))));
         double rot = 0.5*Math.toDegrees(Math.sin((frame*Math.PI)/duration));
         skel.hipLRotX = rot;

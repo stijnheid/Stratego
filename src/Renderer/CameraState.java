@@ -5,9 +5,12 @@
  */
 package Renderer;
 import Game.BoardPosition;
+import Game.Team;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.Map;
+import java.util.HashMap;
 
 /**
  *  Class holding data regarding openGL viewing (camera, centre, etc).
@@ -19,8 +22,6 @@ public class CameraState {
     
     public final Object refresh;
     public final Lock varLock;
-    
-    public Skeleton[][] pieces;
     
     public int w;               // Width of window in pixels.
     public int h;               // Height of window in pixels.
@@ -42,20 +43,6 @@ public class CameraState {
         frameCount = 0;
         refresh = new Object();
         varLock = new ReentrantLock();
-        
-        pieces = new Skeleton[6][6];
-        for(int i=0; i < 6; i++){
-            if(i==0 || i==1){
-                for(int j=0; j<6; j++){
-                    pieces[i][j] = new Skeleton(new BoardPosition(j,i));
-                }
-            }   else if(i==4 || i==5){
-                for(int j=0;j<6; j++){
-                    pieces[i][j] = new Skeleton(new BoardPosition(j,i));
-                    pieces[i][j].rotate(180);
-                }
-            }
-        }
     }
     
     public void setCamera(double phi, double theta, double vDist, Vector cnt){

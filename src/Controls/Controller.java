@@ -6,7 +6,7 @@
 package Controls;
 
 import Game.GameState;
-import Logic.Action;
+import actions.Action;
 import java.util.Map;
 
 /**

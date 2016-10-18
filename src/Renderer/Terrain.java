@@ -5,13 +5,15 @@
  */
 package Renderer;
 
-import robotrace.*;
-import Game.GameState;
+import robotrace.Camera;
+import Game.BoardPosition;
+import Game.GameBoard;
 import Game.GamePiece;
-import com.jogamp.newt.opengl.GLWindow;
+import Game.GameState;
+import Logic.Simulation;
+import tools.search.ai.SetupGenerator;
+
 import com.jogamp.opengl.util.texture.Texture;
-import com.jogamp.opengl.util.gl2.GLUT;
-import java.io.File;
 import static java.lang.Math.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -67,12 +69,25 @@ public class Terrain extends Base {
     boolean pan;
     double lastframe;
     double thisframe;
-    
     Tree tree;
+    Skeleton test;
+    SkeletonTester skeltest;
+    
+   
     
     FitSphere stone1;
+    //package Game variables.
+    GameState gamestate;
+    GameBoard board;
+    GamePiece piece;
     
-    public Terrain(){
+    public Terrain(Simulation s){ 
+        super(s);
+        //form game setup.
+        gamestate = new GameState();
+        SetupGenerator setup = new SetupGenerator();
+        board = setup.generateSetup();
+        gamestate.setGameBoard(board);
         
       
         
@@ -94,8 +109,16 @@ public class Terrain extends Base {
                 
         // Initialize the camera
         camera = new Camera();
+        
+        //test/debug stuff.
         pan = true;
         lastframe = System.currentTimeMillis();
+        try {
+            test = board.getPiece(new BoardPosition(0,4)).getSkeleton();
+            skeltest = new SkeletonTester(test);
+        }   catch (Exception e){
+            System.out.println("Test skeleton failed to load.");
+        }
     }
     
        /**
@@ -111,7 +134,6 @@ public class Terrain extends Base {
         gl.glLoadIdentity();
 
         // Set the perspective.
-        // Modify this to meet the requirements in the assignment.
         float aspectRatio = (float) cs.w / (float) cs.h;
         double fovy = 60;
         try {/** Since vDist is a synchronised variable. */
@@ -120,14 +142,10 @@ public class Terrain extends Base {
         }   finally {
             cs.varLock.unlock();
         }
+        
         // Set camera.
         gl.glMatrixMode(GL_MODELVIEW);
-        gl.glLoadIdentity();
-
-        // Update the view according to the camera mode and robot of interest.
-        // For camera modes 1 to 4, determine which robot to focus on.
-        
-
+        gl.glLoadIdentity();      
         camera.update(cs);
         glu.gluLookAt(camera.eye.x(),camera.eye.y(),camera.eye.z(),cs.cnt.x(),cs.cnt.y(),cs.cnt.z(),0,0,1);
         
@@ -135,9 +153,6 @@ public class Terrain extends Base {
 
         gl.glShadeModel(GL_SMOOTH);
         gl.glDisable(GL_COLOR_MATERIAL);
-
-        // White color definition
-
     }
     
         /**
@@ -278,10 +293,10 @@ public class Terrain extends Base {
         gl.glNormal3d(0, 0, 1);
         for(double x = xmin; x < xmax; x += delta){
             for(double y = ymin; y < ymax; y += delta){
-                if (x == selectPiece[0]-3 && y == selectPiece[1]-3){
+                if (x == selectPiece[0]-3 && y == -selectPiece[1]+2){
                 this.selectvakje.bind(gl);    
                 } 
-                else if (x == selectedPiece[0]-3 && y == selectedPiece[1]-3){
+                else if (x == selectedPiece[0]-3 && y == -selectedPiece[1]+2){
                 this.selectedvakje.bind(gl);   
                 }
                 else
@@ -301,7 +316,8 @@ public class Terrain extends Base {
                 gl.glEnd();               
             }
         }
-        //cross signifying tile (0,0) (for testing purposes).
+        //cross signifying tile (5,0) (for testing purposes).
+        //tile (5,0) meaning bottom left.
         gl.glBegin(GL_TRIANGLE_STRIP);
         gl.glVertex3d(xmin, ymin, z);
         gl.glVertex3d(xmin+1, ymin+1, z);
@@ -313,18 +329,38 @@ public class Terrain extends Base {
         gl.glVertex3d(xmin+1, ymin, z);
         gl.glVertex3d(xmin+0.5, ymin+0.5, 0.1);
         gl.glEnd();
+        
+        //tile at (4,0)
+        gl.glBegin(GL_TRIANGLE_STRIP);
+        gl.glVertex3d(xmin, ymin+1, z);
+        gl.glVertex3d(xmin+1, ymin+2, z);
+        gl.glVertex3d(xmin+0.5, ymin+1.5, 0.1);
+        gl.glEnd();
+        
+        gl.glBegin(GL_TRIANGLE_STRIP);
+        gl.glVertex3d(xmin, ymin+2, z);
+        gl.glVertex3d(xmin+1, ymin+1, z);
+        gl.glVertex3d(xmin+0.5, ymin+1.5, 0.1);
+        gl.glEnd();
     }
     
     /**
      * Method to draw pieces.
+     * int key represents position on the board in reading order (starting top left at 0).
      */
     public void drawPieces(){
-        for(int i=0; i<boardsize; i++){
-            for (int j=0; j<boardsize; j++){
-                if(cs.pieces[i][j] != null){
-                    cs.pieces[i][j].draw(gl, glut);
+        board = gamestate.getGameBoard();
+        try {
+            for (int y=0; y < board.getHeight(); y++){
+                for (int x=0; x < board.getWidth(); x++){                  
+                piece = board.getPiece(new BoardPosition(x,y));
+                    if (piece != null){
+                        piece.getSkeleton().draw(gl, glut);
+                    }
                 }
-            }
+            }        
+        }   catch (Exception e){
+            //stuff's wrong.
         }
     }
     
@@ -335,7 +371,7 @@ public class Terrain extends Base {
      * @param a the Animation that should be played.
      */
     public void playAnimation(Animation a){
-        
+        a.execute();
     }
     
         /**
@@ -365,9 +401,13 @@ public class Terrain extends Base {
         drawBoard();
         drawPieces();
         if(pan){
-            Animation ani = new WalkAnimation(this, null, new Game.BoardPosition(2,0));
-            pan=false;
-            //ani.execute();
+            try {
+                /*Animation ani = new AttackAnimation(this, 
+                    board.getPiece(new BoardPosition(0,4)), 
+                    new BoardPosition(0,3), null);
+                playAnimation(ani);*/
+                pan = false;
+            }   catch (Exception e){}
         }
                
         /**Increment frame count AFTER rendering.*/
@@ -388,7 +428,7 @@ public class Terrain extends Base {
     }
     
     public static void main (String[] args){
-        Terrain terrain = new Terrain();
+        Terrain terrain = new Terrain(null);
         terrain.run();
     }
     

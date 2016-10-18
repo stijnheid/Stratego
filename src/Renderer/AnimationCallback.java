@@ -3,12 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package Logic;
+package Renderer;
 
 /**
- * Class representing an Unselect Action.
- * @author Maurits Ambags (0771400)
+ *
  */
-public class Unselect {
+public interface AnimationCallback {
     
+    public void animationEnded();
 }
