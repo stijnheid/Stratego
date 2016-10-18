@@ -30,7 +30,7 @@ public class AttackAnimation extends Animation {
             moveCamera(new Vector(skel.offset.x+5, skel.offset.y, skel.offset.z+5)
                     ,new Vector(skel.offset.x, skel.offset.y, skel.offset.z+1));
             //first let sword appear.
-            for(int i=1; i <= duration; i++){
+            for(int i=1; i <= (duration/3); i++){
                 try {
                     synchronized(terrain.cs.refresh){
                         terrain.cs.refresh.wait();
@@ -63,7 +63,7 @@ public class AttackAnimation extends Animation {
      * @param frame frame of the animation (from 1 to 30).
      */
     public void showSword(float frame){
-        skel.swordOpacity = frame / 30;
+        skel.swordOpacity = frame / 10;
     }
     
     /**

@@ -11,7 +11,7 @@ import javax.swing.JTextField;
 import javax.swing.JFrame;
 
 /**
- * Class to test skeleton joint edits.
+ * Class to test skeleton movements.
  */
 public class SkeletonTester implements ActionListener {
     
@@ -45,7 +45,7 @@ public class SkeletonTester implements ActionListener {
         try {
             parse(text);        
         }   catch (Exception err){
-                System.out.println("Could not parse message: "+text);          
+                System.out.println(err.getClass().getName()+": Could not parse message: "+text);          
         }
     }
     
@@ -62,6 +62,11 @@ public class SkeletonTester implements ActionListener {
                     Double.parseDouble(contents[2]),
                     Double.parseDouble(contents[3])));
                 break;
+            case "move": skeleton.move(new Vector(
+                    Double.parseDouble(contents[1]),
+                    Double.parseDouble(contents[2]),
+                    Double.parseDouble(contents[3])));
+                break;
             case "shoulderLRotX": skeleton.shoulderLRotX = Integer.parseInt(contents[1]);
                 break;
             case "shoulderLRotY": skeleton.shoulderLRotY = Integer.parseInt(contents[1]);
@@ -69,6 +74,22 @@ public class SkeletonTester implements ActionListener {
             case "shoulderRRotX": skeleton.shoulderRRotX = Integer.parseInt(contents[1]);
                 break;
             case "shoulderRRotY": skeleton.shoulderRRotY = Integer.parseInt(contents[1]);
+                break;
+            case "hipLRotX": skeleton.hipLRotX = Integer.parseInt(contents[1]);
+                break;
+            case "hipLRotY": skeleton.hipLRotY = Integer.parseInt(contents[1]);
+                break;
+            case "hipRRotX": skeleton.hipRRotX = Integer.parseInt(contents[1]);
+                break;
+            case "hipRRotY": skeleton.hipRRotY = Integer.parseInt(contents[1]);
+                break;
+            case "kneeLRotX": skeleton.kneeRRotX = Integer.parseInt(contents[1]);
+                break;
+            case "kneeLRotY": skeleton.kneeLRotY = Integer.parseInt(contents[1]);
+                break;
+            case "kneeRRotX": skeleton.kneeRRotX = Integer.parseInt(contents[1]);
+                break;
+            case "kneeRRotY": skeleton.kneeRRotY = Integer.parseInt(contents[1]);
                 break;
             case "elbowLRotX": skeleton.elbowLRotX = Integer.parseInt(contents[1]);
                 break;
