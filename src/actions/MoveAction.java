@@ -19,6 +19,9 @@ public class MoveAction extends Action {
     private final BoardPosition origin;
     private final BoardPosition destination;
     private boolean isApplied;
+    private boolean isAttack;
+    // Will only be defined if this move results in an attack.
+    private GamePiece enemy;
 
     public MoveAction(Team team, GamePiece piece, 
             BoardPosition origin, 
@@ -80,6 +83,14 @@ public class MoveAction extends Action {
     public void setApplied(boolean applied) {
         this.isApplied = applied;
     }
+
+    public GamePiece getEnemy() {
+        return enemy;
+    }
+
+    public void setEnemy(GamePiece enemy) {
+        this.enemy = enemy;
+    }
     
     public boolean isOkay() {
         if(!this.isApplied && !this.piece.getPosition().equals(this.origin)) {
@@ -113,11 +124,28 @@ public class MoveAction extends Action {
     
     @Override
     public Object clone() {
+        if(this.isApplied) {
+            throw new RuntimeException("Not allowed to clone an applied move. Can be unsafe.");
+        }
+        
         GamePiece clonedPiece = (GamePiece) piece.clone();
         MoveAction clone = new MoveAction(super.team, clonedPiece, 
                 (BoardPosition) origin.clone(), 
                 (BoardPosition) destination.clone());
+        
+        clone.isAttack = this.isAttack;
+        clone.isApplied = this.isApplied;
+        // TODO also copy the deadOpponent and deadAttacker, but we can assume
+        // that the clone function is not used on already applied moves.
         return clone;
+    }
+
+    public boolean isIsAttack() {
+        return isAttack;
+    }
+    
+    public void setAttack() {
+        this.isAttack = true;
     }
 
     @Override
@@ -135,19 +163,21 @@ public class MoveAction extends Action {
             return false;
         }
         final MoveAction other = (MoveAction) obj;
-        /**
+
         if (!Objects.equals(this.piece, other.piece)) {
             return false;
         }
+        /*
         if (!Objects.equals(this.deadAttacker, other.deadAttacker)) {
             return false;
         }
         if (!Objects.equals(this.deadOpponent, other.deadOpponent)) {
             return false;
-        }*/
-        if (this.piece.getRank() != other.piece.getRank()) {
-            return false;
         }
+        if (this.piece.getRank() != other.piece.getRank() &&
+                piece.getTeam() != other.piece.getTeam()) {
+            return false;
+        }*/
         if (!Objects.equals(this.origin, other.origin)) {
             return false;
         }
@@ -155,6 +185,9 @@ public class MoveAction extends Action {
             return false;
         }
         if (this.isApplied != other.isApplied) {
+            return false;
+        }
+        if (this.isAttack != other.isAttack) {
             return false;
         }
         return true;

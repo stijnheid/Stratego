@@ -18,11 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tools.search.ai.AlphaBetaSearch;
 import tools.search.ai.GameNode;
-import tools.search.ai.HeuristicEvaluation;
-import tools.search.ai.WeighedEvaluation;
-import tools.search.ai.WeighedHeuristicTerm;
+import tools.search.ai.WeightedEvaluation;
+import tools.search.ai.WeightedHeuristicTerm;
 
 /**
  *
@@ -71,9 +69,9 @@ public class ModeratePlayer extends AbstractPlayer {
         return move;
     }
     
-    private class MyHeuristic implements WeighedEvaluation {
+    private class MyHeuristic implements WeightedEvaluation {
         
-        List<WeighedHeuristicTerm> Term; 
+        List<WeightedHeuristicTerm> Term; 
 
         @Override
         public double score(GameState state) {
@@ -86,19 +84,18 @@ public class ModeratePlayer extends AbstractPlayer {
             return score;
         }
 
+        @Override
+        public int featureCount() {
+            return 2;
+        }
         
         @Override
         public void setWeights(double[] weights) {
-            /*
-            for (Term: term) {
-                
-            }
-            */
+
         }
-        
     }
     
-    private class PieceValue extends WeighedHeuristicTerm {
+    private class PieceValue extends WeightedHeuristicTerm {
 
         @Override
         public double computeScore(GameState state) {
@@ -165,7 +162,7 @@ public class ModeratePlayer extends AbstractPlayer {
         
     }
     
-    private class BoardValue extends WeighedHeuristicTerm {
+    private class BoardValue extends WeightedHeuristicTerm {
         
         //HashMap<BoardPosition, Integer> cellValue = new HashMap<>();
 
@@ -174,13 +171,21 @@ public class ModeratePlayer extends AbstractPlayer {
             double score = 0;
             GameBoard board = state.getGameBoard();            
             
-            
+            /**
             String setup =  "0|0|0|0\n" +
                             "50|50|50|50\n" +
                             "100|100|100|100\n" +
                             "150|150|150|150\n" +
                             "200|200|200|200\n" +
                             "250|250|250|250";
+            */
+            
+            String setup = "0|0|0\n" +
+                            "50|50|50\n" +
+                            "100|100|100\n" +
+                            "150|150|150\n" +
+                            "200|200|200\n" +
+                            "250|250|250\n";
             
             /**
             String setup = "1000|1000|1000\n" +

@@ -365,6 +365,8 @@ public class BattleEngine {
         System.out.println("Defending team: " + board.getDefender() 
                 + " (" + defender.getClass().getSimpleName() + ")");
         
+        transcript.startGame();
+        
         Team winner;
         while((winner = board.isEndState()) == null) {
             if(maxIterations != -1 && iterations >= maxIterations) {
@@ -447,6 +449,8 @@ public class BattleEngine {
         }
         
         state.setRunning(false);
+        transcript.endGame();
+        transcript.setWinner(winner);
         System.out.println("Game Ended in " + (state.getGameDuration() / 1000d) + " s.");
         System.out.println("Winner: " + winner);
         //transcript.print();

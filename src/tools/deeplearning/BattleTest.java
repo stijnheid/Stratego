@@ -10,9 +10,11 @@ import tools.search.ai.GameNode;
 import tools.search.ai.HeuristicEvaluation;
 import tools.search.ai.SetupGenerator;
 import tools.search.ai.players.Attacker;
+import tools.search.ai.players.AttackerTwo;
 import tools.search.ai.players.DefaultPlayer;
 import tools.search.ai.players.ModerateAttacker;
 import tools.search.ai.players.ModeratePlayer;
+import tools.search.ai.players.ModeratePlayerTwo;
 
 /**
  *
@@ -22,8 +24,9 @@ public class BattleTest {
     public static void main (String[] args) {
         //new BattleTest().testHeuristic();
         //new BattleTest().testSmallBoard();
-        new BattleTest().showCase();
+        //new BattleTest().showCase();
         //new BattleTest().alphaBetaTest();
+        new BattleTest().testNew();
     }
     
     private void testHeuristic() {
@@ -102,5 +105,32 @@ public class BattleTest {
         GameNode node = new GameNode(state);
         MoveAction move = search.iterativeDeepeningAlphaBeta(node, 1, 12, true);
         System.out.println("Move: " + move.toString());
+    }
+    
+    private void testNew() {
+        System.out.println("Test New");
+        SetupGenerator generator = new SetupGenerator();
+        //GameBoard board = generator.generateFourBySix();
+        //GameBoard board = generator.generateShowcaseTwo(); Nice Result.
+        
+        String setup = "r:3|r:4\n" +
+                        "--- ---\n" +
+                        "   |   \n" +
+                        "--- ---\n" +
+                        "b:4|b:3";
+        
+        GameBoard board = generator.generateShowcaseThree();
+        //GameBoard board = GameBoard.loadBoard(setup, 2, 3);
+        
+        BattleEngine engine = new BattleEngine();
+        
+        AIBot attacker = new AttackerTwo(Team.RED);
+        AIBot defender = new ModeratePlayer(Team.BLUE);
+        
+        long computationTime = 2000;
+        int maxIterations = 36; //24; //20; //50;
+        
+        BattleTranscript transcript = engine.battle(board, attacker, defender, computationTime, maxIterations);
+        transcript.print();        
     }
 }

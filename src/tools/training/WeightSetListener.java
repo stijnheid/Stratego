@@ -11,5 +11,5 @@ package tools.training;
  */
 public interface WeightSetListener {
     
-    public void generated(double[] weights);
+    public double generated(double[] weights);
 }

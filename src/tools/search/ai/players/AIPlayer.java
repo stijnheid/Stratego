@@ -12,7 +12,7 @@ import tools.search.ai.AIBot;
 import tools.search.ai.AlphaBetaSearch;
 import tools.search.ai.GameNode;
 import tools.search.ai.HeuristicEvaluation;
-import tools.search.ai.WeighedHeuristicTerm;
+import tools.search.ai.WeightedHeuristicTerm;
 
 
 /**
@@ -68,7 +68,7 @@ public class AIPlayer implements AIBot, Player {
     /**
      * Simple heuristic that counts material.
      */
-    private class EvaluationFunction extends WeighedHeuristicTerm {
+    private class EvaluationFunction extends WeightedHeuristicTerm {
 
         @Override
         public double computeScore(GameState state) {
@@ -79,14 +79,14 @@ public class AIPlayer implements AIBot, Player {
         }        
     }
     
-    private class CompositeHeuristic extends WeighedHeuristicTerm {
+    private class CompositeHeuristic extends WeightedHeuristicTerm {
 
-        List<WeighedHeuristicTerm> terms = new ArrayList<>();
+        List<WeightedHeuristicTerm> terms = new ArrayList<>();
         
         @Override
         public double computeScore(GameState state) {
             double result = 0;
-            for(WeighedHeuristicTerm term : terms) {
+            for(WeightedHeuristicTerm term : terms) {
                 result+= term.score(state);
             }
             return result;

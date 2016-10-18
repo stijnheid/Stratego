@@ -47,8 +47,6 @@ public class Attacker extends AbstractPlayer {
         defendersValues.put(Pieces.COLONEL, 400);
         defendersValues.put(Pieces.GENERAL, 500);
         defendersValues.put(Pieces.MARSHALL, 600);
-        
-        
     }
     
     public Attacker(Team team) {

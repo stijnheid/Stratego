@@ -15,7 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import tools.search.ai.GameNode;
 import tools.search.ai.HeuristicEvaluation;
-import tools.search.ai.WeighedHeuristicTerm;
+import tools.search.ai.WeightedHeuristicTerm;
 
 /**
  *
@@ -113,7 +113,7 @@ public class ModerateAttacker extends AbstractPlayer {
         }
     }
     
-    private class PieceValue extends WeighedHeuristicTerm {
+    private class PieceValue extends WeightedHeuristicTerm {
 
         @Override
         public double computeScore(GameState state) {
@@ -167,7 +167,7 @@ public class ModerateAttacker extends AbstractPlayer {
         
     }
     
-    private class BoardValue extends WeighedHeuristicTerm {
+    private class BoardValue extends WeightedHeuristicTerm {
         
         //HashMap<BoardPosition, Integer> cellValue = new HashMap<>();
 

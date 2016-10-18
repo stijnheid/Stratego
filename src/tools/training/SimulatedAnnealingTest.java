@@ -41,7 +41,7 @@ public class SimulatedAnnealingTest {
        double[] initialWeights = sim.getWeights();
        INDArray weight = Nd4j.create(initialWeights);
        System.out.println(weight);
-       sim.run();
+       sim.start();
        System.out.println("Run finished");
        System.out.println("*****************************");
        System.out.println("initialized result");

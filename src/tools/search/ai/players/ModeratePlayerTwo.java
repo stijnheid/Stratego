@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import tools.search.ai.GameNode;
 import tools.search.ai.HeuristicEvaluation;
-import tools.search.ai.WeighedHeuristicTerm;
+import tools.search.ai.WeightedHeuristicTerm;
 
 /**
  *
@@ -73,7 +73,7 @@ public class ModeratePlayerTwo extends AbstractPlayer{
         
     }
     
-    private class MarshallValue extends WeighedHeuristicTerm {
+    private class MarshallValue extends WeightedHeuristicTerm {
 
         @Override
         public double computeScore(GameState state) {
@@ -94,7 +94,7 @@ public class ModeratePlayerTwo extends AbstractPlayer{
         }        
     }
     
-    private class MinerValue extends WeighedHeuristicTerm {
+    private class MinerValue extends WeightedHeuristicTerm {
 
         @Override
         public double computeScore(GameState state) {
@@ -114,7 +114,7 @@ public class ModeratePlayerTwo extends AbstractPlayer{
         
     }
     
-    private class BombValue extends WeighedHeuristicTerm {
+    private class BombValue extends WeightedHeuristicTerm {
 
         @Override
         public double computeScore(GameState state) {
@@ -124,7 +124,7 @@ public class ModeratePlayerTwo extends AbstractPlayer{
         
     }
     
-    private class OtherValue extends WeighedHeuristicTerm {
+    private class OtherValue extends WeightedHeuristicTerm {
 
         @Override
         public double computeScore(GameState state) {

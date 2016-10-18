@@ -5,9 +5,12 @@ import Game.GameState;
 import Game.Team;
 import actions.MoveAction;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 import tools.search.ai.players.Attacker;
+import tools.search.new_ai.SparringAttacker;
+import tools.search.new_ai.SparringAttacker.SparringAttackerHeuristic;
 
 /**
  *
@@ -41,6 +44,8 @@ public class TreeSearch {
     private MoveAction[] alphaBetaPVPath;
     private double[] alphaBetaPVScore;
     private int currentMaxDepth = 0;
+    private List<MoveAction> currentPVPath;
+    private boolean[] moveOrderState;
     
     public TreeSearch(HeuristicEvaluation evaluation) {
         this.timeout = false;
@@ -60,12 +65,13 @@ public class TreeSearch {
         this.evaluation = evaluation;
     }
     
-    private class SearchResult {
+    public class SearchResult {
         
         private Stack<Integer> exploredNodes;
         private MoveAction bestMove;
         private Stack<Long> iterationTimes;
-        private Stack<MoveAction> principalVariationPath;
+        private Stack<List<MoveAction>> principalVariationPaths;
+        private Stack<Integer> cutoffs;
         
         public SearchResult() {
             this.exploredNodes = new Stack<>();
@@ -95,12 +101,20 @@ public class TreeSearch {
             this.iterationTimes = iterationTimes;
         }
 
-        public Stack<MoveAction> getPrincipalVariationPath() {
-            return principalVariationPath;
+        public Stack<List<MoveAction>> getPrincipalVariationPaths() {
+            return principalVariationPaths;
         }
 
-        public void setPrincipalVariationPath(Stack<MoveAction> principalVariationPath) {
-            this.principalVariationPath = principalVariationPath;
+        public void setPrincipalVariationPaths(Stack<List<MoveAction>> principalVariationPaths) {
+            this.principalVariationPaths = principalVariationPaths;
+        }
+
+        public Stack<Integer> getCutoffs() {
+            return cutoffs;
+        }
+
+        public void setCutoffs(Stack<Integer> cutoffs) {
+            this.cutoffs = cutoffs;
         }
     }
     
@@ -277,7 +291,7 @@ public class TreeSearch {
         result.setBestMove(bestMove);
         result.setExploredNodes(exploredNodes);
         result.setIterationTimes(iterationTimes);
-        result.setPrincipalVariationPath(principalVariationPath);
+        //result.setPrincipalVariationPath(principalVariationPath);
         
         // Print PV Path.
         System.out.println("Correct PV Path:");
@@ -538,7 +552,7 @@ public class TreeSearch {
     }
     
     public static void main(String[] args) {
-        new TreeSearch(null).test();
+        new TreeSearch(null).performanceTest();
     }
     
     private void test() {
@@ -561,22 +575,38 @@ public class TreeSearch {
         GameNode node = new GameNode(state);
         
         int initialDepth = 1;
-        int range = 2; //2; //5; //9; //5; //1; //9; //6; //-1;
+        int range = 9; //3; //1; //9; //2; //5; //9; //5; //1; //9; //6; //-1;
         //SearchResult result = iterativeDeepeningAlphaBeta(node, initialDepth, range, true);
-        SearchResult result = IDAlphaBeta(node, initialDepth, range, true);
+        long start = System.currentTimeMillis();
+        SearchResult result = IDAlphaBeta(node, initialDepth, range, true, true);
+        long end = System.currentTimeMillis();
+        System.out.println("IDAlphaBeta ended in " +
+                (end - start) + " ms. with range [" + initialDepth + ", " + (initialDepth + range) + "]");
         
         // Print results.
         Stack<Integer> counts = result.getExploredNodes();
         Stack<Long> timings = result.getIterationTimes();
+        Stack<Integer> cutoffs = result.getCutoffs();
         //Stack<MoveAction> path = result.getPrincipalVariationPath();
         int N = counts.size();
         for(int i=0; i<N; i++) {
             String time = "( Finished in " + timings.pop() + " ms. )";
-            System.out.println("NodeCount with Max Depth-" 
+            System.out.println("Max Depth-" 
                     + (initialDepth + (N - (i + 1))) +
-                    " -> " + counts.pop() +
+                    " -> #VisitedNodes=" + counts.pop() +
+                    ", Cutoffs=" + cutoffs.pop() +
                     " " + time);
         }
+        
+        Stack<List<MoveAction>> pvPaths = result.getPrincipalVariationPaths();
+        List<MoveAction> path = pvPaths.pop();
+        System.out.println("Principal Variation Path:");
+        int i = 0;
+        for(MoveAction move : path) {
+            System.out.println("#" + i + " " + move);
+            i++;
+        }
+        
         /**
         System.out.println("Principal Variation Path:");
         int j = 0;
@@ -590,9 +620,7 @@ public class TreeSearch {
         System.out.println("Best Move: " + bestMove.toString());
     }
     
-    
-    
-    public SearchResult IDAlphaBeta(GameNode node, int initialDepth, int range, boolean isMaxPlayer) {
+    public SearchResult IDAlphaBeta(GameNode node, int initialDepth, int range, boolean isMaxPlayer, boolean useMoveOrdering) {
         // Reset timeout.
         this.timeout = false;
         
@@ -622,8 +650,11 @@ public class TreeSearch {
         SearchResult result = new SearchResult();
         Stack<Integer> exploredNodes = new Stack<>();
         Stack<Long> iterationTimes = new Stack<>();
+        Stack<Integer> iterationCutoffs = new Stack<>();
+        Stack<List<MoveAction>> iterationPVPaths = new Stack<>();
         //this.iterationBestMoves = new Stack<>();
         //this.alphaBetaBestMoves = new Stack<>();
+        // Deactivate move ordering.
         this.moveOrderOn = false;
         //this.alphaBetaPVPath = new Stack<>();
         
@@ -672,22 +703,53 @@ public class TreeSearch {
                 
                 principalVariationPath.clear();
                 */
+                
+                // Activate move ordering if a principal variation path of at least
+                // length 3 is known.
+                // Must be at least 2, since that's the minimal depth from
+                // which a previous path is defined.
+                if(useMoveOrdering && depth > 1) {
+                    this.moveOrderOn = true;
+                    // All booleans initialize to false as desired.
+                    this.moveOrderState = new boolean[this.currentPVPath.size()];                    
+                }
+                
+                System.out.println("Move Ordering: " + this.moveOrderOn);
+                
                 double score;
                 double alpha = Double.NEGATIVE_INFINITY; // Worst case maximizing player.
                 double beta = Double.POSITIVE_INFINITY; // Worst case minimizing player.
+                LinkedList<MoveAction> path = new LinkedList<>();
                 long start = System.currentTimeMillis();
                 if(isMaxPlayer) {
-                    score = alphaBetaMax(node, alpha, beta, depth);
+                    score = alphaBetaMax(node, alpha, beta, depth, path);
                 } else {
-                    score = alphaBetaMin(node, alpha, beta, depth);
+                    score = alphaBetaMin(node, alpha, beta, depth, path);
                 }
                 long end = System.currentTimeMillis();
+    
+                /**
+                // Print PV Path.
+                System.out.println("Path Size: " + path.size());
+                int z = 0;
+                for(MoveAction m : path) {
+                    System.out.println(z + ": " + m.toString());
+                    z++;
+                }*/
+                
+                this.currentPVPath = path;
                 
                 // Store the node count.
                 exploredNodes.push(this.nodeCount);
                 
                 // Store the iteration computation time required at this depth.
                 iterationTimes.push(end - start);
+                
+                // Store the cutoffs.
+                iterationCutoffs.push(this.cutoffs);
+                
+                // Store the Principal Variation Path.
+                iterationPVPaths.push(path);
                 
                 // If a score of infinity or -infinity depending on the root player
                 // indicates that the game is inevitably lost or won.
@@ -717,10 +779,19 @@ public class TreeSearch {
                             bestMove.toString());
                 }
                 
+                if(isMaxPlayer && bestMove.getTeam() != Team.RED) {
+                    throw new RuntimeException("Returned move for wrong team: " + bestMove);
+                } else if(!isMaxPlayer && bestMove.getTeam() != Team.BLUE) {
+                    throw new RuntimeException("Returned move for wrong team: " + bestMove);
+                }
+                
                 // Print statistical information.
                 System.out.println("BestMove: " + bestMove.toString());
                 System.out.println("Score: " + score);
-                System.out.println("Cutoffs: " + this.cutoffs);                
+                System.out.println("Cutoffs: " + this.cutoffs);
+                System.out.println("#VisitedNodes: " + this.nodeCount);
+                System.out.println("Computation Time: " + (end - start) + " ms.");
+                System.out.println();
                 
                 // Increment depth.
                 depth++;
@@ -733,11 +804,14 @@ public class TreeSearch {
         result.setBestMove(bestMove);
         result.setExploredNodes(exploredNodes);
         result.setIterationTimes(iterationTimes);
+        result.setCutoffs(iterationCutoffs);
+        result.setPrincipalVariationPaths(iterationPVPaths);
         
         return result;
     }
     
-    private double alphaBetaMax(GameNode node, double alpha, double beta, int depth) throws TimeoutException {
+    private double alphaBetaMax(GameNode node, double alpha, double beta, int depth, LinkedList<MoveAction> pathToLeaf) throws TimeoutException {
+        //System.out.println("AlphaBetaMax alpha=" + alpha + ", beta=" + beta + ", depth=" + depth);
         // Counts visited nodes.
         this.nodeCount++;
         
@@ -759,21 +833,42 @@ public class TreeSearch {
         // Reached maximum depth.
         if(depth == 0) {
             // Return heuristic score for this state.
+            //double score = this.evaluation.score(state);
+            //System.out.println("Leaf Score: " + score);
+            //return score;
             return this.evaluation.score(state);
         }
         
+        LinkedList<MoveAction> bestPath = new LinkedList<>();
         List<MoveAction> moves = board.getMoves(Team.RED);
+        if(this.moveOrderOn) {
+            orderMoves(moves, depth, Team.RED);
+        }
+        //System.out.println("MAX depth=" + depth + ", First move=" + moves.get(0));
         for(MoveAction move : moves) {
+            //System.out.println(depth + " Max Applied: " + move);
             // Apply move.
             board.applyMove(move);
             // Recursive call.
+            LinkedList<MoveAction> path = new LinkedList<>();
             //alpha = Math.max(alpha, alphaBetaMin(node, alpha, beta, depth - 1));
-            double score = alphaBetaMin(node, alpha, beta, depth - 1);
+            double score = alphaBetaMin(node, alpha, beta, depth - 1, path);
             if(score > alpha) {
+                //System.out.println(depth + " Max Better Score: " + score + " > " + alpha);
+                path.addFirst(move);
+                bestPath = path;
                 alpha = score;
                 // Store best move.
-                node.setBestMove(move);
-                node.setValue(alpha);
+                if(move.getTeam() != Team.RED) {
+                    throw new RuntimeException("MOVE != RED");
+                }
+                // Only store best move if in root, else by re-using the
+                // node object lower level sets and cutoffs can set the bestMove
+                // as last. Which leads to state corruption.                
+                if(this.currentMaxDepth == depth) {
+                    node.setBestMove(move);
+                    node.setValue(alpha);
+                }
             }
             
             // Undo move.
@@ -781,14 +876,18 @@ public class TreeSearch {
             
             // Cutoff.
             if(alpha >= beta) {
+                this.cutoffs++;
+                pathToLeaf.addAll(bestPath);
                 return beta;
             }
         }
         
+        pathToLeaf.addAll(bestPath);
         return alpha;
     }
     
-    private double alphaBetaMin(GameNode node, double alpha, double beta, int depth) throws TimeoutException {
+    private double alphaBetaMin(GameNode node, double alpha, double beta, int depth, LinkedList<MoveAction> pathToLeaf) throws TimeoutException {
+        //System.out.println("AlphaBetaMin alpha=" + alpha + ", beta=" + beta + ", depth=" + depth);
         // Count visited nodes.
         this.nodeCount++;
         
@@ -810,30 +909,57 @@ public class TreeSearch {
         // Reached maximum depth.
         if(depth == 0) {
             // Return heuristic score for this state.
+            //double score = this.evaluation.score(state);
+            //System.out.println("Leaf Score: " + score);
+            //return score;
             return this.evaluation.score(state);
         }
         
+        LinkedList<MoveAction> bestPath = new LinkedList<>();
         List<MoveAction> moves = board.getMoves(Team.BLUE);
+        if(this.moveOrderOn) {
+            orderMoves(moves, depth, Team.BLUE);
+        }
+        //System.out.println("MIN depth=" + depth + ", First move=" + moves.get(0));
         for(MoveAction move : moves) {
+            //System.out.println(depth + " Min Applied: " + move);
             // Apply move.
             board.applyMove(move);
             // Recursive call.
+            LinkedList<MoveAction> path = new LinkedList<>();
             //beta = Math.min(beta, alphaBetaMax(node, alpha, beta, depth - 1));
-            double score = alphaBetaMax(node, alpha, beta, depth - 1);
+            //GameNode next = new GameNode(state);
+            // TODO dangerous to re-use the node object.
+            double score = alphaBetaMax(node, alpha, beta, depth - 1, path);
             if(score < beta) {
+                //System.out.println(depth + " Min Better Score: " + score + " < " + beta);
+                path.addFirst(move);
+                bestPath = path;
                 beta = score;
                 // Store the best move.
-                node.setBestMove(move);
-                node.setValue(beta);
+                if(move.getTeam() != Team.BLUE) {
+                    throw new RuntimeException("MOVE != BLUE");
+                }
+                // Only store best move if in root, else by re-using the
+                // node object lower level sets and cutoffs can set the bestMove
+                // as last. Which leads to state corruption.
+                if(this.currentMaxDepth == depth) {
+                    node.setBestMove(move);
+                    node.setValue(beta);
+                }
             }
             // Undo move.
             board.undoMove(move);
             
             // Cutoff.
             if(beta <= alpha) {
+                this.cutoffs++;
+                pathToLeaf.addAll(bestPath);
                 return alpha;
             }
         }
+        
+        pathToLeaf.addAll(bestPath);
         
         return beta;
     }
@@ -861,5 +987,157 @@ public class TreeSearch {
         }
         
         return -1;
+    }
+    
+    private void orderMoves(List<MoveAction> moves, int depth, Team team) {
+        if(moves.isEmpty()) {
+            throw new IllegalArgumentException("Provided moves list is empty.");
+        }
+        
+        // Can always order the moves such that the attacks are processed first.
+        /**
+        Collections.sort(moves, new Comparator<MoveAction>() {
+            @Override
+            public int compare(MoveAction move, MoveAction otherMove) {
+                if(move.isApplied() && otherMove.isApplied()) {
+                    // Favor an attack with a highly ranked piece.
+                    int attackVal = (move.getPiece().getRank().ordinal() - move.getEnemy().getRank().ordinal());
+                    int otherVal = (otherMove.getPiece().getRank().ordinal() - move.getEnemy().getRank().ordinal());
+                    if(attackVal >= otherVal) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                    
+                    // Can also incorporate the strategy to only use attacks
+                    // where you kill the opponent with a slightly higher piece.
+                } else if(true) {
+                    
+                }
+            }
+        });*/
+        
+        //System.out.println("orderMoves() #moves=" + moves.size() + ", depth=" + depth + ", #pvMoves=" + this.currentPVPath.size());
+
+        // Order the move of the most recent principal variation path as the
+        // first move in the list, to enhance pruning.
+        int actualDepth = ((this.currentPVPath.size() + 1) - depth);
+        
+        // Reached the next depth that is of course not included in the
+        // pv path of the previous iteration, so nothing to order, so stop.
+        if(actualDepth == this.currentPVPath.size()) {
+            return;
+        }
+        
+        // Move ordering only needs to happen for the first time the algorithm
+        // proceeds to a lower depth.
+        if(this.moveOrderState[actualDepth]) {
+            return;
+        }
+        this.moveOrderState[actualDepth] = true;
+        
+        // Get best move at this depth in the previous iteration.
+        // TODO not the most efficient, since the loop up in a LinkedList takes
+        // O(n) instead of O(1) constant time.
+        MoveAction best = this.currentPVPath.get(actualDepth);
+        
+        if(best.getTeam() != team) {
+            throw new RuntimeException("Team mismatch.");
+        }
+        
+        // Can use the lastIndexOf because the list does not contain duplicates
+        // so basically want indexOf(element).
+        int index = moves.lastIndexOf(best);
+        if(index == -1) {
+            System.out.println("Moves:");
+            for(MoveAction move : moves) {
+                System.out.println(move.toString());
+            }
+            System.out.println("orderMoves() #moves=" + moves.size() + ", depth=" + depth + ", #pvMoves=" + this.currentPVPath.size());
+            throw new IllegalArgumentException("Provided bestMove:" + 
+                    best.toString() + " is not contained in given moves list.");
+        }
+        
+        // Swap best move with first element, such that it is processed first.
+        MoveAction first = moves.get(0);
+        // Use the mathcing element of the new list just to be sure that
+        // no object reference problems will occur.
+        // TODO also inefficient if implemented with a LinkedList.
+        moves.set(0, moves.get(index));
+        moves.set(index, first);
+    }
+    
+    private void performanceTest() {
+        System.out.println("Run Performance Test");
+        HeuristicEvaluation heuristic = new Attacker.AttackerHeuristic();
+        //SparringAttacker attacker = new SparringAttacker(Team.RED);
+        //WeightedEvaluation heuristic = attacker.new SparringAttackerHeuristic();
+        
+        //AlphaBetaSearch search = new AlphaBetaSearch(heuristic);
+        
+        setHeuristic(heuristic);
+        
+        GameState state = new GameState();
+        SetupGenerator generator = new SetupGenerator();
+        //GameBoard board = generator.generateFourBySix();
+        GameBoard board = generator.generateWholeSetup();
+        
+        String setup = "r:3|r:4|r:3|r:4\n" +
+                        "--- --- --- ---\n" + 
+                        "r:4|r:8|r:S|r:4\n" +
+                        "--- --- --- ---\n" +
+                        "   |   |   |   \n" +
+                        "--- --- --- ---\n" +
+                        "   |   |   |   \n" +
+                        "--- --- --- ---\n" +
+                        "b:4|b:9|b:3|b:4\n" +
+                        "--- --- --- ---\n" + 
+                        "b:4|b:3|b:4|b:3";
+        //GameBoard board = GameBoard.loadBoard(setup, 4, 6);
+        System.out.println(board.transcript());
+        state.setGameBoard(board);
+        GameNode node = new GameNode(state);
+        
+        boolean moveOrdering = !false;
+        int initialDepth = 1;
+        int range = 7; //8; //9; //10; //9; //9; //3; //1; //9; //2; //5; //9; //5; //1; //9; //6; //-1;
+        //SearchResult result = iterativeDeepeningAlphaBeta(node, initialDepth, range, true);
+        SearchResult result = IDAlphaBeta(node, initialDepth, range, true, moveOrdering);
+        MoveAction m = result.getBestMove();
+        board.applyMove(m);
+        System.out.println("Board:\n" + board.transcript());
+        long start = System.currentTimeMillis();
+        result = IDAlphaBeta(node, initialDepth, range, true, moveOrdering);
+        //search.iterativeDeepeningAlphaBeta(node, initialDepth, range, true);
+        long end = System.currentTimeMillis();
+        System.out.println("IDAlphaBeta ended in " +
+                (end - start) + " ms. with range [" + initialDepth + ", " + (initialDepth + range) + "]");
+
+        // Print results.
+        Stack<Integer> counts = result.getExploredNodes();
+        Stack<Long> timings = result.getIterationTimes();
+        Stack<Integer> cutoffsStack = result.getCutoffs();
+        //Stack<MoveAction> path = result.getPrincipalVariationPath();
+        int N = counts.size();
+        for(int i=0; i<N; i++) {
+            String time = "( Finished in " + timings.pop() + " ms. )";
+            System.out.println("Max Depth-" 
+                    + (initialDepth + (N - (i + 1))) +
+                    " -> #VisitedNodes=" + counts.pop() +
+                    ", Cutoffs=" + cutoffsStack.pop() +
+                    " " + time);
+        }
+        
+        Stack<List<MoveAction>> pvPaths = result.getPrincipalVariationPaths();
+        List<MoveAction> path = pvPaths.pop();
+        System.out.println("Principal Variation Path:");
+        int i = 0;
+        for(MoveAction move : path) {
+            System.out.println("#" + i + " " + move);
+            i++;
+        }
+        
+        MoveAction bestMove = result.getBestMove();
+        System.out.println("Best Move: " + bestMove.toString());
     }
 }

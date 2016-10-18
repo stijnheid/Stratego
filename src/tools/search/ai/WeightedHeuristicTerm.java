@@ -6,8 +6,8 @@ import Game.GameState;
  * Represents a term in a linear heuristic evaluation function. A term can be
  * assigned a weight.
  */
-public abstract class WeighedHeuristicTerm implements HeuristicEvaluation {
-    
+public abstract class WeightedHeuristicTerm implements HeuristicEvaluation {
+    // Default is full weight.
     private double weight = 1.0;
     
     public void setWeight(double weight) {

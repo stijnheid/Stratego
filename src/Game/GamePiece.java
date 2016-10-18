@@ -1,6 +1,7 @@
 package Game;
 
 import static Game.Pieces.*;
+import java.util.Objects;
 
 /**
  * This object represents a piece on the game board. A piece has a rank and team.
@@ -138,5 +139,38 @@ public class GamePiece {
         return "GamePiece{" + "rank=" + rank + ", team=" + team 
                 + ", isHighlighted=" + isHighlighted + ", position=" 
                 + position.toString() + ", isAlive=" + isAlive + '}';
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final GamePiece other = (GamePiece) obj;
+        if (this.rank != other.rank) {
+            return false;
+        }
+        if (this.team != other.team) {
+            return false;
+        }
+        if (this.isHighlighted != other.isHighlighted) {
+            return false;
+        }
+        if (!Objects.equals(this.position, other.position)) {
+            return false;
+        }
+        if (this.isAlive != other.isAlive) {
+            return false;
+        }
+        return true;
     }    
 }

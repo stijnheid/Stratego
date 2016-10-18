@@ -365,8 +365,14 @@ public class GameBoard {
                 // Valid move if cell is empty or cell contains enemy.
                 // Invalid if cell contains friendly unit.
                 GamePiece other = getPiece(pos);
-                if(other == null || piece.isEnemy(other)) {
+                if(other == null) { // Empty cell.
                     moves.add(new MoveAction(piece.getTeam(), piece, origin, pos));
+                } else if(piece.isEnemy(other)) { // Enemy.
+                    MoveAction m = new MoveAction(piece.getTeam(), piece, origin, pos);
+                    // Marks this move as an attack.
+                    m.setAttack();
+                    m.setEnemy(other);
+                    moves.add(m);
                 }
             } catch (InvalidPositionException ex) {
                 Logger.getLogger(GameBoard.class.getName()).log(Level.SEVERE, null, ex);
@@ -976,5 +982,30 @@ public class GameBoard {
         }
         
         return board;
+    }
+    
+    /**
+     * Unsafe operation that merges two game boards blindly without checking
+     * for conflicts. This function is intended for the training facility to
+     * be used for merging player setups.
+     */ 
+    public void mergeBoard(GameBoard other) {
+        if(this.width != other.width || this.height != other.height) {
+            throw new IllegalArgumentException("Dimensions mismatch.");
+        }
+        
+        for(int row=0; row<other.height; row++) {
+            for(int column=0; column<other.width; column++) {
+                GamePiece piece = other.board[row][column];
+                if(piece != null) {
+                    // Transfer piece to this board.
+                    if(this.board[row][column] == null) { // Empty cell.
+                        this.board[row][column] = piece;
+                    } else {
+                        throw new IllegalStateException("Cannot merge boards, positiion already occupied.");
+                    }
+                }
+            }
+        }
     }
 }

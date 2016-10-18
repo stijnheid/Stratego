@@ -1,6 +1,7 @@
 package tools.search.ai;
 
 import Game.GameState;
+import Game.Team;
 import actions.MoveAction;
 
 /**
@@ -27,6 +28,10 @@ public class GameNode {
     }
     
     public void setBestMove(MoveAction move) {
+        //if(move != null && move.getTeam() != Team.RED) {
+        //    throw new RuntimeException();
+        //}
+        
         this.bestMove = move;
     }
 

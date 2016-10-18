@@ -606,6 +606,7 @@ public class AlphaBetaSearch {
                 }
                 
                 System.out.println("Explored in Iteration: " + this.exploredNodes);
+                System.out.println("Cutoffs: " + this.cutoffs);
                 System.out.println("Value: " + value);
                 System.out.println("Best Move for max depth: " + maxDepth + " is " + bestMove.toString());
                 System.out.println();
@@ -724,6 +725,9 @@ public class AlphaBetaSearch {
                 
                 // Recursive call.
                 // TODO, probably do not need to create a new GameNode
+                // In this case you can re-use the node object since the
+                // best move is locally stored and only set onto the node object
+                // after all depth first exploration has returned.
                 GameNode next = new GameNode(state);
                 
                 // Recursive call with DFS implementation.

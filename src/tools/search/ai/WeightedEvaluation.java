@@ -9,7 +9,7 @@ package tools.search.ai;
  *
  * @author s122041
  */
-public interface WeighedEvaluation extends HeuristicEvaluation{
-    
+public interface WeightedEvaluation extends HeuristicEvaluation{
+    public int featureCount();
     public void setWeights(double[] weights);
 }

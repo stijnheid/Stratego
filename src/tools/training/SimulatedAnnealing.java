@@ -5,6 +5,7 @@
  */
 package tools.training;
 
+import Game.Team;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ import org.jfree.data.xy.XYSeriesCollection;
 //only importing this for testing purposes
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import tools.deeplearning.BattleTranscript;
 
 /**
  * Performs simulated annealing. 
@@ -37,37 +39,35 @@ public class SimulatedAnnealing {
     double energy; // creating an instance variable for the energy, since this requires simulating games. We don't want to simulate the same game multiple times.
     double energies[];
     
-    private List<WeightSetListener> listeners;
+    private WeightSetListener listener;
+    private List<NamedDataSet> plot = new ArrayList();    
     
     //Constructor to create a SimulatedAnnealing class for the given amount of weights
     SimulatedAnnealing(int num_weights, int temp){
-        this.listeners = new ArrayList<>();
-        
         temperature = temp;
         start_temperature = temp;
         weights = new double[num_weights];
         random = new Random();
+        
+        // Initialize weights.
         for(int i=0; i<weights.length;i++){
-            weights[i] = (double)(random.nextInt(20)-10)/10;
+            weights[i] = (double)(random.nextInt(20) - 10) / 10;
         }
+        
         energy = getEnergy(weights); // calculates the energy of the first solution
         System.out.println("Starting energy: "+energy);
         energies = new double[temp];
-        
     }
     
-    public void registerListener(WeightSetListener listener) {
-        this.listeners.add(listener);
+    public void setListener(WeightSetListener listener) {
+        this.listener = listener;
     }
     
     //A method that runs the simulated annealing algorithm
-    public void run() throws IOException{
+    public void start() throws IOException{
         
-        List<NamedDataSet> plot = new ArrayList();
-       
         int index = 0; // index for the array with mean differences
-        
-        while(temperature != 0){
+        while(temperature != 0) {
             
             double[] weightsCopy = weights.clone();         // creating a copy to store adjustments in  
             int randIndex = random.nextInt(weights.length); // generates a random value between 0 and the length of the weights array;
@@ -83,13 +83,13 @@ public class SimulatedAnnealing {
             // *********************************
             */
             
-            // Notify the listeners.
-            for(WeightSetListener listener : this.listeners) {
-                listener.generated(weights);
-            }
+            // Notify the listener.
+            // Blocking method.
+            double winRate = listener.generated(weights);
+            // Process the result.
             
             //if the adjustment is accepted, copy it to the original weights array
-            double e = getEnergy(weightsCopy);
+            double e = 1 - winRate; //getEnergy(weightsCopy);
             System.out.println("Proposed energy: "+e);
             if(checkAccepted(weightsCopy, e)){
                 weights = weightsCopy; // updates the weights
@@ -104,13 +104,16 @@ public class SimulatedAnnealing {
             System.out.println("Current temperature: "+temperature);
             
         }
-        
-        plot.add(new NamedDataSet("Energy",getEnergies()));
-        plotDataSet(plot, "Energies", "Iterations","Energy", false);
+    }
+    
+    public void savePlot(boolean show, String filename) throws IOException {
+        this.plot.add(new NamedDataSet("Energy", getEnergies()));
+        plotDataSet(this.plot, "Energies", "Iterations", "Energy", false, 
+                show, filename);        
     }
     
     public double[] getEnergies(){
-            return energies;
+        return energies;
     }
     
     //A method that returns the current set of weights
@@ -183,55 +186,50 @@ public class SimulatedAnnealing {
                                      
        //let's try going back to something more interesting
        double e = 0;
-       for(double weight: weights){
-           e = e+weight;
+       for(double weight : weights){
+           e = e + weight;
        }
-       e = e*e; // for the hell of it working with e^2, since that is a little more unstable than e itself (changes are exaggerated)
+       e = e * e; // for the hell of it working with e^2, since that is a little more unstable than e itself (changes are exaggerated)
        return e;
     }
     
-    private static void plotDataSet(List<NamedDataSet> ArraySetList, String name, String xAxis, String yAxis, boolean legend) throws IOException{
-            
-                  
-            String plot_title = name;
-            XYSeriesCollection plotData = new XYSeriesCollection();
-            
-            for(NamedDataSet ns: ArraySetList)
-            {
-                XYSeries series = new XYSeries(ns.getName());
-                double[] data = ns.getArray();
-                for(int i=0; i<data.length;i++){
-                    series.add((double)i,data[i]);
-                }
-                
-                plotData.addSeries(series);
-            }
-            
-            String title = plot_title;
-                String xAxisLabel = xAxis;
-                String yAxisLabel = yAxis;
-                PlotOrientation orientation = PlotOrientation.VERTICAL;
-                //boolean legend = true; // might wanna set this to true at some point, but research the library
-                boolean tooltips = false;
-                boolean urls = false;
-                JFreeChart chart = ChartFactory.createScatterPlot(title, xAxisLabel, yAxisLabel, plotData, orientation, legend, tooltips, urls);
-              
-            JPanel panel = new ChartPanel(chart);
-            
-                JFrame f = new JFrame();
-                f.add(panel);
-                f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-                f.pack();
-                f.setTitle(plot_title);
-                
-                f.setVisible(true);  
-            
-            ChartUtilities.saveChartAsJPEG(new File("src/Graphs/test_graph_1.JPEG"),chart,1280,1024);
-            
-    }
-    
-    
-    
-}
-    
+    private static void plotDataSet(List<NamedDataSet> ArraySetList, 
+            String name, String xAxis, String yAxis, boolean legend, 
+            boolean show, String filename) throws IOException{
+        String plot_title = name;
+        XYSeriesCollection plotData = new XYSeriesCollection();
 
+        for(NamedDataSet ns: ArraySetList) {
+            XYSeries series = new XYSeries(ns.getName());
+            double[] data = ns.getArray();
+            for(int i=0; i<data.length;i++){
+                series.add((double)i,data[i]);
+            }
+
+            plotData.addSeries(series);
+        }
+
+        String title = plot_title;
+        String xAxisLabel = xAxis;
+        String yAxisLabel = yAxis;
+        PlotOrientation orientation = PlotOrientation.VERTICAL;
+        //boolean legend = true; // might wanna set this to true at some point, but research the library
+        boolean tooltips = false;
+        boolean urls = false;
+        JFreeChart chart = ChartFactory.createScatterPlot(title, xAxisLabel, 
+                yAxisLabel, plotData, orientation, legend, tooltips, urls);
+
+        if(show) {
+            JPanel panel = new ChartPanel(chart);
+            JFrame f = new JFrame();
+            f.add(panel);
+            f.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            f.pack();
+            f.setTitle(plot_title);
+            f.setVisible(true);
+        }
+        
+        ChartUtilities.saveChartAsJPEG(new File(filename), 
+                chart, 1280, 1024);
+    }
+}
