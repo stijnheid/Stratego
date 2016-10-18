@@ -31,7 +31,7 @@ public class GamePiece {
         this.team = team;
         this.isAlive = true;
         this.position = position;
-        this.skeleton = new Skeleton(position, team);
+        this.skeleton = new Skeleton(position, team, rank);
     }
     
     public boolean isStatic() {
