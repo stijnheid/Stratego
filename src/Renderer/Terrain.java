@@ -60,7 +60,7 @@ public class Terrain extends Base {
     public final Camera camera;
     
     /** Instances of different textures */
-    public static Texture grass, vakje ,leaves, water, wood, selectvakje, selectedvakje;
+    public static Texture grass, vakje ,leaves, water, wood, selectvakje, selectedvakje, Bomb, Captain, Colonel, General, Lieutenant, Major, Marshall, Miner, Scout, Sergeant, Spy;
     
     private final int boardsize = 6;
     private final int terrainsize = 20;
@@ -119,6 +119,9 @@ public class Terrain extends Base {
         }   catch (Exception e){
             System.out.println("Test skeleton failed to load.");
         }
+        
+        //get everything going.
+        run();
     }
     
        /**
@@ -215,6 +218,23 @@ public class Terrain extends Base {
         selectedvakje = loadTexture(pwd + "SelectedVakje.jpg");
         leaves = loadTexture(pwd + "Leaves.jpg");
         water = loadTexture(pwd + "water.jpg");
+        
+        pwd = "src/Textures.Pieces/";
+        
+        Bomb = loadTexture(pwd + "Bomb.jpg");
+        Captain = loadTexture(pwd + "Bomb.jpg");
+        Colonel = loadTexture(pwd + "Bomb.jpg");
+        General = loadTexture(pwd + "Bomb.jpg");
+        Lieutenant = loadTexture(pwd + "Bomb.jpg");
+        Bomb = loadTexture(pwd + "Bomb.jpg");
+        Bomb = loadTexture(pwd + "Bomb.jpg");
+        Bomb = loadTexture(pwd + "Bomb.jpg");
+        Bomb = loadTexture(pwd + "Bomb.jpg");
+        Bomb = loadTexture(pwd + "Bomb.jpg");
+        Bomb = loadTexture(pwd + "Bomb.jpg");
+        
+        
+        
     }
     
     /**
@@ -402,10 +422,10 @@ public class Terrain extends Base {
         drawPieces();
         if(pan){
             try {
-                /*Animation ani = new AttackAnimation(this, 
+                Animation ani = new AttackAnimation(this, 
                     board.getPiece(new BoardPosition(0,4)), 
                     new BoardPosition(0,3), null);
-                playAnimation(ani);*/
+                playAnimation(ani);
                 pan = false;
             }   catch (Exception e){}
         }
@@ -429,7 +449,6 @@ public class Terrain extends Base {
     
     public static void main (String[] args){
         Terrain terrain = new Terrain(null);
-        terrain.run();
     }
     
         public double heightAt(double x, double y) {

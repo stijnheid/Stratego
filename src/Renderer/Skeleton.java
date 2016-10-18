@@ -6,12 +6,14 @@
 package Renderer;
 import Game.BoardPosition;
 import Game.Team;
+import Renderer.Terrain;
 
 import java.util.List;
 import java.util.ArrayList;
 import javax.media.opengl.GL2;
 import com.jogamp.opengl.util.gl2.GLUT;
 import static javax.media.opengl.GL.GL_FRONT_AND_BACK;
+import static javax.media.opengl.GL.GL_TRIANGLE_STRIP;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_AMBIENT_AND_DIFFUSE;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_SHININESS;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_SPECULAR;
@@ -76,6 +78,9 @@ public class Skeleton {
     double kneeRRotY = 0;
     double swordRotX = 0;
     float swordOpacity = 0;
+    
+    //should the ranks be shown
+    boolean showRank = false;
 
     /**
      * Constructor for a skeleton. Does not yet draw a skeleton.
@@ -150,6 +155,7 @@ public class Skeleton {
         drawLeg(gl, glut, false);//right leg
         drawArm(gl, glut, true);// left arm
         drawArm(gl, glut, false);//right arm
+        drawRank(gl);
         gl.glEnable(GL2.GL_TEXTURE_2D);
         gl.glPopMatrix();
     }
@@ -352,7 +358,25 @@ public class Skeleton {
             gl.glPopMatrix();
         }
     }
-    
+        
+     private void drawRank (GL2 gl){
+         if (showRank){
+           gl.glBegin(GL_TRIANGLE_STRIP);
+                
+                gl.glTexCoord2d(0, 0);
+                gl.glVertex3d(0, -0.3, 2.5);
+                  
+                gl.glTexCoord2d(0, 1);
+                gl.glVertex3d(0, 0.3, 2.5);
+                    
+                gl.glTexCoord2d(1, 0);
+                gl.glVertex3d(0,-0.3,3.5);
+
+                gl.glTexCoord2d(1, 1);
+                gl.glVertex3d(0,0.3,3.5);
+            gl.glEnd();   
+         }
+     }
     /**
      * Draw a sphere at the specified target (relative to current location).
      * @param gl
