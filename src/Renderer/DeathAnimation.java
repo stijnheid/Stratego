@@ -55,7 +55,11 @@ public class DeathAnimation extends Animation {
     }
     
     public void die(int frame){
-        
+        if (frame >= (duration/2d) && frame <= ((5d*duration)/6d)){//raise arms to protect.
+            
+        }   else {//fall to the ground.
+            
+        }
     }
     
 }

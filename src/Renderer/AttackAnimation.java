@@ -70,7 +70,6 @@ public class AttackAnimation extends Animation {
     
     /**
      * Method to show the rank.
-     * @param frame frame of the animation (from 1 to 30).
      */
     public void showRank(){
         skel.showRank = true;
@@ -78,34 +77,34 @@ public class AttackAnimation extends Animation {
     
     /**
      * Method to perform an attack animation.
-     * @param frame frame of the animation (from 1 to 30).
+     * @param frame frame of the animation (in [1,duration]).
      */
     public void attack(double frame){
-        if (frame <= 15){//raise sword in the air.
-            skel.shoulderL = new Vector(-0.2,(frame/150),1.6);
-            skel.shoulderR = new Vector(0.2,-(frame/150),1.6);
-            skel.elbowRRotX = 6*frame;
-            skel.elbowLRotX = 3*frame;
-            skel.shoulderRRotX = 6*frame;
-            skel.shoulderRRotY = -3*frame;
-        }   else if (frame <= 25){//swing sword at opponent.
-            skel.shoulderL = new Vector(-0.2,0.1-((frame-15)/50),1.6);
-            skel.shoulderR = new Vector(0.2, -0.1+((frame-15)/50),1.6);
-            skel.elbowRRotX = 90 - ((frame-15)*4.5);
-            skel.elbowLRotX = 45 - ((frame-15)*2.5);
-            skel.shoulderRRotX = 90 - ((frame-15)*4.5);
-            skel.shoulderRRotY = -45 + ((frame-15)*9);
-            skel.shoulderLRotX = -2*(frame-15);
-            skel.swordRotX = -6*(frame-15);
+        if (frame <= (duration/2)){//raise sword in the air.
+            skel.shoulderL = new Vector(-0.2,(frame/(duration*5d)),1.6);
+            skel.shoulderR = new Vector(0.2,-(frame/(duration*5d)),1.6);
+            skel.elbowRRotX = (180d/duration)*frame;
+            skel.elbowLRotX = (90d/duration)*frame;
+            skel.shoulderRRotX = (180d/duration)*frame;
+            skel.shoulderRRotY = (-90d/duration)*frame;
+        }   else if (frame <= (5d*duration/6d)){//swing sword at opponent.
+            skel.shoulderL = new Vector(-0.2,0.1-((frame-(duration/2d))/(5d*duration/3d)),1.6);
+            skel.shoulderR = new Vector(0.2, -0.1+((frame-(duration/2d))/(5*duration/3d)),1.6);
+            skel.elbowRRotX = 90d - ((frame-(duration/2d))*(135d/duration));
+            skel.elbowLRotX = 45d - ((frame-(duration/2d))*(75d/duration));
+            skel.shoulderRRotX = 90d - ((frame-(duration/2d))*(135d/duration));
+            skel.shoulderRRotY = -45d + ((frame-(duration/2d))*(180d/duration));
+            skel.shoulderLRotX = -(60d/duration)*(frame-(duration/2d));
+            skel.swordRotX = -(180d/duration)*(frame-(duration/2d));
         }   else {//return to rest position.
-            skel.shoulderL = new Vector(-0.2,-0.1+((frame-25)/50),1.6);
-            skel.shoulderR = new Vector(0.2,0.1-((frame-25)/50),1.6);
-            skel.elbowRRotX = 45 - ((frame-25)*9);
-            skel.elbowLRotX = 20 - ((frame-25)*4);
-            skel.shoulderRRotX = 45 - ((frame-25)*9);
-            skel.shoulderRRotY = 45 - ((frame-25)*9);
-            skel.shoulderLRotX = -20 + ((frame-25)*4);
-            skel.swordRotX = -60 + ((frame-25)*12);
+            skel.shoulderL = new Vector(-0.2,-0.1+((frame-(5d*duration/6d))/(5d*duration/3d)),1.6);
+            skel.shoulderR = new Vector(0.2,0.1-((frame-(5d*duration/6d))/(5d*duration/3d)),1.6);
+            skel.elbowRRotX = 45d - ((frame-(5d*duration/6d))*(270d/duration));
+            skel.elbowLRotX = 20d - ((frame-(5d*duration/6d))*(120d/duration));
+            skel.shoulderRRotX = 45d - ((frame-(5d*duration/6d))*(270d/duration));
+            skel.shoulderRRotY = 45d - ((frame-(5d*duration/6d))*(270d/duration));
+            skel.shoulderLRotX = -20d + ((frame-(5d*duration/6d))*(120d/duration));
+            skel.swordRotX = -60d + ((frame-(5d*duration/6d))*(360d/duration));
         }
     }
 }
