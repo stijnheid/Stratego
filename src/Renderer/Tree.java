@@ -23,7 +23,7 @@ import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_SPECULAR;
  */
 public class Tree {
     
-   private static Texture leaves, wood;
+   private static Texture leave, wood;
    // used to calculate the height of the bottom of the upper leaves
    double offset;
    
@@ -81,15 +81,16 @@ public class Tree {
             rotation.add(randomVar.nextDouble() *360);
             position.add(0.35+ randomVar.nextDouble() *0.25); 
             
-            length = new Vector(1f,1f,1f);//(double)position.get(i)*height + height/4*Math.cos(70/360*2*Math.PI)       
+            length = new Vector(1.5d,0,(double)position.get(i)*height + height/3*Math.cos(70/360*2*Math.PI));//(double)position.get(i)*height + height/4*Math.cos(70/360*2*Math.PI)       
             length.rotate((double)rotation.get(i));
+            length.add(new Vector(x,y,z));
             System.out.println(length.x +","+ length.y +","+ length.z);
             pointsSphere.add(length);
             
 
         }
         pointsSphere.add(new Vector(0, 0, 0.35*height));
-        sphere = new FitSphere(pointsSphere, 0.2f);
+        sphere = new FitSphere(pointsSphere, 0.23f, 15);
         
         
 
@@ -107,8 +108,26 @@ public class Tree {
     
      void draw( GL2 gl, float tAnim)   
      {
-
-                 
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Material.GREEN.diffuse, 0);
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.GREEN.specular, 0);
+        gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Material.GREEN.shininess);
+         
+        
+        wood = Terrain.leaves;
+        wood.bind(gl);
+        
+        sphere.draw(gl, 0.9);
+        
+        
+        
+        wood = Terrain.vakje;
+        wood.bind(gl);
+        
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Material.WOOD.diffuse, 0);   
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.WOOD.specular, 0);
+        gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Material.WOOD.shininess);
+        
+        /*         
         for (int i =0; i<18; i++){
             Vector mands = (Vector)pointsSphere.get(i);
             double length1 = 0.1;
@@ -133,8 +152,9 @@ public class Tree {
             gl.glEnd();
             gl.glPopMatrix();
         }
+*/
 
-        //sphere.draw(gl);
+
         double rotationfactor = 1;
 
         
@@ -157,17 +177,13 @@ public class Tree {
         void drawBranch(double base, double length, GL2 gl, double tAnim, double localposition,double localrotation, int iteration) {
         iteration = iteration + 1;    
         // Defenition of Materials 
-        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Material.WOOD.diffuse, 0);   
-        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.WOOD.specular, 0);
-        gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Material.WOOD.shininess);
+
         
         double length1 = length +tAnim * scalefactor;
         double base1 = 0.5*base +tAnim * scalefactor;
         
         // Defenition of the texture
-        wood = terrain.vakje;
-        wood.bind(gl);
-        
+
         
 
         
@@ -193,6 +209,9 @@ public class Tree {
                     localrotation = (double) rotation.get(i);
                     base1 = 0.7*(1-localposition)*base;
                     length1 = length/2+tAnim * scalefactor*localposition;
+                    if (iteration == 2){
+                         length1 = length/3;
+                    }
         
                     gl.glPushMatrix();
                     gl.glTranslated(0, 0, localposition*length);

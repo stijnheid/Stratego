@@ -35,6 +35,7 @@ public class AttackAnimation extends Animation {
                     synchronized(terrain.cs.refresh){
                         terrain.cs.refresh.wait();
                         showSword(i);
+                        showRank();
                     }
                 }   catch (Exception e){}
             }
@@ -47,6 +48,7 @@ public class AttackAnimation extends Animation {
                     }
                 }   catch (Exception e){}
             }
+            skel.showRank = false;
             //return skeleton to default position without sword.
             faceForward();
             skel.swordOpacity = 0;
@@ -64,6 +66,14 @@ public class AttackAnimation extends Animation {
      */
     public void showSword(float frame){
         skel.swordOpacity = frame / 10;
+    }
+    
+    /**
+     * Method to show the rank.
+     * @param frame frame of the animation (from 1 to 30).
+     */
+    public void showRank(){
+        skel.showRank = true;
     }
     
     /**

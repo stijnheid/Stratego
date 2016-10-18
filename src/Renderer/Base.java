@@ -31,6 +31,9 @@ import javax.media.opengl.awt.GLJPanel;
 import javax.media.opengl.glu.GLU;
 import javax.swing.UIManager;
 import Game.GameState;
+import Game.Team;
+import Logic.Simulation;
+import actions.PlyAction;
 
 /**
  * Handles all of the RobotRace graphics functionality,
@@ -71,7 +74,16 @@ abstract public class Base {
     // Desired frames per second.
     static public int FPS = 60;
     
+    // holds the selected square on the board.
+    static public int selectPiece[] = {0,0};
     
+        // holds the selected square on the board.
+    static public int selectedPiece[] = {0,0};
+    static public int destination[] = {0,0};
+    static public int origin[] = {0,0};
+    
+    // counts the amount of enters
+    static private int movecounter = 0;
     // Global state, created at startup.
     protected GameState gs;
     
@@ -88,13 +100,17 @@ abstract public class Base {
     // Start time of animation.
     private long startTime;
     
+    private Simulation simulation;
+    
     // Textures.
     public static Texture track, brick, head, torso;
     
     /**
      * Constructs base class.
      */
-    public Base() {
+    public Base(Simulation s) {
+        this.simulation = s;
+        
         // Print library version number.
         System.out.println("Using RobotRace library version " + LIBRARY_VERSION);
         
@@ -396,6 +412,47 @@ abstract public class Base {
                 case 'z':   cs.cnt = new Vector(cs.cnt.x,
                                                 cs.cnt.y,
                                                 cs.cnt.z - CENTER_POINT_CHANGE);
+                            break;
+            }
+                switch(e.getKeyCode()) {
+                            
+                case KeyEvent.VK_UP:
+                            if (selectPiece[1]<5){
+                                selectPiece[1]++; 
+                            }
+                    break;
+                case KeyEvent.VK_DOWN:
+                            if (selectPiece[1]>0){
+                                selectPiece[1]--; 
+                            }
+                            break;
+                case KeyEvent.VK_LEFT:
+                            if (selectPiece[0]<5){
+                                selectPiece[0]++; 
+                            }
+                            break;
+                case KeyEvent.VK_RIGHT :
+                            if (selectPiece[0]>0){
+                                selectPiece[0]--; 
+                            }
+                            break;
+                case KeyEvent.VK_ENTER :
+                    selectedPiece = selectPiece.clone();       
+                    if (movecounter == 0){
+                        origin = selectedPiece;
+                        movecounter++;
+                    }
+                    if (movecounter == 1 && origin != selectedPiece){
+                            destination = selectedPiece;
+                            PlyAction action;
+                            try {
+                                action = new PlyAction(Team.RED, new Game.BoardPosition(origin[0], origin[1]), new Game.BoardPosition(destination[0], destination[1]));                            
+                                Base.this.simulation.processAction(action);
+                            } catch (Exception err){}
+                            
+                            movecounter = 0;
+                    }
+
                             break;
             }
         }

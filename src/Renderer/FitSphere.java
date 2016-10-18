@@ -5,12 +5,11 @@
  */
 package Renderer;
 
-import com.jogamp.opengl.util.texture.Texture;
+
 import java.util.List;
 import static java.lang.Math.*;
 import java.util.ArrayList;
 import static javax.media.opengl.GL.GL_FRONT_AND_BACK;
-import static javax.media.opengl.GL.GL_TRIANGLE_FAN;
 import javax.media.opengl.GL2;
 import static javax.media.opengl.GL.GL_TRIANGLE_STRIP;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.GL_AMBIENT_AND_DIFFUSE;
@@ -28,11 +27,11 @@ public class FitSphere {
     List<Vector> PointsSphere;
     List<Vector> WeightPoints;
     List<Vector> Difference;
-    double NodesOnRing = 10;
+    double NodesOnRing;
     
 
    
-    public FitSphere(List<Vector> Input, float adaption){
+    public FitSphere(List<Vector> Input, float adaption, double nodes){
         input = Input;
            
            
@@ -40,9 +39,10 @@ public class FitSphere {
         WeightPoints = new ArrayList();
         Difference = new ArrayList();
         
+        NodesOnRing = nodes;
+        
         Vector summation = new Vector(0,0,0);
         Vector SpherePoint = new Vector(0,0,0);
-        Vector Origin = new Vector(0,0,0);
         float radius = 0;
         
         for (Vector v : input){
@@ -128,15 +128,13 @@ public class FitSphere {
 
     }
     
-    void draw(GL2 gl){
+    void draw(GL2 gl, double partdrawn){
         
-        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Material.CONCRETE.diffuse, 0);
-        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.CONCRETE.specular, 0);
-        gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Material.CONCRETE.shininess);
+
         
 
         gl.glBegin(GL_TRIANGLE_STRIP);
-        for (int i = 0; i <PointsSphere.size()-6*NodesOnRing ; i=i-1){
+        for (int i = 0; i <partdrawn*PointsSphere.size()-6*NodesOnRing ; i=i-1){
                     
             
             Vector vector1 = new Vector(PointsSphere.get(i+(int)NodesOnRing));
@@ -145,10 +143,6 @@ public class FitSphere {
             vector1.subtract(PointsSphere.get(i));
             vector2.subtract(PointsSphere.get(i));
             Vector vector3 = vector1.cross(vector2);
-            
-            
-            
-            
             gl.glNormal3d(vector3.x, vector3.y, vector3.z);
             
             
