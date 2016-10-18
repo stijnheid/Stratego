@@ -13,6 +13,7 @@ import tools.search.ai.players.Attacker;
 import tools.search.ai.players.DefaultPlayer;
 import tools.search.ai.players.ModerateAttacker;
 import tools.search.ai.players.ModeratePlayer;
+import tools.search.ai.players.ModeratePlayerTwo;
 
 /**
  *
@@ -68,7 +69,7 @@ public class BattleTest {
     
     private void showCase() {
         SetupGenerator generator = new SetupGenerator();
-        GameBoard board = generator.generateFourBySix();
+        GameBoard board = generator.defensiveSetupFive();
         System.out.println("BoardState:\n" + board.transcript());
         
         BattleEngine engine = new BattleEngine();
@@ -76,7 +77,7 @@ public class BattleTest {
         AIBot attacker = new ModerateAttacker(Team.RED);
         //AIBot attacker = new Attacker(Team.RED);
         //AIBot defender = new Attacker(Team.BLUE);
-        AIBot defender = new ModeratePlayer(Team.BLUE);
+        AIBot defender = new ModeratePlayerTwo(Team.BLUE);
         //AIBot defender = new Attacker(Team.BLUE);
         
         long computationTime = 2000;

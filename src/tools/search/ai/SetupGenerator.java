@@ -232,4 +232,100 @@ public class SetupGenerator {
                        "b:F|b:B|b:9|b:5\n";
         return GameBoard.loadBoard(setup, 4, 6);
     }
+    
+    public GameBoard defensiveSetupOne(){
+        String setup = "r:2|r:S|r:7|r:4\n" +
+                       "--- --- --- ---\n" +
+                       "r:8|r:6|r:9|r:5\n" +
+                       "--- --- --- ---\n" +
+                       "   |   |   |   \n" + 
+                       "--- --- --- ---\n" +
+                       "   |   |   |   \n" + 
+                       "--- --- --- ---\n" +
+                       "b:B|b:6|b:4|b:7\n" + 
+                       "--- --- --- ---\n" +
+                       "b:F|b:B|b:9|b:5\n";
+        
+        return GameBoard.loadBoard(setup, 4, 6);
+    }
+    
+    public GameBoard defensiveSetupTwo() {
+        String setup = "r:8|r:S|r:7|r:4\n" +
+                       "--- --- --- ---\n" +
+                       "r:2|r:6|r:9|r:5\n" +
+                       "--- --- --- ---\n" +
+                       "   |   |   |   \n" + 
+                       "--- --- --- ---\n" +
+                       "   |   |   |   \n" + 
+                       "--- --- --- ---\n" +
+                       "b:4|b:B|b:B|b:5\n" + 
+                       "--- --- --- ---\n" +
+                       "b:9|b:6|b:F|b:7\n";
+        
+        return GameBoard.loadBoard(setup, 4, 6);
+    }
+    
+    public GameBoard defensiveSetupThree() {
+        String setup = "r:8|r:S|r:7|r:4\n" +
+                       "--- --- --- ---\n" +
+                       "r:2|r:6|r:9|r:5\n" +
+                       "--- --- --- ---\n" +
+                       "   |   |   |   \n" + 
+                       "--- --- --- ---\n" +
+                       "   |   |   |   \n" + 
+                       "--- --- --- ---\n" +
+                       "b:6|b:9|b:7|b:B\n" + 
+                       "--- --- --- ---\n" +
+                       "b:B|b:F|b:5|b:4\n";
+        
+        return GameBoard.loadBoard(setup, 4, 6);
+    }
+    
+    public GameBoard defensiveSetupFour() {
+        String setup = "r:8|r:S|r:7|r:4\n" +
+                       "--- --- --- ---\n" +
+                       "r:2|r:6|r:9|r:5\n" +
+                       "--- --- --- ---\n" +
+                       "   |   |   |   \n" + 
+                       "--- --- --- ---\n" +
+                       "   |   |   |   \n" + 
+                       "--- --- --- ---\n" +
+                       "b:B|b:9|b:7|b:5\n" + 
+                       "--- --- --- ---\n" +
+                       "b:4|b:6|b:F|b:B\n";
+        
+        return GameBoard.loadBoard(setup, 4, 6);
+    }
+    
+    public GameBoard defensiveSetupFive() {
+        String setup = "r:8|r:S|r:7|r:4\n" +
+                       "--- --- --- ---\n" +
+                       "r:2|r:6|r:9|r:5\n" +
+                       "--- --- --- ---\n" +
+                       "   |   |   |   \n" + 
+                       "--- --- --- ---\n" +
+                       "   |   |   |   \n" + 
+                       "--- --- --- ---\n" +
+                       "b:B|b:5|b:6|b:B\n" + 
+                       "--- --- --- ---\n" +
+                       "b:4|b:9|b:7|b:F\n";
+        
+        return GameBoard.loadBoard(setup, 4, 6);
+    }
+    
+    public GameBoard defensiveSetupSix() {
+        String setup = "r:8|r:S|r:7|r:4\n" +
+                       "--- --- --- ---\n" +
+                       "r:2|r:6|r:9|r:5\n" +
+                       "--- --- --- ---\n" +
+                       "   |   |   |   \n" + 
+                       "--- --- --- ---\n" +
+                       "   |   |   |   \n" + 
+                       "--- --- --- ---\n" +
+                       "b:B|b:6|b:9|b:F\n" + 
+                       "--- --- --- ---\n" +
+                       "b:B|b:4|b:7|b:5\n";
+        
+        return GameBoard.loadBoard(setup, 4, 6);
+    }
 }

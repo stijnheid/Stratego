@@ -11,5 +11,7 @@ package tools.search.ai;
  */
 public interface WeighedEvaluation extends HeuristicEvaluation{
     
+    public int featuresConnt();
+    
     public void setWeights(double[] weights);
 }

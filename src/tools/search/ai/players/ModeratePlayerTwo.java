@@ -5,16 +5,23 @@
  */
 package tools.search.ai.players;
 
+import Game.BoardPosition;
 import Game.GameBoard;
 import Game.GamePiece;
 import Game.GameState;
+import Game.InvalidPositionException;
 import Game.Pieces;
 import Game.Team;
 import actions.MoveAction;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import tools.search.ai.GameNode;
 import tools.search.ai.HeuristicEvaluation;
+import tools.search.ai.WeighedEvaluation;
 import tools.search.ai.WeighedHeuristicTerm;
 
 /**
@@ -47,6 +54,15 @@ public class ModeratePlayerTwo extends AbstractPlayer{
         attacker.put(Pieces.SPY, -325);
     }
     
+    MarshallValue marshallValue = new MarshallValue();
+    SpyValue spyValue = new SpyValue();
+    MinerValue minerValue = new MinerValue();
+    BombValue bombValue = new BombValue();
+    OtherValue otherValue = new OtherValue();
+    BoardValue boardValue = new BoardValue();
+    
+    List<WeighedHeuristicTerm> Term = Arrays.asList(marshallValue, spyValue, minerValue, bombValue, otherValue, boardValue);
+    
     public ModeratePlayerTwo(Team team) {
         super(team);
     }
@@ -63,12 +79,31 @@ public class ModeratePlayerTwo extends AbstractPlayer{
         return move;
     }
     
-    private class MyHeuristic implements HeuristicEvaluation {
+    private class MyHeuristic implements WeighedEvaluation {
 
         @Override
         public double score(GameState state) {
             double score = 0;
-            return score;
+            for (WeighedHeuristicTerm term: Term) {
+                score+= term.computeScore(state);
+            }
+            
+            //return a minus value because it is a minimize player
+            return -score;
+        }
+
+        @Override
+        public void setWeights(double[] weights) {
+            for (WeighedHeuristicTerm term: Term) {
+                for (double weight: weights) {
+                    term.setWeight(weight);
+                }
+            }
+        }
+
+        @Override
+        public int featuresConnt() {
+            return Term.size();
         }
         
     }
@@ -92,6 +127,27 @@ public class ModeratePlayerTwo extends AbstractPlayer{
            
             return score;
         }        
+    }
+    
+    private class SpyValue extends WeighedHeuristicTerm {
+
+        @Override
+        public double computeScore(GameState state) {
+            double score = 0;
+            GameBoard board = state.getGameBoard();
+            
+            List<GamePiece> defenderMarshall = board.getPieces(ModeratePlayerTwo.super.team, Pieces.MARSHALL);
+            if(defenderMarshall.isEmpty()) {
+                // Spy of attacker died.
+                score = attacker.get(Pieces.SPY) * 0.5;
+            }
+            else {
+                score = attacker.get(Pieces.SPY);
+            }
+            
+            return score;
+        }
+        
     }
     
     private class MinerValue extends WeighedHeuristicTerm {
@@ -118,8 +174,9 @@ public class ModeratePlayerTwo extends AbstractPlayer{
 
         @Override
         public double computeScore(GameState state) {
-            double score;
-            return score = (-HighestValue(state, ModeratePlayerTwo.super.team.opposite())/2) * getPiecesAmount(state, ModeratePlayerTwo.super.team, Pieces.BOMB);
+            double score = 0;
+            score = (-HighestValue(state, ModeratePlayerTwo.super.team.opposite(), attacker)/2);
+            return score * getPiecesAmount(state, ModeratePlayerTwo.super.team, Pieces.BOMB);
         }
         
     }
@@ -128,7 +185,87 @@ public class ModeratePlayerTwo extends AbstractPlayer{
 
         @Override
         public double computeScore(GameState state) {
+            double redScore = 0;
+            double blueScore = 0;
             double score = 0;
+            GameBoard board = state.getGameBoard();
+            List<GamePiece> attackerArmy = board.getTeam(ModeratePlayerTwo.super.team.opposite());
+            List<GamePiece> defenderArmy = board.getTeam(ModeratePlayerTwo.super.team);
+            
+            redScore = attacker.get(Pieces.MARSHALL) * getPiecesAmount(state, ModeratePlayerTwo.super.team.opposite(), Pieces.MARSHALL)
+                       + attacker.get(Pieces.GENERAL) * getPiecesAmount(state, ModeratePlayerTwo.super.team.opposite(), Pieces.GENERAL) 
+                       + attacker.get(Pieces.COLONEL) * getPiecesAmount(state, ModeratePlayerTwo.super.team.opposite(), Pieces.COLONEL)
+                       + attacker.get(Pieces.CAPTAIN) * getPiecesAmount(state, ModeratePlayerTwo.super.team.opposite(), Pieces.CAPTAIN)
+                       + attacker.get(Pieces.MAJOR) * getPiecesAmount(state, ModeratePlayerTwo.super.team.opposite(), Pieces.MAJOR)
+                       + attacker.get(Pieces.LIEUTENANT) * getPiecesAmount(state, ModeratePlayerTwo.super.team.opposite(), Pieces.LIEUTENANT);
+            
+            blueScore = defender.get(Pieces.FLAG) * getPiecesAmount(state, ModeratePlayerTwo.super.team, Pieces.FLAG)
+                       + defender.get(Pieces.COLONEL) * getPiecesAmount(state, ModeratePlayerTwo.super.team, Pieces.COLONEL)
+                       + defender.get(Pieces.CAPTAIN) * getPiecesAmount(state, ModeratePlayerTwo.super.team, Pieces.CAPTAIN)
+                       + defender.get(Pieces.MAJOR) * getPiecesAmount(state, ModeratePlayerTwo.super.team, Pieces.MAJOR)
+                       + defender.get(Pieces.LIEUTENANT) * getPiecesAmount(state, ModeratePlayerTwo.super.team, Pieces.LIEUTENANT);
+            
+            score = redScore * (attackerArmy.size()/defenderArmy.size())+ blueScore * (attackerArmy.size()/defenderArmy.size());
+            return score;
+        }
+        
+    }
+    
+    private class BoardValue extends WeighedHeuristicTerm {
+
+        @Override
+        public double computeScore(GameState state) {
+            double score = 0;
+            GameBoard board = state.getGameBoard();            
+            
+            
+            String setup =  "0|0|0|0\n" +
+                            "50|50|50|50\n" +
+                            "100|100|100|100\n" +
+                            "150|150|150|150\n" +
+                            "200|200|200|200\n" +
+                            "250|250|250|250";
+            
+            /**
+            String setup = "1000|1000|1000\n" +
+                            "0|0|0\n" +
+                            "0|0|0\n" +
+                            "0|0|0\n" +
+                            "0|0|0\n" +
+                            "0|0|0\n";
+            */
+            /**
+            /*
+            String setup = "25|25|25|25|25|25\n" +
+                            "50|50|50|50|50|50\n" +
+                            "100|100|100|100|100|100\n" +
+                            "150|150|150|150|150|150\n" +
+                            "200|200|200|200|200|200\n" +
+                            "200|200|200|200|200|200\n";
+            */
+            HashMap<BoardPosition, Integer> map = loadMap(setup);
+            
+            for (Map.Entry<BoardPosition, Integer> entrys: map.entrySet()) {
+                BoardPosition position = entrys.getKey();
+                Integer value = entrys.getValue();
+                
+                try {
+                    if (board.isEmpty(position)) {
+                        score = score + 0;
+                    }
+                    else {
+                        if (board.getPiece(position).getTeam() == Team.RED) {
+                            score = score - value;
+                        }
+                        else {
+                            score = score + value;
+                        }
+                    }
+                } catch (InvalidPositionException ex) {
+                    Logger.getLogger(ModeratePlayer.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+            
             return score;
         }
         
@@ -141,17 +278,36 @@ public class ModeratePlayerTwo extends AbstractPlayer{
         return pieces.size();
     }
     
-    public int HighestValue(GameState state, Team team) {
+    //Find the highest value among all the pieces from a team
+    public int HighestValue(GameState state, Team team, HashMap<Pieces, Integer> value) {
         GameBoard board = state.getGameBoard();
-        List<GamePiece> army = board.getTeam(ModeratePlayerTwo.super.team);
+        List<GamePiece> army = board.getTeam(team);
         
         int maxValue = Integer.MIN_VALUE;
-        for (GamePiece pieces : army) {
-            if (attacker.get(army) > maxValue) {
-                maxValue = attacker.get(army);
+        for (GamePiece piece : army) {
+            if (maxValue <= value.get(piece.getRank())) {
+                maxValue = value.get(piece.getRank());
             }
         }
         
         return maxValue;
+    }
+    
+    private HashMap<BoardPosition, Integer> loadMap(String values) {
+        HashMap<BoardPosition, Integer> map = new HashMap<>();
+        
+        String[] lines = values.split("\n");
+        for(int row=0; row<lines.length; row++) {
+            String line = lines[row];
+            
+            String[] vals = line.split("\\|");
+            for(int column=0; column<vals.length; column++) {
+                int value = Integer.parseInt(vals[column]);
+                BoardPosition pos = new BoardPosition(column, row);
+                map.put(pos, value);
+            }
+        }
+        
+        return map;
     }
 }

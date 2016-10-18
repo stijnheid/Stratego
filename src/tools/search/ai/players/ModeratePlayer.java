@@ -13,6 +13,8 @@ import Game.InvalidPositionException;
 import Game.Pieces;
 import Game.Team;
 import actions.MoveAction;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +55,11 @@ public class ModeratePlayer extends AbstractPlayer {
         attacker.put(Pieces.MINER, -300);
         attacker.put(Pieces.SPY, -325);
     }
+    
+    PieceValue pieceValue = new PieceValue();
+    BoardValue boardValue = new BoardValue();
+        
+    List<WeighedHeuristicTerm> Term = Arrays.asList(pieceValue, boardValue);
 
     public ModeratePlayer(Team team) {
         super(team);
@@ -72,30 +79,32 @@ public class ModeratePlayer extends AbstractPlayer {
     }
     
     private class MyHeuristic implements WeighedEvaluation {
-        
-        List<WeighedHeuristicTerm> Term; 
 
         @Override
         public double score(GameState state) {
-            PieceValue pieceValue = new PieceValue();
-            BoardValue boardValue = new BoardValue();
             double score = 0;
             pieceValue.setWeight(0.7);
             boardValue.setWeight(0.3);
             score = pieceValue.computeScore(state) + boardValue.computeScore(state);
-            return score;
+            
+            //return a minus value because it is a minimize player
+            return -score;
         }
 
-        
         @Override
         public void setWeights(double[] weights) {
-            /*
-            for (Term: term) {
-                
+            
+            for (WeighedHeuristicTerm term: Term) {
+                for (double weight: weights) {
+                    term.setWeight(weight);
+                }
             }
-            */
         }
-        
+
+        @Override
+        public int featuresConnt() {
+            return Term.size();
+        }
     }
     
     private class PieceValue extends WeighedHeuristicTerm {
@@ -123,12 +132,20 @@ public class ModeratePlayer extends AbstractPlayer {
             
             //If the flag is surrounded by the bombs, the bombs and the miner of attacker will become much more valueable
             if(FlagSurroundedByBomb(state)) {
-                attacker.put(Pieces.MINER, -300 * getPiecesAmount(state, ModeratePlayer.super.team.opposite(), Pieces.MINER));
+                defender.put(Pieces.BOMB, 300 * getPiecesAmount(state, ModeratePlayer.super.team.opposite(), Pieces.MINER));
             }
             else {
                 defender.put(Pieces.FLAG, 2495);
                 defender.put(Pieces.BOMB, 300 * (1 / (getPiecesAmount(state, ModeratePlayer.super.team.opposite(), Pieces.MINER) + 1)));
-                attacker.put(Pieces.MINER, -300 * (1 / (getPiecesAmount(state, ModeratePlayer.super.team, Pieces.BOMB) + 1)));
+            }
+            
+            //If all the bombs from defender are gone, the miner of attacker will become less valueable
+            List<GamePiece> defenderBomb = board.getPieces(ModeratePlayer.super.team, Pieces.BOMB);
+            if(defenderBomb.isEmpty()) {
+                attacker.put(Pieces.MINER, -100);
+            }
+            else {
+                attacker.put(Pieces.MINER, -300 * (1 / getPiecesAmount(state, ModeratePlayer.super.team, Pieces.BOMB)));
             }
             
             List<GamePiece> red = board.getTeam(Team.RED);
@@ -146,7 +163,7 @@ public class ModeratePlayer extends AbstractPlayer {
             }
             score = blueScore + redScore;
             
-            return -score;
+            return score;
             //return -score * (blue.size()/red.size());
         }
         
@@ -222,56 +239,8 @@ public class ModeratePlayer extends AbstractPlayer {
                 }
             }
             
-            return -score;
+            return score;
         } 
-    }
-    
-    public static void main(String[] args) {
-        ModeratePlayer player = new ModeratePlayer(Team.BLUE);
-        
-        String setup = "0|0|0\n" +
-                        "0|0|0\n" +
-                        "100|100|100\n" +
-                        "150|150|150\n" +
-                        "200|200|200\n" +
-                        "200|200|200";
-        
-        HashMap<BoardPosition, Integer> map = player.loadMap(setup);
-        player.printMap(map, 3, 6);
-    }
-    
-    private void printMap(HashMap<BoardPosition, Integer> map, int w, int h) {
-        StringBuilder builder = new StringBuilder();
-        for(int r=0; r<h; r++) {
-            for(int c=0; c<w; c++) {
-                BoardPosition pos = new BoardPosition(c, r);
-                Integer value = map.get(pos);
-                if(value != null) {
-                    int val = (int) value;
-                    builder.append(val);
-                } else {
-                    builder.append(" ");
-                }
-                
-                if(c < (w - 1)) {
-                    builder.append("|");
-                }
-            }
-            
-            builder.append("\n");
-            
-            if(r < (h - 1)) {
-                for(int i=0; i<w; i++) {
-                    builder.append("-");
-                    if(i < w - 1) {
-                        builder.append(" ");
-                    }
-                }
-                builder.append("\n");
-            }
-        }
-        
-        System.out.println("CellMap:\n" + builder.toString());
     }
     
     private HashMap<BoardPosition, Integer> loadMap(String values) {
