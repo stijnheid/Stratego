@@ -2,6 +2,7 @@ package Game;
 
 import static Game.Pieces.*;
 import java.util.Objects;
+import  Renderer.Skeleton;
 
 /**
  * This object represents a piece on the game board. A piece has a rank and team.
@@ -16,6 +17,7 @@ public class GamePiece {
     private boolean isHighlighted;
     private BoardPosition position;
     private boolean isAlive;
+    private Skeleton skeleton;
     
     public GamePiece(Pieces rank, Team team) {
         this.rank = rank;
@@ -30,6 +32,7 @@ public class GamePiece {
         this.team = team;
         this.isAlive = true;
         this.position = position;
+        this.skeleton = new Skeleton(position, team, rank);
     }
     
     public boolean isStatic() {
@@ -74,6 +77,10 @@ public class GamePiece {
     
     public boolean isAlive() {
         return this.isAlive;
+    }
+    
+    public Skeleton getSkeleton(){
+        return this.skeleton;
     }
     
     /**
