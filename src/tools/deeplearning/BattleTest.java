@@ -14,7 +14,8 @@ import tools.search.ai.players.AttackerTwo;
 import tools.search.ai.players.DefaultPlayer;
 import tools.search.ai.players.ModerateAttacker;
 import tools.search.ai.players.ModeratePlayer;
-import tools.search.ai.players.ModeratePlayerTwo;
+import tools.search.new_ai.DefenderOne;
+import tools.search.new_ai.SparringAttacker;
 
 /**
  *
@@ -26,7 +27,8 @@ public class BattleTest {
         //new BattleTest().testSmallBoard();
         //new BattleTest().showCase();
         //new BattleTest().alphaBetaTest();
-        new BattleTest().testNew();
+        //new BattleTest().testNew();
+        new BattleTest().IDTest();
     }
     
     private void testHeuristic() {
@@ -132,5 +134,29 @@ public class BattleTest {
         
         BattleTranscript transcript = engine.battle(board, attacker, defender, computationTime, maxIterations);
         transcript.print();        
+    }
+    
+    private void IDTest() {
+        String setup = "r:9|r:7|r:6|r:8\n" +
+                        "--- --- --- ---\n" +
+                        "r:4|r:5|r:S|r:2\n" +
+                        "--- --- --- ---\n" +
+                        "   |   |   |   \n" +
+                        "--- --- --- ---\n" +
+                        "   |   |   |   \n" +
+                        "--- --- --- ---\n" +
+                        "b:B|b:6|b:4|b:7\n" +
+                        "--- --- --- ---\n" +
+                        "b:F|b:B|b:9|b:5";
+        GameBoard board = GameBoard.loadBoard(setup, 4, 6);
+        
+        BattleEngine engine = new BattleEngine();
+        
+        AIBot attacker = new SparringAttacker(Team.RED);
+        AIBot defender = new DefenderOne(Team.BLUE);
+        long time = 2000;
+        int maxIterations = 20;
+        BattleTranscript report = engine.battle(board, attacker, defender, time, maxIterations);
+        report.print();
     }
 }

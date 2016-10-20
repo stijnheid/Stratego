@@ -7,6 +7,7 @@ import java.util.List;
 import tools.search.ai.GameNode;
 import tools.search.ai.HeuristicEvaluation;
 import tools.search.ai.TreeSearch;
+import tools.search.ai.TreeSearch.MySearchResult;
 
 /**
  *
@@ -37,7 +38,7 @@ public class AttackerTwo extends AbstractPlayer {
         MoveAction move;
         int range = -1;
         // Conduct search.
-        TreeSearch.SearchResult result = this.search.IDAlphaBeta(node, 1, range, true, true);
+        MySearchResult result = this.search.IDAlphaBeta(node, 1, range, true, true);
         move = result.getBestMove();
         
         // Print Principal Variation Path.

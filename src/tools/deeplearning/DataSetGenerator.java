@@ -27,7 +27,7 @@ public class DataSetGenerator {
     }
     
     private void generate() {
-        BattleTranscript result = this.battleEngine.battle();
+        //BattleTranscript result = this.battleEngine.battle();
         
         // Notify all listeners.
         for(DeepLearner learner : this.learners) {

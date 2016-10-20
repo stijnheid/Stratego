@@ -50,6 +50,7 @@ public class BattleEngine {
             //new BattleEngine().testEpicWeirdness();
             //new BattleEngine().testAlphaBeta();
             new BattleEngine().testBuggyAttack();
+            new BattleEngine().testLoopDetection();
         } catch (InvalidPositionException ex) {
             Logger.getLogger(BattleEngine.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -364,15 +365,19 @@ public class BattleEngine {
                 + " (" + attacker.getClass().getSimpleName() + ")");
         System.out.println("Defending team: " + board.getDefender() 
                 + " (" + defender.getClass().getSimpleName() + ")");
+        System.out.println("Initial Setup:\n" + board.transcript());
         
         transcript.startGame();
         
+        int loopLimit = 5; // maximum allowed # of consecutive back and forth moves.
         Team winner;
         while((winner = board.isEndState()) == null) {
             if(maxIterations != -1 && iterations >= maxIterations) {
                 System.out.println("ENDED LONG MATCH");
                 break;
             }
+            
+            System.out.println("Next Move for " + attacker.getClass().getSimpleName());
             
             //System.out.println("Invoke Move");
             MoveAction move = timedAIMove((GameState) state.clone(), 
@@ -437,6 +442,13 @@ public class BattleEngine {
             
             System.out.println("BoardState:\n" + state.getGameBoard().transcript());
             
+            // Detect back and forth loop.
+            List<MoveAction> moves = transcript.getMoves();
+            if(isLoop(moves, loopLimit)) {
+                System.out.println("Detected loop.");
+                break;
+            }
+            
             // Swap turn.
             if(currentTurn == attacker) {
                 currentTurn = defender;
@@ -444,7 +456,6 @@ public class BattleEngine {
                 currentTurn = attacker;
             }
             
-            System.out.println("Next Move");
             iterations++;
         }
         
@@ -456,34 +467,75 @@ public class BattleEngine {
         //transcript.print();
         return transcript;
     }
-
+    
+    private boolean isLoop(List<MoveAction> moves, int length) {
+        // Red and Blue moves are interleaved, need to extract them.
+        List<MoveAction> redMoves = new ArrayList<>();
+        List<MoveAction> blueMoves = new ArrayList<>();
+        
+        for(MoveAction m : moves) {
+            if(m.getTeam() == Team.RED) {
+                redMoves.add(m);
+            } else {
+                blueMoves.add(m);
+            }
+        }
+        
+        return (detectLoop(redMoves, length) || detectLoop(blueMoves, length));
+    }
+    
+    private boolean detectLoop(List<MoveAction> moves, int length) {
+        if(moves.size() < length) {
+            return false;
+        }
+        
+        boolean isLoop = false;
+        // Start from the back.
+        int sequence = 0;
+        MoveAction current = moves.get(moves.size() - 1);
+        for(int i=(moves.size() - 2); i>=0; i--) {
+            MoveAction previous = moves.get(i);
+            // Check if the origin and destination of the current move are
+            // swapped in the previous move. This indicates a back and forth
+            // move.
+            if(current.getOrigin().equals(previous.getDestination()) && 
+                    current.getDestination().equals(previous.getOrigin())) {
+                sequence++;
+            } else { // No loop.
+                break;
+            }
+            
+            // Found a loop.
+            if(sequence == length) {
+                isLoop = true;
+                break;
+            }
+            
+            // Update current.
+            current = previous;
+        }
+        
+        return isLoop;
+    }
     
     private boolean interrupted;
     
-    private MoveAction timedAIMove(GameState state, final AIBot bot, long computationTime) {
-        interrupted = false;
+    public static MoveAction timedAIMove(final GameState state, final AIBot bot, long computationTime) {
+        //interrupted = false;
         Timer timer = new Timer();
         TimerTask task = new TimerTask() {
             @Override
             public void run() {
-                interrupted = true;
+                //interrupted = true;
                 bot.stop();
             }
         };
         
         timer.schedule(task, computationTime);
         MoveAction move = bot.nextMove(state);
-        System.out.println("Interrupted: " + interrupted);
+        //System.out.println("Interrupted: " + interrupted);
         task.cancel();
         return move;
-    }
-    
-    // Calculate a random setup for the player.
-    
-    // Make random moves.
-    
-    public BattleTranscript battle() {
-        return null;
     }
     
     public void debug() throws InvalidPositionException {
@@ -804,5 +856,58 @@ public class BattleEngine {
         System.out.println();
         
         System.out.println("Test Buggy Attack Ended.");
+    }
+    
+    private void testLoopDetection() {
+        String setup = "r:9|r:S|   |r:4\n" +
+                        "--- --- --- ---\n" +
+                        "r:8|r:5|r:6|r:2\n" +
+                        "--- --- --- ---\n" +
+                        "   |r:7|   |   \n" +
+                        "--- --- --- ---\n" +
+                        "   |   |b:4|   \n" +
+                        "--- --- --- ---\n" +
+                        "b:B|b:6|   |b:7\n" +
+                        "--- --- --- ---\n" +
+                        "b:F|b:B|b:9|b:5";
+        
+        GameBoard board = GameBoard.loadBoard(setup, 4, 6);
+        List<MoveAction> moves = new ArrayList<>();
+        try {
+            int loopLength = 5;
+            for(int i=0; i<loopLength; i++) {
+                MoveAction spyMove = createMoveAction(board, 1, 0, 2, 0);
+                moves.add(spyMove);
+                MoveAction moveLieutenant = createMoveAction(board, 2, 3, 1, 3);
+                moves.add(moveLieutenant);
+                
+                moves.add(new MoveAction(spyMove.getTeam(), spyMove.getPiece(), 
+                        spyMove.getDestination(), spyMove.getOrigin()));
+                //moves.add(new MoveAction(spyMove.getTeam(), spyMove.getPiece(), new BoardPosition(1,0), new BoardPosition(1,0)));
+                moves.add(new MoveAction(moveLieutenant.getTeam(), 
+                        moveLieutenant.getPiece(), 
+                        moveLieutenant.getDestination(), 
+                        moveLieutenant.getOrigin()));
+                //moves.add(createMoveAction(board, 2, 0, 1, 0));
+                //moves.add(createMoveAction(board, 1, 3, 2, 3));
+            }
+            
+            // Do loop detection.
+            System.out.println("Has Loop: " + isLoop(moves, loopLength));
+        } catch (InvalidPositionException ex) {
+            Logger.getLogger(BattleEngine.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+    }
+    
+    private MoveAction createMoveAction(GameBoard board, int x, int y, int x2, int y2) throws InvalidPositionException {
+        GamePiece piece = board.getPiece(new BoardPosition(x, y));
+        if(piece == null) {
+            throw new RuntimeException("No piece at " + (new BoardPosition(x, y)).toString());
+        }
+        
+        MoveAction move = new MoveAction(piece.getTeam(), piece, 
+                new BoardPosition(x, y), new BoardPosition(x2, y2));
+        return move;
     }
 }

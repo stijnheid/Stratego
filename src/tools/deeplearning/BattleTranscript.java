@@ -1,10 +1,15 @@
 package tools.deeplearning;
 
+import Game.BoardPosition;
 import Game.GameBoard;
+import Game.GamePiece;
+import Game.InvalidPositionException;
 import Game.Team;
 import actions.MoveAction;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A battle can be described as an initial setup and a list of sequential
@@ -83,6 +88,31 @@ public class BattleTranscript {
     }
     
     public void save(String filename) {
+        // Store the played game.
+        // Denote board dimensions and #moves
+        StringBuilder builder = new StringBuilder();
+        builder.append(this.initialSetup.getWidth());
+        builder.append(" ");
+        builder.append(this.initialSetup.getHeight());
+        builder.append(" ");
+        // Store the initial setup.
+        for(int row=0; row<this.initialSetup.getHeight(); row++) {
+            for(int column=0; column<this.initialSetup.getWidth(); column++) {
+                try {
+                    GamePiece piece = this.initialSetup.getPiece(new BoardPosition(column, row));
+                    if(piece != null) {
+                        builder.append(piece.getRank().getPieceSymbol() + ":" + column + "," + row);
+                        builder.append(" ");
+                    }
+                } catch (InvalidPositionException ex) {
+                    Logger.getLogger(BattleTranscript.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        }
         
+        // # of moves
+        builder.append(this.moves.size());
+        builder.append(" ");
+        // Store the moves.
     }
 }

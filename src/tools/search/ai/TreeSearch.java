@@ -9,20 +9,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 import tools.search.ai.players.Attacker;
-import tools.search.new_ai.SparringAttacker;
-import tools.search.new_ai.SparringAttacker.SparringAttackerHeuristic;
 
 /**
  *
  */
-public class TreeSearch {
-    
-    // Evaluation function to be used by search algorithm to evaluate board
-    // state.
-    private HeuristicEvaluation evaluation;
-    
-    // Flag that indicates the algorithm must be interrupted.
-    private boolean timeout;
+public class TreeSearch extends InterruptableSearch {
     
     private int nodeCount;
     
@@ -64,8 +55,14 @@ public class TreeSearch {
     public void setHeuristic(HeuristicEvaluation evaluation) {
         this.evaluation = evaluation;
     }
+
+    @Override
+    public tools.search.ai.SearchResult search(
+            GameNode node, int initialDepth, int range, boolean isMaxPlayer, boolean moveOrdering) {
+        return IDAlphaBeta(node, initialDepth, range, isMaxPlayer, moveOrdering);
+    }
     
-    public class SearchResult {
+    public class MySearchResult extends SearchResult {
         
         private Stack<Integer> exploredNodes;
         private MoveAction bestMove;
@@ -73,7 +70,7 @@ public class TreeSearch {
         private Stack<List<MoveAction>> principalVariationPaths;
         private Stack<Integer> cutoffs;
         
-        public SearchResult() {
+        public MySearchResult() {
             this.exploredNodes = new Stack<>();
         }
 
@@ -152,7 +149,7 @@ public class TreeSearch {
         
         MoveAction bestMove = null;
         System.out.println("isMaxPlayer: " + isMaxPlayer);
-        SearchResult result = new SearchResult();
+        MySearchResult result = new MySearchResult();
         Stack<Integer> exploredNodes = new Stack<>();
         Stack<Long> iterationTimes = new Stack<>();
         this.iterationBestMoves = new Stack<>();
@@ -578,7 +575,7 @@ public class TreeSearch {
         int range = 9; //3; //1; //9; //2; //5; //9; //5; //1; //9; //6; //-1;
         //SearchResult result = iterativeDeepeningAlphaBeta(node, initialDepth, range, true);
         long start = System.currentTimeMillis();
-        SearchResult result = IDAlphaBeta(node, initialDepth, range, true, true);
+        MySearchResult result = IDAlphaBeta(node, initialDepth, range, true, true);
         long end = System.currentTimeMillis();
         System.out.println("IDAlphaBeta ended in " +
                 (end - start) + " ms. with range [" + initialDepth + ", " + (initialDepth + range) + "]");
@@ -620,7 +617,7 @@ public class TreeSearch {
         System.out.println("Best Move: " + bestMove.toString());
     }
     
-    public SearchResult IDAlphaBeta(GameNode node, int initialDepth, int range, boolean isMaxPlayer, boolean useMoveOrdering) {
+    public MySearchResult IDAlphaBeta(GameNode node, int initialDepth, int range, boolean isMaxPlayer, boolean useMoveOrdering) {
         // Reset timeout.
         this.timeout = false;
         
@@ -647,7 +644,7 @@ public class TreeSearch {
         
         MoveAction bestMove = null;
         System.out.println("isMaxPlayer: " + isMaxPlayer);
-        SearchResult result = new SearchResult();
+        MySearchResult result = new MySearchResult();
         Stack<Integer> exploredNodes = new Stack<>();
         Stack<Long> iterationTimes = new Stack<>();
         Stack<Integer> iterationCutoffs = new Stack<>();
@@ -722,8 +719,10 @@ public class TreeSearch {
                 LinkedList<MoveAction> path = new LinkedList<>();
                 long start = System.currentTimeMillis();
                 if(isMaxPlayer) {
+                    System.out.println("alphaBetaMax");
                     score = alphaBetaMax(node, alpha, beta, depth, path);
                 } else {
+                    System.out.println("alphaBetaMin");
                     score = alphaBetaMin(node, alpha, beta, depth, path);
                 }
                 long end = System.currentTimeMillis();
@@ -751,6 +750,29 @@ public class TreeSearch {
                 // Store the Principal Variation Path.
                 iterationPVPaths.push(path);
                 
+                // Update best move.
+                //System.out.println("Move Score: " + score);
+                // Fixed bug where bestMove was previously null if all
+                // possible moves are infinitely bad.
+                bestMove = node.getBestMove();
+                if(bestMove == null) {
+                    throw new RuntimeException("No best move.");
+                }
+                
+                //this.iterationBestMoves.push(bestMove);
+                // Check if bestMove is okay.
+                // TODO remove this check if this function is stable.
+                if(!bestMove.isOkay()) {
+                    throw new RuntimeException("Corrupt MoveAction: " + 
+                            bestMove.toString());
+                }
+                
+                if(isMaxPlayer && bestMove.getTeam() != Team.RED) {
+                    throw new RuntimeException("Returned move for wrong team: " + bestMove);
+                } else if(!isMaxPlayer && bestMove.getTeam() != Team.BLUE) {
+                    throw new RuntimeException("Returned move for wrong team: " + bestMove);
+                }                
+                
                 // If a score of infinity or -infinity depending on the root player
                 // indicates that the game is inevitably lost or won.
                 // When this happens there is no point on continueing iterative
@@ -769,28 +791,15 @@ public class TreeSearch {
                     break;
                 }
                 
-                // Update best move.
-                bestMove = node.getBestMove();
-                //this.iterationBestMoves.push(bestMove);
-                // Check if bestMove is okay.
-                // TODO remove this check if this function is stable.
-                if(!bestMove.isOkay()) {
-                    throw new RuntimeException("Corrupt MoveAction: " + 
-                            bestMove.toString());
-                }
-                
-                if(isMaxPlayer && bestMove.getTeam() != Team.RED) {
-                    throw new RuntimeException("Returned move for wrong team: " + bestMove);
-                } else if(!isMaxPlayer && bestMove.getTeam() != Team.BLUE) {
-                    throw new RuntimeException("Returned move for wrong team: " + bestMove);
-                }
-                
                 // Print statistical information.
+                long begin = System.currentTimeMillis();
                 System.out.println("BestMove: " + bestMove.toString());
                 System.out.println("Score: " + score);
                 System.out.println("Cutoffs: " + this.cutoffs);
                 System.out.println("#VisitedNodes: " + this.nodeCount);
                 System.out.println("Computation Time: " + (end - start) + " ms.");
+                long termination = System.currentTimeMillis();
+                System.out.println("Message output took " + (termination - begin) + " ms.");
                 System.out.println();
                 
                 // Increment depth.
@@ -853,7 +862,7 @@ public class TreeSearch {
             LinkedList<MoveAction> path = new LinkedList<>();
             //alpha = Math.max(alpha, alphaBetaMin(node, alpha, beta, depth - 1));
             double score = alphaBetaMin(node, alpha, beta, depth - 1, path);
-            if(score > alpha) {
+            if(score > alpha || node.getBestMove() == null) {
                 //System.out.println(depth + " Max Better Score: " + score + " > " + alpha);
                 path.addFirst(move);
                 bestPath = path;
@@ -931,7 +940,7 @@ public class TreeSearch {
             //GameNode next = new GameNode(state);
             // TODO dangerous to re-use the node object.
             double score = alphaBetaMax(node, alpha, beta, depth - 1, path);
-            if(score < beta) {
+            if(score < beta || node.getBestMove() == null) {
                 //System.out.println(depth + " Min Better Score: " + score + " < " + beta);
                 path.addFirst(move);
                 bestPath = path;
@@ -1102,7 +1111,7 @@ public class TreeSearch {
         int initialDepth = 1;
         int range = 7; //8; //9; //10; //9; //9; //3; //1; //9; //2; //5; //9; //5; //1; //9; //6; //-1;
         //SearchResult result = iterativeDeepeningAlphaBeta(node, initialDepth, range, true);
-        SearchResult result = IDAlphaBeta(node, initialDepth, range, true, moveOrdering);
+        MySearchResult result = IDAlphaBeta(node, initialDepth, range, true, moveOrdering);
         MoveAction m = result.getBestMove();
         board.applyMove(m);
         System.out.println("Board:\n" + board.transcript());

@@ -15,7 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import tools.deeplearning.BattleEngine;
 import tools.deeplearning.BattleTranscript;
-import tools.search.ai.players.ModeratePlayer;
+import tools.search.new_ai.DefenderOne;
 import tools.search.new_ai.SparringAttacker;
 import tools.search.new_ai.WeightedAIBot;
 
@@ -36,6 +36,8 @@ public class HeuristicTraining implements WeightSetListener {
     private final int boardWidth = 4;
     private final int boardHeight = 6;
     private final int matchesPerWeightAssigment = 10;
+    private WeightedAIBot subject; // The subject that is being trained.
+    private SimulatedAnnealing algorithm;
     
     public HeuristicTraining() {
         
@@ -57,12 +59,14 @@ public class HeuristicTraining implements WeightSetListener {
         // Setup the bots to be used.
         this.attacker = new SparringAttacker(Team.RED);
         //this.defender = new ModeratePlayer(Team.BLUE);        
-        this.defender = null;
+        this.defender = new DefenderOne(Team.BLUE);
         
         int numberOfFeatures = this.defender.featureCount();
         int rounds = 50; // # of weight assignments that will be used.
-        SimulatedAnnealing generator = new SimulatedAnnealing(
-                numberOfFeatures, rounds);
+        //SimulatedAnnealing generator = new SimulatedAnnealing(
+        //        numberOfFeatures, rounds);
+        this.algorithm = new SimulatedAnnealing(numberOfFeatures, rounds);
+        SimulatedAnnealing generator = this.algorithm;
 
         // Create battle engine.
         this.engine = new BattleEngine();
@@ -70,8 +74,12 @@ public class HeuristicTraining implements WeightSetListener {
         // Attach this class as single listener.
         generator.setListener(this);
         
+        // Set the training subject.
+        this.subject = this.defender;
+        
         try {
             // Run the generator, this is a blocking method not a Thread.
+            System.out.println("Start training...");
             generator.start();
             
             // Get the resulting weights.
@@ -111,28 +119,40 @@ public class HeuristicTraining implements WeightSetListener {
         
         double winRate = 0; // # of won finished matches.
         double incomplete = 0; // # of unfinished matches.
-        double matches = 0; // # of total matches.
+        int matches = 0; // # of total matches.
         
         // Assign the new weights to the defensive heuristic.
-        this.defender.setWeights(weights);
+        this.subject.setWeights(weights);
         
         int rounds = 3;
+        // The attacker plays against each setup #rounds times, but each time
+        // with a different setup.
+        long start = System.currentTimeMillis();
         for(int i=0; i<rounds; i++) {
             for(GameBoard defensiveSetup : defensiveSetups) {
+                if(matches > loadDefensiveSetups().size()) {
+                    System.out.println("TERMINATE");
+                    this.algorithm.stop();
+                    break;
+                }
+                
                 // Generate a random attacker setup.
                 GameBoard attackerSetup = loadOffensiveSetup(getArmyComposition());
                 // Merge the board setups.
                 attackerSetup.mergeBoard(defensiveSetup);
                 
                 // Simulate the battle.
+                System.out.println("Start Battle #" + matches);
                 BattleTranscript result = this.engine.battle(
                         attackerSetup, this.attacker, this.defender, 
                         computationTime, maxIterations);
+                
+                // Save results to a file. Put onto a queue and save in batches.
 
                 // How to affect the win rate if the game does not end?
                 Team winner = result.getWinner();
                 if(winner != null) { // There is an actual winner.
-                    if(winner == this.attackingTeam) {
+                    if(winner == this.subject.getTeam()) {
                         winRate++;
                     }
                 } else {
@@ -140,24 +160,39 @@ public class HeuristicTraining implements WeightSetListener {
                     incomplete++;
                 }
                 
+                System.out.println(matches + ": winner=" + winner);
+                result.print();
+                
                 matches++;
             }
         }
+        long end = System.currentTimeMillis();
+        System.out.println("Weight Assignment Iteration Training lasted " + (end - start) + " ms.");
         // Can store the transcript here with the given weight set and
         // the WeightedAIBot algorithms used.
         
         // Return the win rate, is the fraction of the winRate summed with
         // half of the incomplete matches divided by the total # of matches.
-        return (winRate + (incomplete / 2.0d)) / matches;
+        return (winRate + (incomplete / 2.0d)) / (double) matches;
     }
     
     private List<Pieces> getArmyComposition() {
         Pieces[] army = new Pieces[] { 
             MARSHALL, SPY, MINER, GENERAL, LIEUTENANT, COLONEL, MAJOR, CAPTAIN };
-        return Arrays.asList(army);
+        List<Pieces> list = new ArrayList<>();
+        for(Pieces type : army) {
+            list.add(type);
+        }
+        
+        return list;
+        //return Arrays.asList(army); // Return a List that does not support remove()
     }
     
     private GameBoard loadOffensiveSetup(List<Pieces> army) {
+        if(this.offensiveSide == null) {
+            this.offensiveSide = fillPositions(this.boardWidth, this.boardHeight);
+        }
+        
         List<BoardPosition> positions = this.offensiveSide;
         if(army.size() != positions.size()) {
             throw new IllegalArgumentException(
@@ -165,6 +200,7 @@ public class HeuristicTraining implements WeightSetListener {
                             " != " + positions.size());
         }
         
+        //System.out.println("List Type: " + army.getClass());
         SecureRandom random = new SecureRandom();
         
         GameBoard board = new GameBoard(this.boardWidth, this.boardHeight, this.attackingTeam, this.defendingTeam);
@@ -285,6 +321,22 @@ public class HeuristicTraining implements WeightSetListener {
     }
     
     private void test() {
+        // Initialize this class.
+        initialize();
         
+        // Print the defensive setups.
+        List<GameBoard> boards = loadDefensiveSetups();
+        for(GameBoard board : boards) {
+            System.out.println(board.transcript());
+        }
+        
+        // Print the offensive setup.
+        GameBoard offense = loadOffensiveSetup(getArmyComposition());
+        System.out.println("Offense:\n" + offense.transcript());
+        
+        // Test the merging of boards.
+        GameBoard defense = boards.get(0);
+        offense.mergeBoard(defense);
+        System.out.println("Merged board:\n" + offense.transcript());
     }
 }

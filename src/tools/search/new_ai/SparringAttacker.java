@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import tools.search.ai.GameNode;
-import tools.search.ai.TreeSearch.SearchResult;
+import tools.search.ai.SearchResult;
 import tools.search.ai.WeightedEvaluation;
 import tools.search.ai.WeightedHeuristicTerm;
 
@@ -27,22 +27,22 @@ public class SparringAttacker extends AbstractWeightedPlayer {
         
         if(team != Team.RED) {
             throw new IllegalArgumentException("Assumes to be team RED due to heuristic function.");
-        }        
+        }
+        
+        // Set the heuristic.
+        this.evaluation = new SparringAttackerHeuristic();
+        this.search.setHeuristic(this.evaluation);         
     }
     
     @Override
     public MoveAction nextMove(GameState state) {
-        this.active = true;
-        
-        // Set the heuristic.
-        this.evaluation = new SparringAttackerHeuristic();
-        this.search.setHeuristic(this.evaluation);        
+        this.active = true;       
         
         // Create the game node.
         GameNode node = new GameNode(state);
         int initialDepth = 1;
         boolean moveOrdering = false;
-        SearchResult result = this.search.IDAlphaBeta(node, initialDepth, 
+        SearchResult result = this.search.search(node, initialDepth, 
                 this.range, true, moveOrdering);
         // Best move.
         MoveAction move = result.getBestMove();
@@ -51,9 +51,12 @@ public class SparringAttacker extends AbstractWeightedPlayer {
         return move;
     }    
     
+    @Override
     public void setRange(int range) {
         this.range = range;
     }
+    
+    // Put all Heuristic stuff after here.
     
     public class SparringAttackerHeuristic implements WeightedEvaluation {
 

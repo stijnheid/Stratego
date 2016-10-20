@@ -996,6 +996,7 @@ public class GameBoard {
         
         for(int row=0; row<other.height; row++) {
             for(int column=0; column<other.width; column++) {
+                // Re-use the original reference, do not create a new GamePiece.
                 GamePiece piece = other.board[row][column];
                 if(piece != null) {
                     // Transfer piece to this board.
