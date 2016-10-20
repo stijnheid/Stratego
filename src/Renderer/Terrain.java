@@ -75,22 +75,25 @@ public class Terrain extends Base {
     
     Skeleton test;
     SkeletonTester skeltest;
-  
-   
     
-
     //package Game variables.
     GameState gamestate;
     GameBoard board;
     GamePiece piece;
     
-    public Terrain(Simulation s){ 
+    public Terrain(GameState gs, GameBoard gb, Simulation s){ 
         super(s);
         //form game setup.
-        gamestate = new GameState();
-        SetupGenerator setup = new SetupGenerator();
-        board = setup.generateSetup();
-        gamestate.setGameBoard(board);
+        if (gs == null || gb == null){
+            gamestate = new GameState();
+            SetupGenerator setup = new SetupGenerator();
+            board = setup.generateSetup();
+            gamestate.setGameBoard(board);
+            System.out.println("WARNING: Terrain was loaded with self generated GameState.");
+        }   else {
+            gamestate = gs;
+            board = gb;
+        }
         
                 
         // Initialize the camera
@@ -467,7 +470,7 @@ public class Terrain extends Base {
     }
     
     public static void main (String[] args){
-        Terrain terrain = new Terrain(null);
+        Terrain terrain = new Terrain(null, null, null);
     }
     
         public double heightAt(double x, double y) {

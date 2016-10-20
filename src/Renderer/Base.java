@@ -189,7 +189,7 @@ abstract public class Base {
         }
             
         if(result != null) {
-            System.out.println("Loaded " + file);
+            //System.out.println("Loaded " + file);
             result.enable(gl);
         }
 

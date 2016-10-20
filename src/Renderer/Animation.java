@@ -50,6 +50,9 @@ public class Animation {
         this.target = target;
         this.call = callback;
         this.skel = subject.getSkeleton();
+        if (skel == null){
+            throw new NullPointerException("Animation was constructed with an invalid GamePiece");
+        }
     }
     
     /**
