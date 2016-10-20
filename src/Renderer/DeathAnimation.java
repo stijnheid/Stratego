@@ -23,14 +23,14 @@ public class DeathAnimation extends Animation {
         Thread die = new Thread(() -> {
             /*NO camera movement : already performed in the opponent's attack animation.*/
             //wait for camera movement and opponent to show sword (to sync up animations).
-            for(int i=1; i <= (7d/3d)*duration; i++){
+            for(int i=1; i <= (8d/3d)*duration; i++){
                 try {
                     synchronized(terrain.cs.refresh){
                         terrain.cs.refresh.wait();
                         if (i >= duration){
                             skel.showRank = true;
                         }
-                        if (i > (4d/3d)*duration){//trigger death animation.
+                        if (i > (4d/3d)*duration && i < (7d/3d)*duration){//trigger death animation.
                             die(i - (4d/3d)*duration);
                         }
                     }
@@ -47,7 +47,6 @@ public class DeathAnimation extends Animation {
         double c;
         if (frame > (duration/2d) && frame <= ((4d*duration)/6d)){//raise arms to protect.
             c = (frame-(duration/2d))*(6/duration);
-            System.out.println(c);
             skel.shoulderLRotX = 110d * c;
             skel.shoulderLRotY = -30d * c;
             skel.shoulderRRotX = 110d * c;
@@ -58,7 +57,6 @@ public class DeathAnimation extends Animation {
             skel.elbowRRotY = 45d * c;
         }   else if (frame > ((5d*duration)/6d)){//fall to the ground.
             c = (frame-((5d*duration)/6d))*(6/duration);
-            System.out.println(c);
             skel.shoulderLRotX = 110d*(1-c);
             skel.shoulderLRotY = -30d*(1-c);
             skel.shoulderRRotX = 110d*(1-c);

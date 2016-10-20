@@ -19,9 +19,10 @@ public class AttackAnimation extends Animation {
     @Override
     public void execute(){
         startloc = new Vector(skel.offset);
+        startloc.rotate(-skel.getRotation());
         faceTarget();
         direction = new Vector(0,1,0);
-        direction.rotate(-skel.getRotation());
+        direction.rotate(skel.getRotation());
         Thread attack = new Thread(() -> {
             //Current camera location.
             Vector center = terrain.camera.center;
@@ -31,11 +32,11 @@ public class AttackAnimation extends Animation {
             cameraloc = cameraloc.scale(3d/cameraloc.length());
             cameraloc.add(startloc);
             cameraloc.add(direction.scale(0.5));
-            cameraloc.add(new Vector(0,0,5));            
+            startloc.add(direction.scale(0.5));
+            cameraloc.add(new Vector(0,0,4));            
             //Move Camera to location.
             moveCamera(cameraloc
                     ,new Vector(startloc.x, startloc.y, startloc.z+1));
-            
             skel.showRank = true;
             //Animation iteration loop.
             for(int i=1; i <= (5d/3d)*duration; i++){
@@ -49,7 +50,6 @@ public class AttackAnimation extends Animation {
                         }   else {
                             //stall.
                         }
-                        showSword(i);
                     }
                 }   catch (Exception e){}
             }

@@ -19,7 +19,7 @@ public class WalkAnimation extends Animation{
     
     @Override
     public void execute(){
-        startloc = skel.offset;
+        startloc = new Vector(skel.offset);
         faceTarget();
         direction = new Vector(0,1,0);
         direction.rotate(skel.getRotation());
@@ -27,9 +27,16 @@ public class WalkAnimation extends Animation{
             //Current camera location.
             Vector center = terrain.camera.center;
             Vector eye = terrain.camera.eye;
-            //move Camera to location.
-            moveCamera(new Vector(skel.offset.x+5, skel.offset.y, skel.offset.z+5)
-                    ,new Vector(skel.offset.x, skel.offset.y, skel.offset.z+1));
+            //Calculate camera location.
+            Vector cameraloc = direction.cross(new Vector(0,0,1)).scale(-1);
+            cameraloc = cameraloc.scale(3d/cameraloc.length());
+            cameraloc.add(startloc);
+            cameraloc.add(direction.scale(0.5));
+            startloc.add(direction.scale(0.5));
+            cameraloc.add(new Vector(0,0,4));            
+            //Move Camera to location.
+            moveCamera(cameraloc
+                    ,new Vector(startloc.x, startloc.y, startloc.z+1));
             //execute animation (through refresh call).
             for(int i=1; i <= duration; i++){
                 try {

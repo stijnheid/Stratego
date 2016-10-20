@@ -133,4 +133,12 @@ public class Vector {
     public Vector sum(Vector a){
         return new Vector(x+a.x, y+a.y, z+a.z);
     }
+    
+    /**
+     * Returns the String representation of this Vector.
+     * @return String.
+     */
+    public String toString(){
+        return "("+this.x+", "+this.y+", "+this.z+")";
+    }
 }

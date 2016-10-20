@@ -122,21 +122,16 @@ public class Terrain extends Base {
         gl.glMatrixMode(GL_PROJECTION);
         gl.glLoadIdentity();
 
-        // Set the perspective.
-        float aspectRatio = (float) cs.w / (float) cs.h;
-        double fovy = 60;
         try {/** Since vDist is a synchronised variable. */
             cs.varLock.lock();
-            glu.gluPerspective(fovy, aspectRatio, 0.1 * (float)cs.vDist, 10.0 * (float)cs.vDist); 
+            glu.gluPerspective(60, (cs.w/cs.h), 0.1 * (float)cs.vDist, 10.0 * (float)cs.vDist); 
+            gl.glMatrixMode(GL_MODELVIEW);
+            gl.glLoadIdentity();      
+            glu.gluLookAt(camera.eye.x(),camera.eye.y(),camera.eye.z(),
+                    camera.center.x(),camera.center.y(),camera.center.z(),0,0,1);
         }   finally {
             cs.varLock.unlock();
         }
-        
-        // Set camera.
-        gl.glMatrixMode(GL_MODELVIEW);
-        gl.glLoadIdentity();      
-        camera.update(cs);
-        glu.gluLookAt(camera.eye.x(),camera.eye.y(),camera.eye.z(),cs.cnt.x(),cs.cnt.y(),cs.cnt.z(),0,0,1);
         
         //Lighting implementation
 
@@ -442,15 +437,19 @@ public class Terrain extends Base {
         if(pan){
             try {
                 Animation ani1 = new AttackAnimation(this, 
-                    board.getPiece(new BoardPosition(0,4)), 
-                    new BoardPosition(1,4), null);
+                    board.getPiece(new BoardPosition(4,1)), 
+                    new BoardPosition(3,1), null);
                 Animation ani2 = new DeathAnimation(this,
-                    board.getPiece(new BoardPosition(1,4)),
-                    new BoardPosition(0,4), null);
+                    board.getPiece(new BoardPosition(3,1)),
+                    new BoardPosition(4,1), null);
                 playAnimation(ani1);
                 playAnimation(ani2);
                 pan = false;
-            }   catch (Exception e){}
+            }   catch (Game.InvalidPositionException e){
+                //Screw you Stevie.
+            }   catch (Exception e){
+                throw e;
+            }
         }
         /**Increment frame count AFTER rendering.*/
         cs.frameTick();

@@ -49,9 +49,7 @@ public class Animation {
         this.terrain = terrain;
         this.target = target;
         this.call = callback;
-        try {
-            this.skel = subject.getSkeleton();        
-        }   catch (Exception e){}
+        this.skel = subject.getSkeleton();
     }
     
     /**
@@ -69,22 +67,21 @@ public class Animation {
         double phi2 = (float) getPhi(eye, center);
         double theta2 = (float) getTheta(eye, center);
         double dist2 = (float) getDist(eye, center);
-        Vector cnt2 = terrain.cs.cnt;
+        Vector cnt2 = new Vector(center);
         //Camera variables during transit.
         double phi3 = phi1, theta3 = theta1, dist3 = dist1;
-        Vector cnt3 = new Vector(center);
-        cnt3.subtract(cnt1);
-        cnt3 = cnt3.scale(1d/(double)duration);
+        Vector cnt3;
         //loop over a period of frames.
-        for (int i=0; i<duration; i++){
+        for (double i=0; i<duration; i++){
             try {//update on frame refresh.
                 synchronized(terrain.cs.refresh){
                     terrain.cs.refresh.wait();  
                     phi3 += (phi2-phi1)/duration;
                     theta3 += (theta2-theta1)/duration;
                     dist3 += (dist2-dist1)/duration;
-                    cnt2.add(cnt3);
-                    terrain.cs.setCamera(phi3, theta3, dist3, cnt2); 
+                    cnt3 = new Vector(cnt1.x + (cnt2.x-cnt1.x)*(i/duration), 
+                            cnt1.y + (cnt2.y-cnt1.y)*(i/duration), cnt1.z + (cnt2.z-cnt1.z*(i/duration)));
+                    terrain.cs.setCamera(phi3, theta3, dist3, cnt3); 
                 }
             }   catch (Exception e){}
         }

@@ -73,7 +73,7 @@ public class Tree {
         this.offset = 1;   
         this.height= 5.5; 
         Random randomVar = new Random(seed);
-               System.out.println(x);  
+               //System.out.println(x);  
         
         
         for (int i =0; i<branches; i++){
@@ -84,7 +84,7 @@ public class Tree {
             length = new Vector(1.5d,0,(double)position.get(i)*height + height/3*Math.cos(70/360*2*Math.PI));//(double)position.get(i)*height + height/4*Math.cos(70/360*2*Math.PI)       
             length.rotate((double)rotation.get(i));
             length.add(new Vector(x,y,z));
-            System.out.println(length.x +","+ length.y +","+ length.z);
+            //System.out.println(length.x +","+ length.y +","+ length.z);
             pointsSphere.add(length);
             
 
