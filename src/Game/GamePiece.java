@@ -62,7 +62,7 @@ public class GamePiece {
     public BoardPosition getPosition() {
         return this.position;
     }
-
+    
     public void setPosition(BoardPosition position) {
         this.position = position;
     }

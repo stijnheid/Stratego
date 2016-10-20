@@ -15,7 +15,7 @@ public class Animation {
     
     /*Duration of the animation (in frames).*/
     protected final static double duration = 70;
-    
+
     /*GamePiece on which this animation acts.*/
     protected final GamePiece subject;
     
@@ -121,9 +121,9 @@ public class Animation {
         }   else if(target.getX() == x){
                 if(target.getX() < x){
                     skel.rotate(-90);
-                }   else {
+            }   else {
                     skel.rotate(90);
-                }
+            }
         }   else {
             skel.rotate(180);
         }

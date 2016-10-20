@@ -34,11 +34,11 @@ public class AttackAnimation extends Animation {
                 try {
                     synchronized(terrain.cs.refresh){
                         terrain.cs.refresh.wait();
-                        showSword(i);
+                            showSword(i);
                         showRank();
-                    }
+                        }
                 }   catch (Exception e){}
-            }
+                    }
             //now attack opponent.
             for(int i=1; i <= duration; i++){
                 try {

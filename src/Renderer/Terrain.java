@@ -75,7 +75,7 @@ public class Terrain extends Base {
     
     Skeleton test;
     SkeletonTester skeltest;
-    
+  
    
     
 
@@ -367,7 +367,7 @@ public class Terrain extends Base {
                 else
                 this.vakje.bind(gl);
                 
-                System.out.println(Arrays.toString(selectedPiece));
+                //System.out.println(Arrays.toString(selectedPiece));
                 
                 gl.glBegin(GL_QUAD_STRIP);
                 gl.glTexCoord2d(0, 0);
@@ -441,14 +441,17 @@ public class Terrain extends Base {
         drawPieces();
         if(pan){
             try {
-                Animation ani = new AttackAnimation(this, 
+                Animation ani1 = new AttackAnimation(this, 
                     board.getPiece(new BoardPosition(0,4)), 
-                    new BoardPosition(0,3), null);
-                playAnimation(ani);
+                    new BoardPosition(1,4), null);
+                Animation ani2 = new DeathAnimation(this,
+                    board.getPiece(new BoardPosition(1,4)),
+                    new BoardPosition(0,4), null);
+                playAnimation(ani1);
+                playAnimation(ani2);
                 pan = false;
             }   catch (Exception e){}
         }
-               
         /**Increment frame count AFTER rendering.*/
         cs.frameTick();
         thisframe = System.currentTimeMillis();

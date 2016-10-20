@@ -62,6 +62,17 @@ public class SkeletonTester implements ActionListener {
                     Double.parseDouble(contents[2]),
                     Double.parseDouble(contents[3])));
                 break;
+
+            case "neck" : skeleton.neck.add(new Vector(
+                    Double.parseDouble(contents[1]),
+                    Double.parseDouble(contents[2]),
+                    Double.parseDouble(contents[3])));
+                break;
+            case "head" : skeleton.head.add(new Vector(
+                    Double.parseDouble(contents[1]),
+                    Double.parseDouble(contents[2]),
+                    Double.parseDouble(contents[3])));
+                break;
             case "move": skeleton.move(new Vector(
                     Double.parseDouble(contents[1]),
                     Double.parseDouble(contents[2]),
@@ -83,7 +94,7 @@ public class SkeletonTester implements ActionListener {
                 break;
             case "hipRRotY": skeleton.hipRRotY = Integer.parseInt(contents[1]);
                 break;
-            case "kneeLRotX": skeleton.kneeRRotX = Integer.parseInt(contents[1]);
+            case "kneeLRotX": skeleton.kneeLRotX = Integer.parseInt(contents[1]);
                 break;
             case "kneeLRotY": skeleton.kneeLRotY = Integer.parseInt(contents[1]);
                 break;
@@ -102,6 +113,8 @@ public class SkeletonTester implements ActionListener {
             case "swordRotX": skeleton.swordRotX = Integer.parseInt(contents[1]);
                 break;
             case "swordOpacity": skeleton.swordOpacity = Float.parseFloat(contents[1]);
+                break;
+            case "rotate" : skeleton.rotate(Integer.parseInt(contents[1]));
                 break;
             case "exit": stuff.interrupt();
                 frame.dispose();

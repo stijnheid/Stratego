@@ -40,7 +40,7 @@ import actions.PlyAction;
  * which should be extended per the Assignments.
  */
 abstract public class Base {
-    
+
     // Library version number.
     static public int LIBRARY_VERSION = 5;
     
