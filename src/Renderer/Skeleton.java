@@ -11,6 +11,7 @@ import static Game.Pieces.FLAG;
 import Game.Team;
 import static Renderer.Material.BLANK;
 import Renderer.Terrain;
+import com.jogamp.opengl.util.gl2.GLUT;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -89,6 +90,9 @@ public class Skeleton {
     
     //should the ranks be shown
     boolean showRank = false;
+    
+    //Hold the position of the camera for showing the rank during non-animating
+    public Vector CameraPos = new Vector (0d,0d,0d);
 
     /**
      * Constructor for a skeleton. Does not yet draw a skeleton.
@@ -152,7 +156,13 @@ public class Skeleton {
      * @param gl
      * @param glut 
      */
-    public void draw(GL2 gl, GLUT glut){
+    public void draw(GL2 gl, GLUT glut, Vector CamPos){
+        CameraPos = new Vector(CamPos);
+        //create a vector towards the camera
+        CameraPos.subtract(offset);
+        CameraPos.scale(1/CameraPos.length());
+        
+        
         gl.glPushMatrix();
         gl.glDisable(GL2.GL_TEXTURE_2D);
         gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, skelDiffuse, 0);
@@ -170,7 +180,7 @@ public class Skeleton {
         gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, BLANK.diffuse, 0);
         gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, BLANK.specular, 0);
         gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, BLANK.shininess);
-        drawRank(gl);
+        drawRank(gl, glut);
         gl.glEnable(GL2.GL_TEXTURE_2D);
         gl.glPopMatrix();
     }
@@ -374,52 +384,65 @@ public class Skeleton {
         }
     }
         
-     private void drawRank (GL2 gl){
+     private void drawRank (GL2 gl, GLUT glut){
          
- 
-        if (showRank){
+            char reank = 'i';
+        
             
              gl.glEnable(GL2.GL_TEXTURE_2D);
                     switch(rank) {
             case BOMB:
                 Terrain.Bomb.bind(gl);
+                reank = 'B';
                 break;
             case FLAG:
                 Terrain.Flag.bind(gl);
+                reank = 'F';
                 break;
             case SPY:
                 Terrain.Spy.bind(gl);
+                reank = 'S';
                 break;
             case SCOUT:
                 Terrain.Scout.bind(gl);
+                reank = '-';
                 break;
             case MINER:
                 Terrain.Miner.bind(gl);
+                reank = 'M';
                 break;
             case SERGEANT:
                 Terrain.Sergeant.bind(gl);
+                reank = '-';
                 break;
             case LIEUTENANT:
                 Terrain.Lieutenant.bind(gl);
+                reank = '6';
                 break;
             case CAPTAIN:
                 Terrain.Captain.bind(gl);
+                reank = '5';
                 break;
             case MAJOR:
                 Terrain.Major.bind(gl);
+                reank = '4';
                 break;
             case COLONEL:
                 Terrain.Colonel.bind(gl);
+                reank = '3';
                 break;
             case MARSHALL:
                 Terrain.Marshall.bind(gl);
+                reank = '1';
                 break;
             case GENERAL:
                 Terrain.General.bind(gl);
+                reank = '2';
                 break;
             default:
                 
         }
+           if (showRank){
            gl.glBegin(GL_TRIANGLE_STRIP);
                 
                 gl.glTexCoord2d(0, 0);
@@ -435,8 +458,23 @@ public class Skeleton {
                 gl.glVertex3d(0,0.3,3.5);
             gl.glEnd(); 
             
-            gl.glDisable(GL2.GL_TEXTURE_2D);
+            
          }
+        gl.glDisable(GL2.GL_TEXTURE_2D);
+        if(team == Team.RED)
+        {
+            
+            gl.glPushMatrix();
+            gl.glTranslated(0.1, 0, 2.1);
+            gl.glRotated(-180d, 0, 1, 0);
+            gl.glRotated(90, 1, 0, 0);
+            gl.glRotated(180, 0, 0, 1);
+            gl.glScaled(0.0025, 0.0025, 0.0025);
+            glut.glutStrokeCharacter(GLUT.STROKE_ROMAN, reank);
+            gl.glPopMatrix();
+            
+        }
+        
          
      }
     /**

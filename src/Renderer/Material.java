@@ -53,7 +53,7 @@ public enum Material {
     */
     
     GREEN (
-        new float[] {30/255f, 180/255f, 10/255f, 1f},
+        new float[] {30/255f, 130/255f, 10/255f, 1f},
         new float[] {50/255f, 160/255f, 30/255f, 1f},
         0f),
    /**
@@ -78,6 +78,15 @@ public enum Material {
     
     BLANK (
     	new float[] {1f, 1f, 1f, 1f},
+    	new float[] {1f, 1f, 1f, 1f},
+    	1f),
+    
+    /**
+    * SKYBOX material properties. 
+    */
+    
+    SKYBOX (
+    	new float[] {0.8f, 1f, 0.8f, 1f},
     	new float[] {1f, 1f, 1f, 1f},
     	1f),
    /**
@@ -112,6 +121,16 @@ public enum Material {
 	new float[] {150/255f, 75/255f, 0/255f, 1f},
 	new float[] {0.3f, 1f, 0.5f, 0.3f},
 	1f),
+    /**
+    * Board material properties. 
+    */
+	   
+    
+    BOARD (
+        new float[] {150/255f, 150/255f, 0/255f, 1f},
+	new float[] {0.6f, 1f, 1f, 0.8f},
+	1f),
+
    /**
     * Water material properties. 
     */

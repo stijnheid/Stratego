@@ -30,6 +30,7 @@ import static javax.media.opengl.GL.GL_NICEST;
 import static javax.media.opengl.GL.GL_ONE_MINUS_SRC_ALPHA;
 import static javax.media.opengl.GL.GL_SRC_ALPHA;
 import static javax.media.opengl.GL.GL_TEXTURE_2D;
+import static javax.media.opengl.GL.GL_TRIANGLE_STRIP;
 import static javax.media.opengl.GL2.*;
 import static javax.media.opengl.GL2ES1.GL_PERSPECTIVE_CORRECTION_HINT;
 import static javax.media.opengl.GL2GL3.GL_FILL;
@@ -60,7 +61,7 @@ public class Terrain extends Base {
     public final Camera camera;
     
     /** Instances of different textures */
-    public static Texture grass, vakje ,leaves, water, wood, selectvakje, selectedvakje, Bomb, Captain, Colonel, General, Lieutenant, Major, Marshall, Miner, Scout, Sergeant, Spy, Flag;
+    public static Texture grass, vakje ,leaves, water, wood, selectvakje, selectedvakje, Bomb, Captain, Colonel, General, Lieutenant, Major, Marshall, Miner, Scout, Sergeant, Spy, Flag, skybox;
     
     private final int boardsize = 6;
     private final int terrainsize = 20;
@@ -209,6 +210,7 @@ public class Terrain extends Base {
         selectedvakje = loadTexture(pwd + "SelectedVakje.jpg");
         leaves = loadTexture(pwd + "Leaves.jpg");
         water = loadTexture(pwd + "water.jpg");
+        skybox = loadTexture(pwd + "FieldWithTrees.jpg");
         
         pwd = "src/Textures/Pieces/";
         
@@ -281,6 +283,56 @@ public class Terrain extends Base {
                 }
             }
         }
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Material.SKYBOX.diffuse, 0);
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.SKYBOX.specular, 0);
+        gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Material.SKYBOX.shininess);
+        
+           skybox.bind(gl);
+           gl.glBegin(GL_TRIANGLE_STRIP);               
+                gl.glTexCoord2d(0, 0);
+                gl.glVertex3d(terrainsize/2, -terrainsize/2, -2);                  
+                gl.glTexCoord2d(1, 0);
+                gl.glVertex3d(terrainsize/2, terrainsize/2, -2);                     
+                gl.glTexCoord2d(0, 1);
+                gl.glVertex3d(terrainsize/2, -terrainsize/2, 6); 
+                gl.glTexCoord2d(1, 1);
+                gl.glVertex3d(terrainsize/2, terrainsize/2, 6); 
+            gl.glEnd(); 
+            
+            gl.glBegin(GL_TRIANGLE_STRIP);               
+                gl.glTexCoord2d(0, 0);
+                gl.glVertex3d(-terrainsize/2, -terrainsize/2, -2);                  
+                gl.glTexCoord2d(1, 0);
+                gl.glVertex3d(-terrainsize/2, terrainsize/2, -2);                     
+                gl.glTexCoord2d(0, 1);
+                gl.glVertex3d(-terrainsize/2, -terrainsize/2, 6); 
+                gl.glTexCoord2d(1, 1);
+                gl.glVertex3d(-terrainsize/2, terrainsize/2, 6); 
+            gl.glEnd(); 
+            
+            gl.glBegin(GL_TRIANGLE_STRIP);               
+                gl.glTexCoord2d(0, 0);
+                gl.glVertex3d(-terrainsize/2, -terrainsize/2, -2);                  
+                gl.glTexCoord2d(1, 0);
+                gl.glVertex3d(terrainsize/2, -terrainsize/2, -2);                     
+                gl.glTexCoord2d(0, 1);
+                gl.glVertex3d(-terrainsize/2, -terrainsize/2, 6); 
+                gl.glTexCoord2d(1, 1);
+                gl.glVertex3d(terrainsize/2, -terrainsize/2, 6); 
+            gl.glEnd(); 
+            
+            gl.glBegin(GL_TRIANGLE_STRIP);               
+                gl.glTexCoord2d(0, 0);
+                gl.glVertex3d(-terrainsize/2, terrainsize/2, -2);                  
+                gl.glTexCoord2d(1, 0);
+                gl.glVertex3d(terrainsize/2, terrainsize/2, -2);                     
+                gl.glTexCoord2d(0, 1);
+                gl.glVertex3d(-terrainsize/2, terrainsize/2, 6); 
+                gl.glTexCoord2d(1, 1);
+                gl.glVertex3d(terrainsize/2, terrainsize/2, 6); 
+            gl.glEnd(); 
+        
+        
         
     }
     
@@ -297,9 +349,9 @@ public class Terrain extends Base {
         double z = 0;
         
         
-        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Material.CONCRETE.diffuse, 0);
-        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.CONCRETE.specular, 0);
-        gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Material.CONCRETE.shininess);
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, Material.BOARD.diffuse, 0);
+        gl.glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, Material.BOARD.specular, 0);
+        gl.glMaterialf(GL_FRONT_AND_BACK, GL_SHININESS, Material.BOARD.shininess);
         
         //Square board.
         gl.glColor3f(0, 0, 1);
@@ -342,7 +394,7 @@ public class Terrain extends Base {
                 for (int x=0; x < board.getWidth(); x++){                  
                 piece = board.getPiece(new BoardPosition(x,y));
                     if (piece != null){
-                        piece.getSkeleton().draw(gl, glut);
+                        piece.getSkeleton().draw(gl, glut, camera.center);
                     }
                 }
             }        
