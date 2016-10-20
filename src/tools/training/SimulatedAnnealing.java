@@ -120,7 +120,7 @@ public class SimulatedAnnealing {
         if(weights[index] > 0.9){
             System.out.println("add -0.1");
             return weights[index] - 0.1; // subtracting 0.1 if 1
-        } else if(weights[index] < 0.1) { //-0.9){
+        } else if(weights[index] <= 0.1) { //-0.9){ // Prevent a value of 0.1 going to 0, by using <=
             System.out.println(" add 0.1");
             return weights[index] + 0.1; // adding 0.1 if -1
         } else {

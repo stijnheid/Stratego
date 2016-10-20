@@ -173,15 +173,15 @@ public class BattleTest {
                             "b:B|b:6|b:4|b:7\n" +
                             "--- --- --- ---\n" +
                             "b:F|b:B|b:9|b:5";
-        
+        */
         
         String setup = "r:3|r:4\n" +
                         "--- ---\n" +
                         "   |   \n" +
                         "--- ---\n" +
                         "b:4|b:3";
-        */
         
+        /*
         String setup = "r:6|r:9|r:2|r:8\n" +
                         "--- --- --- ---\n" +
                         "r:S|r:7|r:4|r:5\n" +
@@ -193,7 +193,8 @@ public class BattleTest {
                         "b:B|b:6|b:4|b:7\n" +
                         "--- --- --- ---\n" +
                         "b:F|b:B|b:9|b:5";
-        GameBoard board = GameBoard.loadBoard(setup, 4, 6);
+        */
+        GameBoard board = GameBoard.loadBoard(setup, 2, 3);
         
         BattleEngine engine = new BattleEngine();
         

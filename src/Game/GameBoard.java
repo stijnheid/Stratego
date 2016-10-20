@@ -501,12 +501,12 @@ public class GameBoard {
         
         // Has the flag been captured? Count the # of flags on the defending
         // side.
-        
+        /*
         List<GamePiece> defenderFlag = getPieces(this.defender, Pieces.FLAG);
         if(defenderFlag.isEmpty()) {
             //System.out.println("Defender has no flag.");
             return this.attacker;
-        }
+        }*/
         
         
         // The game is in an end state if the attacker has no miners left and

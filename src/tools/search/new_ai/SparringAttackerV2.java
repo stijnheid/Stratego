@@ -17,9 +17,9 @@ import tools.search.ai.WeightedHeuristicTerm;
 /**
  *
  */
-public class SparringAttacker extends AbstractWeightedPlayer {
+public class SparringAttackerV2 extends AbstractWeightedPlayer {
 
-    public SparringAttacker(Team team) {
+    public SparringAttackerV2(Team team) {
         super(team);
         this.range = 8;
         
@@ -49,8 +49,8 @@ public class SparringAttacker extends AbstractWeightedPlayer {
         
         this.active = false;
         return move;
-    }
-    
+    }    
+
     // Put all Heuristic stuff after here.
     
     public class SparringAttackerHeuristic implements WeightedEvaluation {
@@ -61,6 +61,7 @@ public class SparringAttacker extends AbstractWeightedPlayer {
             // Add the heuristic terms here to the list.
             this.terms = new ArrayList<>();
             this.terms.add(new MaterialCount());
+            this.terms.add(new CellValues());
         }
         
         @Override
@@ -106,15 +107,23 @@ public class SparringAttacker extends AbstractWeightedPlayer {
             // Compute the score of team red.
             int redScore = 0;
             for(GamePiece piece : red) {
-                redScore+= SparringAttacker.attackerValues.get(piece.getRank());
+                redScore+= SparringAttackerV2.attackerValues.get(piece.getRank());
             }
 
             int blueScore = 0;
             for(GamePiece piece : blue) {
-                blueScore+= SparringAttacker.defendersValues.get(piece.getRank());
+                blueScore+= SparringAttackerV2.defendersValues.get(piece.getRank());
             }
             return (redScore - blueScore);
         }
+    }
+    
+    private class CellValues extends WeightedHeuristicTerm {
+
+        @Override
+        public double computeScore(GameState state) {
+            return 0;
+        }        
     }
     
     private final static HashMap<Pieces, Integer> attackerValues;

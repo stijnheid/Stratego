@@ -117,10 +117,20 @@ public class MoveAction extends Action {
 
     @Override
     public String toString() {
+        return "MoveAction{" + "piece=" + piece +
+                ", origin=" + origin +
+                ", destination=" + destination +
+                ", isApplied=" + isApplied +
+                ", isAttack=" + isAttack + '}';
+    }
+    
+    /**
+    @Override
+    public String toString() {
         return "MoveAction{" + "piece=" + piece.toString()
                 + ", origin=" + origin.toString() 
                 + ", destination=" + destination.toString() + '}';
-    }
+    }*/
     
     @Override
     public Object clone() {

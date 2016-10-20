@@ -24,8 +24,6 @@ import tools.search.ai.players.ModeratePlayer;
  */
 public class DefenderThree extends AbstractWeightedPlayer {
 
-    private int range;
-    
     public DefenderThree(Team team) {
         super(team);
         this.range = 8;
@@ -64,11 +62,6 @@ public class DefenderThree extends AbstractWeightedPlayer {
         
         this.active = false;
         return move;
-    }
-    
-    @Override
-    public void setRange(int range) {
-        this.range = range;
     }
     
     private final static HashMap<Pieces, Integer> attacker;
