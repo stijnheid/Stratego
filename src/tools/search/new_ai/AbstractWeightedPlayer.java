@@ -3,6 +3,7 @@ package tools.search.new_ai;
 import Game.GameState;
 import Game.Team;
 import actions.MoveAction;
+import tools.search.ai.AlphaBetaSearch;
 import tools.search.ai.InterruptableSearch;
 import tools.search.ai.TreeSearch;
 import tools.search.ai.WeightedEvaluation;
@@ -19,7 +20,8 @@ public abstract class AbstractWeightedPlayer implements WeightedAIBot {
 
     public AbstractWeightedPlayer(Team team) {
         this.team = team;
-        this.search = new TreeSearch(null);
+        //this.search = new TreeSearch(null);
+        this.search = new AlphaBetaSearch(null);
     }
 
     @Override

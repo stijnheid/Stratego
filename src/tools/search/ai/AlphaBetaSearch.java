@@ -19,16 +19,12 @@ import tools.deeplearning.BattleEngine;
  * around by iterative deepening. The class must be configured to use a custom
  * heuristic.
  */
-public class AlphaBetaSearch {
+public class AlphaBetaSearch extends InterruptableSearch {
     
     public static void main(String[] args) {
         new AlphaBetaSearch(null).iterativeDeepeningTest();
     }
     
-    // Evaluation function to be used by miniMax or alphaBeta
-    private HeuristicEvaluation evaluation;
-    // Indicates if the algorithm was timed out.
-    private boolean timeout;
     // Deepest depth reached by the most recently executed miniMax or alphaBeta
     // algorithm.
     private int deepestDepth;
@@ -720,7 +716,14 @@ public class AlphaBetaSearch {
             for(MoveAction move : moves) {
                 //System.out.println("APPLY" + depth + ":::" + move.toString());
                 // Apply move.
-                board.applyMove(move);
+                try {
+                    board.applyMove(move);
+                } catch(IllegalStateException e) {
+                    System.out.println("Max Bad move: " + move.toString());
+                    System.out.println("BoardState:\n" + board.transcript());
+                    // Forward e.
+                    throw e;
+                }
                 //System.out.println("MaxPlayer Applied move: " + move.toString());
                 
                 // Recursive call.
@@ -766,7 +769,14 @@ public class AlphaBetaSearch {
             for(MoveAction move : moves) {
                 //System.out.println("APPLY" + depth + ":::" + move.toString());
                 // Apply move.
-                board.applyMove(move);
+                try {
+                    board.applyMove(move);
+                } catch(IllegalStateException e) {
+                    System.out.println("Min Bad move: " + move.toString());
+                    System.out.println("BoardState:\n" + board.transcript());
+                    // Forward e.
+                    throw e;
+                }
                 //System.out.println("MinPlayer Applied move: " + move.toString());
                 
                 GameNode next = new GameNode(state);
@@ -1128,5 +1138,14 @@ public class AlphaBetaSearch {
     
     public void setHeuristic(HeuristicEvaluation evaluation) {
         this.evaluation = evaluation;
+    }
+
+    @Override
+    public SearchResult search(GameNode node, int initialDepth, int range, 
+            boolean isMaxPlayer, boolean moveOrdering) {
+        MoveAction bestMove = iterativeDeepeningAlphaBeta(node, initialDepth, range, isMaxPlayer);
+        SearchResult result = new SearchResult();
+        result.setBestMove(bestMove);
+        return result;
     }
 }

@@ -779,7 +779,7 @@ public class TreeSearch extends InterruptableSearch {
                 // deepening.
                 if(isMaxPlayer && score == Double.POSITIVE_INFINITY || 
                         !isMaxPlayer && score == Double.NEGATIVE_INFINITY) {
-                    System.out.println("Inevitable Win!");
+                    System.out.println("Inevitable Win! " + isMaxPlayer);
                     break;
                 }
                 
@@ -787,7 +787,7 @@ public class TreeSearch extends InterruptableSearch {
                 // not been set, since all moves are bad.
                 if(isMaxPlayer && score == Double.NEGATIVE_INFINITY ||
                         !isMaxPlayer && score == Double.POSITIVE_INFINITY) {
-                    System.out.println("Inevitable Loss!");
+                    System.out.println("Inevitable Loss!" + isMaxPlayer);
                     break;
                 }
                 
@@ -861,8 +861,9 @@ public class TreeSearch extends InterruptableSearch {
             // Recursive call.
             LinkedList<MoveAction> path = new LinkedList<>();
             //alpha = Math.max(alpha, alphaBetaMin(node, alpha, beta, depth - 1));
-            double score = alphaBetaMin(node, alpha, beta, depth - 1, path);
-            if(score > alpha || node.getBestMove() == null) {
+            GameNode next = new GameNode(state);
+            double score = alphaBetaMin(next, alpha, beta, depth - 1, path);
+            if(score > alpha) { // || node.getBestMove() == null) {
                 //System.out.println(depth + " Max Better Score: " + score + " > " + alpha);
                 path.addFirst(move);
                 bestPath = path;
@@ -939,8 +940,12 @@ public class TreeSearch extends InterruptableSearch {
             //beta = Math.min(beta, alphaBetaMax(node, alpha, beta, depth - 1));
             //GameNode next = new GameNode(state);
             // TODO dangerous to re-use the node object.
-            double score = alphaBetaMax(node, alpha, beta, depth - 1, path);
-            if(score < beta || node.getBestMove() == null) {
+            GameNode next = new GameNode(state);
+            double score = alphaBetaMax(next, alpha, beta, depth - 1, path);
+            // node.getBestMove() will only occur for the first move.
+            // It is needed to always set a move, since if all moves are
+            // infinitely as bad, then no move will be set.
+            if(score < beta) {// || node.getBestMove() == null) {
                 //System.out.println(depth + " Min Better Score: " + score + " < " + beta);
                 path.addFirst(move);
                 bestPath = path;

@@ -11,6 +11,9 @@ public abstract class WeightedHeuristicTerm implements HeuristicEvaluation {
     private double weight = 1.0;
     
     public void setWeight(double weight) {
+        if(weight < 0 || weight > 1) {
+            throw new IllegalArgumentException("Invalid weigh: " + weight);
+        }
         this.weight = weight;
     }
     
