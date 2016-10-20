@@ -996,17 +996,39 @@ public class GameBoard {
         
         for(int row=0; row<other.height; row++) {
             for(int column=0; column<other.width; column++) {
-                // Re-use the original reference, do not create a new GamePiece.
+                // Must create a new GamePiece to prevent state corruption.
+                // With boards that use the same reference, changes are reflected
+                // and can corrupt state.
                 GamePiece piece = other.board[row][column];
                 if(piece != null) {
                     // Transfer piece to this board.
                     if(this.board[row][column] == null) { // Empty cell.
-                        this.board[row][column] = piece;
+                        this.board[row][column] = ((GamePiece) piece.clone());
                     } else {
                         throw new IllegalStateException("Cannot merge boards, positiion already occupied.");
                     }
                 }
             }
         }
+    }
+    
+    public boolean isSetupValid() {
+        boolean valid = true;
+        for(int row=0; row<this.height; row++) {
+            for(int column=0; column<this.width; column++) {
+                GamePiece piece = this.board[row][column];
+                if(piece != null) {
+                    if(this.board[row][column] != null) {
+                        // Verify that the position stored within the piece
+                        // object is correct.
+                        if(!(new BoardPosition(column, row)).equals(piece.getPosition())) {
+                            valid = false;
+                            return valid;
+                        }
+                    }
+                }
+            }
+        }
+        return valid;
     }
 }

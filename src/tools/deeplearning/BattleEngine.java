@@ -427,7 +427,7 @@ public class BattleEngine {
             }
             
             if(!originalPiece.getPosition().equals(move.getOrigin())) {
-                throw new RuntimeException("Incorrect origin for move: piece=" + 
+                throw new RuntimeException("Incorrect origin for move: originalPiece=" + 
                         originalPiece.toString() + ", move=" + move.toString());
             }
             
