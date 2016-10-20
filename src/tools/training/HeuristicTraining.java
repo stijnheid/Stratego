@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import tools.deeplearning.BattleEngine;
 import tools.deeplearning.BattleTranscript;
 import tools.search.new_ai.DefenderOne;
+import tools.search.new_ai.DefenderTwo;
 import tools.search.new_ai.SparringAttacker;
 import tools.search.new_ai.WeightedAIBot;
 
@@ -59,10 +60,10 @@ public class HeuristicTraining implements WeightSetListener {
         // Setup the bots to be used.
         this.attacker = new SparringAttacker(Team.RED);
         //this.defender = new ModeratePlayer(Team.BLUE);        
-        this.defender = new DefenderOne(Team.BLUE);
+        this.defender = new DefenderTwo(Team.BLUE);
         
         int numberOfFeatures = this.defender.featureCount();
-        int rounds = 5; //50; // # of weight assignments that will be used.
+        int rounds = 1; //50; // # of weight assignments that will be used.
         //SimulatedAnnealing generator = new SimulatedAnnealing(
         //        numberOfFeatures, rounds);
         this.algorithm = new SimulatedAnnealing(numberOfFeatures, rounds);
@@ -90,6 +91,7 @@ public class HeuristicTraining implements WeightSetListener {
             String filename = "";
             generator.savePlot(false, filename);
             System.out.println("TRAINING ENDED");
+            System.out.println(generated(weights));
         } catch (IOException ex) {
             Logger.getLogger(HeuristicTraining.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -130,11 +132,13 @@ public class HeuristicTraining implements WeightSetListener {
         long start = System.currentTimeMillis();
         for(int i=0; i<rounds; i++) {
             for(GameBoard defensiveSetup : defensiveSetups) {
+                /*
                 if(matches >= loadDefensiveSetups().size()) {
                     System.out.println("EARLY TERMINATION");
                     this.algorithm.stop();
                     break;
                 }
+                */
                 
                 // Generate a random attacker setup.
                 GameBoard attackerSetup = loadOffensiveSetup(getArmyComposition());

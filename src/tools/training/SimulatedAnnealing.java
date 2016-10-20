@@ -45,7 +45,7 @@ public class SimulatedAnnealing {
         // Random weight within the range [-1,1] are assigned.
         for(int i=0; i<this.weights.length;i++){
             //this.weights[i] = (double)(this.random.nextInt(20) - 10) / 10.0;
-            this.weights[i] = ((double) this.random.nextInt(10)) / 10.0;
+            this.weights[i] = ((double) (this.random.nextInt(10) + 1)) / 10.0;
         }
         System.out.println("Initial Weights: " + Arrays.toString(this.weights));
         
