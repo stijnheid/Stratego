@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import tools.search.ai.GameNode;
 import tools.search.ai.SearchResult;
+import tools.search.ai.TreeSearch;
+import tools.search.ai.TreeSearch.MySearchResult;
 import tools.search.ai.WeightedHeuristicTerm;
 
 /**
@@ -48,6 +50,16 @@ public class DefenderOne extends AbstractWeightedPlayer {
         SearchResult result = this.search.search(node, 
                 initialDepth, 
                 this.range, isMaxPlayer, moveOrdering);
+        
+        if(this.search instanceof TreeSearch) {
+            MySearchResult report = (MySearchResult) result;
+            System.out.println("Principal Variation Path:");
+            List<MoveAction> pvPath = report.getPrincipalVariationPaths().pop();
+            for(MoveAction move : pvPath) {
+                System.out.println(move.toString());
+            }
+        }
+        
         // Best move.
         MoveAction move = result.getBestMove();
         
@@ -87,6 +99,7 @@ public class DefenderOne extends AbstractWeightedPlayer {
             //return -1 * (blueScore - redScore);
             // Why does this not work?
             return (redScore - blueScore);
+            //return (blueScore - redScore);
             // Does also not work, BLUE player must play as the minimizer.
             //return (blueScore - redScore);
             // returen rescore - blueScore should work for minimizing BLUE?

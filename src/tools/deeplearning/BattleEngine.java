@@ -377,7 +377,7 @@ public class BattleEngine {
                 break;
             }
             
-            System.out.println("Next Move for " + attacker.getClass().getSimpleName());
+            System.out.println("Next Move for " + currentTurn.getClass().getSimpleName());
             
             //System.out.println("Invoke Move");
             MoveAction move = timedAIMove((GameState) state.clone(), 

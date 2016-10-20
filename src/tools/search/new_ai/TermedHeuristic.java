@@ -37,6 +37,10 @@ public class TermedHeuristic implements WeightedEvaluation {
 
     @Override
     public double score(GameState state) {
+        if(terms.isEmpty()) {
+            throw new IllegalStateException("No heuristic terms are set.");
+        }
+        
         double score = 0;
         for(WeightedHeuristicTerm term : terms) {
             score+= term.score(state);

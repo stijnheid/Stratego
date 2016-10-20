@@ -122,6 +122,14 @@ public class SparringAttacker extends AbstractWeightedPlayer {
         }
     }
     
+    private class CellValues extends WeightedHeuristicTerm {
+
+        @Override
+        public double computeScore(GameState state) {
+            return 0;
+        }        
+    }
+    
     private final static HashMap<Pieces, Integer> attackerValues;
     private final static HashMap<Pieces, Integer> defendersValues;
     
