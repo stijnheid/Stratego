@@ -9,11 +9,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 import tools.search.ai.players.Attacker;
-import tools.search.new_ai.AbstractWeightedPlayer;
 import tools.search.new_ai.DefenderOne;
+import tools.search.new_ai.DefenderTwo;
 import tools.search.new_ai.SparringAttacker;
 import tools.search.new_ai.SparringAttacker.SparringAttackerHeuristic;
-import tools.search.new_ai.WeightedAIBot;
 
 /**
  *
@@ -556,7 +555,7 @@ public class TreeSearch extends InterruptableSearch {
     }
     
     public static void main(String[] args) {
-        new TreeSearch(null).minimizerTest(); //performanceTest();
+        new TreeSearch(null).endTest(); //minimizerTest(); //performanceTest();
     }
     
     private void test() {
@@ -871,7 +870,7 @@ public class TreeSearch extends InterruptableSearch {
             //alpha = Math.max(alpha, alphaBetaMin(node, alpha, beta, depth - 1));
             GameNode next = new GameNode(state);
             double score = alphaBetaMin(next, alpha, beta, depth - 1, path);
-            if(score > alpha) { // || node.getBestMove() == null) {
+            if(score > alpha || node.getBestMove() == null && this.currentMaxDepth == depth) {
                 //System.out.println(depth + " Max Better Score: " + score + " > " + alpha);
                 path.addFirst(move);
                 bestPath = path;
@@ -954,7 +953,7 @@ public class TreeSearch extends InterruptableSearch {
             // node.getBestMove() will only occur for the first move.
             // It is needed to always set a move, since if all moves are
             // infinitely as bad, then no move will be set.
-            if(score < beta) {// || node.getBestMove() == null) {
+            if(score < beta || node.getBestMove() == null && this.currentMaxDepth == depth) {
                 //System.out.println(depth + " Min Better Score: " + score + " < " + beta);
                 path.addFirst(move);
                 bestPath = path;
@@ -1088,6 +1087,40 @@ public class TreeSearch extends InterruptableSearch {
         // TODO also inefficient if implemented with a LinkedList.
         moves.set(0, moves.get(index));
         moves.set(index, first);
+    }
+    
+    private void endTest() {
+        //SparringAttacker defender = new SparringAttacker(Team.RED);        
+        DefenderTwo defender = new DefenderTwo(Team.BLUE);
+        GameState state = new GameState();
+        /*
+        String setup = "r:3|   \n" +
+                        "--- ---\n" +
+                        "b:4|   \n" +
+                        "--- ---\n" +
+                        "b:F|r:4";
+        */
+        String setup = "r:7|   |r:8|r:5\n" +
+                        "--- --- --- ---\n" + 
+                        "   |r:4|r:2|   \n" +
+                        "--- --- --- ---\n" +
+                        "   |r:6|   |   \n" +
+                        "--- --- --- ---\n" +
+                        "r:S|   |   |   \n" +
+                        "--- --- --- ---\n" +
+                        "   |b:B|b:B|   \n" +
+                        "--- --- --- ---\n" + 
+                        "   |b:6|b:F|r:9";
+        GameBoard board = GameBoard.loadBoard(setup, 4, 6);
+        defender.setRange(8);
+        //GameBoard board = GameBoard.loadBoard(setup, 2, 3);
+        
+        System.out.println("Board Setup:\n" + board.transcript());
+        state.setGameBoard(board);
+        // Run algorithm.
+        MoveAction move = defender.nextMove(state);
+        System.out.println("Next Move: " + move);
+        MySearchResult result = (MySearchResult) defender.getResult();        
     }
     
     private void minimizerTest() {
