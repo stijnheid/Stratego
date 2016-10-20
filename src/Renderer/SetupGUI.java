@@ -57,7 +57,9 @@ public class SetupGUI extends javax.swing.JFrame {
                 initComponents();
                 fields = new JTextField[]{Pos51, Pos41, Pos31, Pos21, Pos11, Pos01, Pos50, Pos40, Pos30, Pos20, Pos10, Pos00};
             }
-        });        
+        });      
+        
+        
     }
 
     /**
@@ -218,6 +220,15 @@ public class SetupGUI extends javax.swing.JFrame {
         }
         /*Now pass this setup on to the AI to deliver a defensive setup.*/
         parent.setAttackerSetup(setup);
+        
+        synchronized(this){
+            try{
+                parent.notify();
+            } catch (Exception e){
+                
+            }
+        }
+        dispose();
     }//GEN-LAST:event_jButtonConfirmActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

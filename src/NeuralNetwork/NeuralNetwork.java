@@ -53,8 +53,8 @@ public class NeuralNetwork {
         int[] result = network.predict(attacksetup); // predicting the best defender setup with the neural network. This generates an array of classifications for each input INDArray
                                                      // Which in this case is just on value but there will only be one value in it
         String board = boardGenerator(attackersetup, defendersetup[result[0]]); // Generates a board string from the attacker setup and the predicted best defender setup
-        GameBoard gameboard = GameBoard.loadBoard(board, width, height);
-        main.setGameBoard(gameboard);
+        GameBoard gameboard = GameBoard.loadBoard(board, width, height); // creates a gameboard object based on the string representation
+        main.setGameBoard(gameboard); // sets the gameboard in the Main class
     }
     /*
     A method that takes arrays of the attacker (integer array) and the defender (string array)
