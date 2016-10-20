@@ -315,7 +315,7 @@ public class Terrain extends Base {
                 else
                 this.vakje.bind(gl);
                 
-                System.out.println(Arrays.toString(selectedPiece));
+                //System.out.println(Arrays.toString(selectedPiece));
                 
                 gl.glBegin(GL_QUAD_STRIP);
                 gl.glTexCoord2d(0, 0);
@@ -329,32 +329,6 @@ public class Terrain extends Base {
                 gl.glEnd();               
             }
         }
-        //cross signifying tile (5,0) (for testing purposes).
-        //tile (5,0) meaning bottom left.
-        gl.glBegin(GL_TRIANGLE_STRIP);
-        gl.glVertex3d(xmin, ymin, z);
-        gl.glVertex3d(xmin+1, ymin+1, z);
-        gl.glVertex3d(xmin+0.5, ymin+0.5, 0.1);
-        gl.glEnd();
-        
-        gl.glBegin(GL_TRIANGLE_STRIP);
-        gl.glVertex3d(xmin, ymin+1, z);
-        gl.glVertex3d(xmin+1, ymin, z);
-        gl.glVertex3d(xmin+0.5, ymin+0.5, 0.1);
-        gl.glEnd();
-        
-        //tile at (4,0)
-        gl.glBegin(GL_TRIANGLE_STRIP);
-        gl.glVertex3d(xmin, ymin+1, z);
-        gl.glVertex3d(xmin+1, ymin+2, z);
-        gl.glVertex3d(xmin+0.5, ymin+1.5, 0.1);
-        gl.glEnd();
-        
-        gl.glBegin(GL_TRIANGLE_STRIP);
-        gl.glVertex3d(xmin, ymin+2, z);
-        gl.glVertex3d(xmin+1, ymin+1, z);
-        gl.glVertex3d(xmin+0.5, ymin+1.5, 0.1);
-        gl.glEnd();
     }
     
     /**
@@ -415,14 +389,17 @@ public class Terrain extends Base {
         drawPieces();
         if(pan){
             try {
-                Animation ani = new AttackAnimation(this, 
+                Animation ani1 = new AttackAnimation(this, 
                     board.getPiece(new BoardPosition(0,4)), 
-                    new BoardPosition(0,3), null);
-                playAnimation(ani);
+                    new BoardPosition(1,4), null);
+                Animation ani2 = new DeathAnimation(this,
+                    board.getPiece(new BoardPosition(1,4)),
+                    new BoardPosition(0,4), null);
+                playAnimation(ani1);
+                playAnimation(ani2);
                 pan = false;
             }   catch (Exception e){}
         }
-               
         /**Increment frame count AFTER rendering.*/
         cs.frameTick();
         thisframe = System.currentTimeMillis();

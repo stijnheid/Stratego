@@ -18,47 +18,64 @@ public class DeathAnimation extends Animation {
     
     @Override
     public void execute(){
-        startloc = skel.offset;
         faceTarget();
-        direction = new Vector(0,1,0);
-        direction.rotate(skel.getRotation());
+        startloc = new Vector(skel.offset);
         Thread die = new Thread(() -> {
-            //Current camera location.
-            Vector center = terrain.camera.center;
-            Vector eye = terrain.camera.eye;
-            //move Camera to location.
-            moveCamera(new Vector(skel.offset.x+5, skel.offset.y, skel.offset.z+5)
-                    ,new Vector(skel.offset.x, skel.offset.y, skel.offset.z+1));
-            //wait for opponent to show sword (to sync up animations).
-            for(int i=1; i <= (duration/3); i++){
+            /*NO camera movement : already performed in the opponent's attack animation.*/
+            //wait for camera movement and opponent to show sword (to sync up animations).
+            for(int i=1; i <= (7d/3d)*duration; i++){
                 try {
                     synchronized(terrain.cs.refresh){
                         terrain.cs.refresh.wait();
+                        if (i >= duration){
+                            skel.showRank = true;
+                        }
+                        if (i > (4d/3d)*duration){//trigger death animation.
+                            die(i - (4d/3d)*duration);
+                        }
                     }
                 }   catch (Exception e){}
             }
-            //now attack opponent.
-            for(int i=1; i <= duration; i++){
-                try {
-                    synchronized(terrain.cs.refresh){
-                        terrain.cs.refresh.wait();
-                        die(i);
-                    }
-                }   catch (Exception e){}
-            }
-            //move Camera back to original location.
-            moveCamera(eye, center);
+            skel.showRank = false;
             //signal to end animation.
             endAnimation();
         });
         die.start();        
     }
     
-    public void die(int frame){
-        if (frame >= (duration/2d) && frame <= ((5d*duration)/6d)){//raise arms to protect.
-            
-        }   else {//fall to the ground.
-            
+    public void die(double frame){
+        double c;
+        if (frame > (duration/2d) && frame <= ((4d*duration)/6d)){//raise arms to protect.
+            c = (frame-(duration/2d))*(6/duration);
+            System.out.println(c);
+            skel.shoulderLRotX = 110d * c;
+            skel.shoulderLRotY = -30d * c;
+            skel.shoulderRRotX = 110d * c;
+            skel.shoulderRRotY = 30d * c;
+            skel.elbowLRotX = 90d * c;
+            skel.elbowLRotY = -45d * c;
+            skel.elbowRRotX = 90d * c;
+            skel.elbowRRotY = 45d * c;
+        }   else if (frame > ((5d*duration)/6d)){//fall to the ground.
+            c = (frame-((5d*duration)/6d))*(6/duration);
+            System.out.println(c);
+            skel.shoulderLRotX = 110d*(1-c);
+            skel.shoulderLRotY = -30d*(1-c);
+            skel.shoulderRRotX = 110d*(1-c);
+            skel.shoulderRRotY = 30d*(1-c);
+            skel.elbowLRotX = 90d*(1-c);
+            skel.elbowLRotY = -45d*(1-c);
+            skel.elbowRRotX = 90d*(1-c);
+            skel.elbowRRotY = 45d*(1-c);
+            skel.hipLRotX = 20d*c;
+            skel.hipRRotX = 20d*c;
+            skel.kneeLRotX = -120d*c;
+            skel.kneeRRotX = -120d*c;
+            skel.shoulderL = new Vector(-0.2, c/10d, 1.6);
+            skel.shoulderR = new Vector(0.2, c/10d, 1.6);
+            skel.neck = new Vector(0, c/10d, 1.6);
+            skel.head = new Vector(0, c/5d, 1.8);
+            skel.offset = new Vector(startloc.x, startloc.y + 0.3*c, startloc.z - 0.3*c);
         }
     }
     

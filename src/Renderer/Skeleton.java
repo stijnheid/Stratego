@@ -380,7 +380,6 @@ public class Skeleton {
         if (showRank){
             
              gl.glEnable(GL2.GL_TEXTURE_2D);
-            System.out.println(rank);
                     switch(rank) {
             case BOMB:
                 Terrain.Bomb.bind(gl);

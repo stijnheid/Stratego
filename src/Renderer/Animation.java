@@ -14,7 +14,7 @@ import Game.Team;
 public class Animation {
     
     /*Duration of the animation (in frames).*/
-    protected final static double duration = 60;
+    protected final static double duration = 120;
     
     /*GamePiece on which this animation acts.*/
     protected final GamePiece subject;
@@ -114,18 +114,23 @@ public class Animation {
      */
     public void faceTarget(){
         BoardPosition pos = subject.getPosition();
-        int x = pos.getX();
-        int y = pos.getY();
-        if (target.getY() < y){
-            skel.rotate(0);
-        }   else if(target.getX() == x){
-                if(target.getX() < x){
-                    skel.rotate(-90);
-                }   else {
-                    skel.rotate(90);
-                }
+        int x1 = pos.getX();
+        int y1 = pos.getY();
+        int x2 = target.getX();
+        int y2 = target.getY();
+        
+        if (x1 == x2){//x is equal.
+            if (y1 < y2){
+                //face backwards.
+                skel.rotate(180);
+            }   else {
+                //face forward.
+                skel.rotate(0);
+            }
+        }   else if (x1 < x2){//face right.
+                skel.rotate(270);
         }   else {
-            skel.rotate(180);
+                skel.rotate(90);//face left.
         }
     }
     
