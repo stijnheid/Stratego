@@ -147,7 +147,7 @@ public class DefenderTwo extends AbstractWeightedPlayer {
             }
             score = blueScore + redScore;
             
-            return score;
+            return -score;
             //return -score * (blue.size()/red.size());
         }
         
@@ -223,7 +223,7 @@ public class DefenderTwo extends AbstractWeightedPlayer {
                 }
             }
             
-            return score;
+            return -score;
         } 
     }
     

@@ -112,7 +112,7 @@ public class DefenderThree extends AbstractWeightedPlayer {
                 score = defender.get(Pieces.MARSHALL);
             }
            
-            return score;
+            return -score;
         }        
     }
     
@@ -132,7 +132,7 @@ public class DefenderThree extends AbstractWeightedPlayer {
                 score = attacker.get(Pieces.SPY);
             }
             
-            return score;
+            return -score;
         }
         
     }
@@ -152,7 +152,7 @@ public class DefenderThree extends AbstractWeightedPlayer {
                 score = defender.get(Pieces.MINER);
             }
             
-            return score * getPiecesAmount(state, DefenderThree.super.team.opposite(), Pieces.MINER);
+            return -score * getPiecesAmount(state, DefenderThree.super.team.opposite(), Pieces.MINER);
         }
         
     }
@@ -163,7 +163,7 @@ public class DefenderThree extends AbstractWeightedPlayer {
         public double computeScore(GameState state) {
             double score = 0;
             score = (-HighestValue(state, DefenderThree.super.team.opposite(), attacker)/2);
-            return score * getPiecesAmount(state, DefenderThree.super.team, Pieces.BOMB);
+            return -score * getPiecesAmount(state, DefenderThree.super.team, Pieces.BOMB);
         }
         
     }
@@ -193,7 +193,7 @@ public class DefenderThree extends AbstractWeightedPlayer {
                        + defender.get(Pieces.LIEUTENANT) * getPiecesAmount(state, DefenderThree.super.team, Pieces.LIEUTENANT);
             
             score = redScore * (attackerArmy.size()/defenderArmy.size())+ blueScore * (attackerArmy.size()/defenderArmy.size());
-            return score;
+            return -score;
         }
         
     }
@@ -253,7 +253,7 @@ public class DefenderThree extends AbstractWeightedPlayer {
                 }
             }
             
-            return score;
+            return -score;
         }
         
     }
