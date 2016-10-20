@@ -1,4 +1,5 @@
 package Game;
+import Renderer.Vector;
 
 import Renderer.Animation;
 import Renderer.RendererState;
@@ -43,7 +44,7 @@ public class GameState {
         this.board = board;
     }
     
-    public boolean isRunnning() {
+    public boolean isRunning() {
         return this.isRunning;
     }
     
