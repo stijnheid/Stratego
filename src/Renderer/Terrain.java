@@ -440,11 +440,11 @@ public class Terrain extends Base {
         if(pan){
             try {
                 Animation ani1 = new AttackAnimation(this, 
-                    board.getPiece(new BoardPosition(4,1)), 
-                    new BoardPosition(3,1), null);
+                    board.getPiece(new BoardPosition(4,4)), 
+                    new BoardPosition(3,4), null);
                 Animation ani2 = new DeathAnimation(this,
-                    board.getPiece(new BoardPosition(3,1)),
-                    new BoardPosition(4,1), null);
+                    board.getPiece(new BoardPosition(3,4)),
+                    new BoardPosition(4,4), null);
                 playAnimation(ani1);
                 playAnimation(ani2);
                 pan = false;

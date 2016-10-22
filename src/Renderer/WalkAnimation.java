@@ -20,6 +20,7 @@ public class WalkAnimation extends Animation{
     @Override
     public void execute(){
         startloc = new Vector(skel.offset);
+        startloc.rotate(skel.getRotation());
         faceTarget();
         direction = new Vector(0,1,0);
         direction.rotate(skel.getRotation());
@@ -38,6 +39,8 @@ public class WalkAnimation extends Animation{
             moveCamera(cameraloc
                     ,new Vector(startloc.x, startloc.y, startloc.z+1));
             //execute animation (through refresh call).
+            startloc = new Vector(skel.offset);//re-init startloc for walk().
+            direction = new Vector(0,1,0);//same stuff.
             for(int i=1; i <= duration; i++){
                 try {
                     synchronized(terrain.cs.refresh){
@@ -62,7 +65,7 @@ public class WalkAnimation extends Animation{
      */
     private void walk(int frame){
         skel.offset = startloc.sum(direction.scale(Math.sin((frame*Math.PI)/(2*duration))));
-        double rot = 0.5*Math.toDegrees(Math.sin((frame*Math.PI)/duration));
+        double rot = 0.5*Math.toDegrees(Math.sin((2*frame*Math.PI)/duration));
         skel.hipLRotX = rot;
         skel.hipRRotX = -rot;
         skel.shoulderLRotX = rot;

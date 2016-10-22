@@ -109,10 +109,7 @@ abstract public class Base {
      */
     public Base(Simulation s) {
         this.simulation = s;
-        
-        // Print library version number.
-        System.out.println("Using RobotRace library version " + LIBRARY_VERSION);
-        
+                
         // Global state.
         this.gs = new GameState();
         

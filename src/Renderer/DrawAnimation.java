@@ -46,6 +46,7 @@ public class DrawAnimation extends Animation{
                 moveCamera(cameraloc
                         ,new Vector(startloc.x, startloc.y, startloc.z+1));
                 skel.showRank = true;
+                startloc = new Vector(skel.offset);//re-init startloc for attack().
                 //Animation iteration loop.
                 for(int i=1; i <= (5d/3d)*duration; i++){
                     try {
@@ -63,6 +64,7 @@ public class DrawAnimation extends Animation{
                 }
                 moveCamera(eye, center);
             }   else {//MOVECAM == FALSE.
+                startloc = new Vector(skel.offset);//re-init startloc for attack().
                 for(int i=1; i <= (8d/3d)*duration; i++){
                     try {
                         synchronized(terrain.cs.refresh){

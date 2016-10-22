@@ -19,7 +19,7 @@ public class AttackAnimation extends Animation {
     @Override
     public void execute(){
         startloc = new Vector(skel.offset);
-        startloc.rotate(-skel.getRotation());
+        startloc.rotate(skel.getRotation());
         faceTarget();
         direction = new Vector(0,1,0);
         direction.rotate(skel.getRotation());
@@ -38,6 +38,7 @@ public class AttackAnimation extends Animation {
             moveCamera(cameraloc
                     ,new Vector(startloc.x, startloc.y, startloc.z+1));
             skel.showRank = true;
+            startloc = new Vector(skel.offset);//re-init for attack().
             //Animation iteration loop.
             for(int i=1; i <= (5d/3d)*duration; i++){
                 try {
@@ -87,6 +88,10 @@ public class AttackAnimation extends Animation {
             skel.elbowLRotX = 45 * c;
             skel.shoulderRRotX = 90 * c;
             skel.shoulderRRotY = -45 * c;
+            skel.hipLRotX = 30d * c;
+            skel.hipRRotX = -30d * c;
+            skel.kneeLRotX = -30d * c;
+            skel.offset = new Vector(startloc.x, startloc.y + 0.3*c, startloc.z);
         }   else if (frame <= (5d*duration/6d)){//swing sword at opponent.
             c = (frame - (duration/2d)) * (3d/duration);
             skel.shoulderL = new Vector(-0.2,0.1-(c/5d),1.6);
@@ -107,6 +112,10 @@ public class AttackAnimation extends Animation {
             skel.shoulderRRotY = 45d * (1-c);
             skel.shoulderLRotX = -20d * (1-c);
             skel.swordRotX = -80d * (1-c);
+            skel.offset = new Vector(startloc.x, startloc.y + 0.3*(1-c), startloc.z);
+            skel.hipLRotX = 30d * (1-c);
+            skel.hipRRotX = -30d * (1-c);
+            skel.kneeLRotX = -30d * (1-c);
         }
     }
 }
