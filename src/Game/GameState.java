@@ -1,5 +1,4 @@
 package Game;
-import Renderer.Vector;
 
 import Renderer.Animation;
 import Renderer.CameraState;
