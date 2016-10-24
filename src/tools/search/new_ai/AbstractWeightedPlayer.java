@@ -25,7 +25,12 @@ public abstract class AbstractWeightedPlayer implements WeightedAIBot {
         this.search = new TreeSearch(null);
         //this.search = new AlphaBetaSearch(null);
     }
-
+    
+    /**
+    public AbstractWeightedPlayer(Team team, Class<T extends AbstractWeightedPlayer> class) {
+        
+    }
+    */
     @Override
     public abstract MoveAction nextMove(GameState state);
     

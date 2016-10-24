@@ -612,6 +612,7 @@ public class GameBoard {
     
     /**
      * Method intended for the AI to apply a move.
+     * This method does not check if the game board is already in an end state.
      * 
      * @param move 
      */

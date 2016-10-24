@@ -236,5 +236,5 @@ public class DefenderTwo extends AbstractWeightedPlayer {
         }
         
         return map;
-    }    
+    }
 }

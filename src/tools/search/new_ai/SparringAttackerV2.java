@@ -1,5 +1,6 @@
 package tools.search.new_ai;
 
+import Game.BoardPosition;
 import Game.GameBoard;
 import Game.GamePiece;
 import Game.GameState;
@@ -120,9 +121,50 @@ public class SparringAttackerV2 extends AbstractWeightedPlayer {
     
     private class CellValues extends WeightedHeuristicTerm {
 
+        private final HashMap<BoardPosition, Integer> map;
+        
+        private CellValues() {
+            /*
+            String values = "0|0|0|0\n" +
+                            "50|50|50|50\n" +
+                            "100|150|150|100\n" +
+                            "150|200|200|150\n" +
+                            "170|220|220|170\n" +
+                            "200|200|200|200\n"; // try to replace by all "150".
+            */
+            /*
+            String values = "0|0|0|0\n" +
+                            "50|50|50|50\n" +
+                            "100|150|150|100\n" +
+                            "150|200|200|150\n" +
+                            "150|200|200|150\n" +
+                            "250|200|200|250\n"; // try to replace by all "150".    
+            */
+            String values = "0|0|0|0\n" +
+                            "100|100|100|100\n" +
+                            "100|150|100|150\n" +
+                            "150|100|150|100\n" +
+                            "100|100|100|100\n" +
+                            "100|100|100|100\n"; // try to replace by all "150". 
+            
+            this.map = HeuristicUtils.loadMap(values);
+        }
+        
         @Override
         public double computeScore(GameState state) {
-            return 0;
+            int score = 0;
+            GameBoard board = state.getGameBoard();
+            for(int row=0; row<board.getHeight(); row++) {
+                for(int column=0; column<board.getWidth(); column++) {
+                    BoardPosition position = new BoardPosition(column, row);
+                    GamePiece piece = board.getPiece(position);
+                    if(piece != null) {
+                        score+= map.get(position);
+                    }
+                }
+            }
+            
+            return score;
         }        
     }
     

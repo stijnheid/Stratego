@@ -91,7 +91,7 @@ public class HeuristicTraining implements WeightSetListener {
             String filename = "";
             generator.savePlot(false, filename);
             System.out.println("TRAINING ENDED");
-            System.out.println(generated(weights));
+            System.out.println(Arrays.toString(this.algorithm.getWeights()));
         } catch (IOException ex) {
             Logger.getLogger(HeuristicTraining.class.getName()).log(Level.SEVERE, null, ex);
         }
