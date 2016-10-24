@@ -96,12 +96,12 @@ public class AttackAnimation extends Animation {
             c = (frame - (duration/2d)) * (3d/duration);
             skel.shoulderL = new Vector(-0.2,0.1-(c/5d),1.6);
             skel.shoulderR = new Vector(0.2, -0.1+(c/5d),1.6);
-            skel.elbowRRotX = 90d * (1-c);
-            skel.elbowLRotX = 45d - 25 * c;
-            skel.shoulderRRotX = 90d - 45 * c;
-            skel.shoulderRRotY = -45d + 90 * c;
-            skel.shoulderLRotX = -20 * c;
-            skel.swordRotX = -80 * c;
+            skel.elbowRRotX = 90d - 45d * c;
+            skel.elbowLRotX = 45d - 25d * c;
+            skel.shoulderRRotX = 90d - 45d * c;
+            skel.shoulderRRotY = -45d + 90d * c;
+            skel.shoulderLRotX = -20d * c;
+            skel.swordRotX = -80d * c;
         }   else {//return to rest position.
             c = (frame - (5d/6d)*duration) * (6d/duration);
             skel.shoulderL = new Vector(-0.2,-0.1+(c/10d),1.6);
