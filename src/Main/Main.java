@@ -39,11 +39,15 @@ public  class Main {
         GameState gamestate = new GameState();
         gamestate.setGameBoard(board);
         
-        Simulation simulation = new Simulation();
+        
+        //Simulation needs to be initiated here somewhere
+        //Simulation simulation = new Simulation();
         
         //This also needs to happen sequentially, we first need all the crap above before we create a new Terrain
         
-        Terrain terrain = new Terrain(gamestate,board,simulation);
+        //Creating a terrain object 
+        
+        //Terrain terrain = new Terrain(gamestate,board,simulation);
         // Here we have the GameBoard object, use this to create the game itself
         // Something needs to call the animations too!
         
