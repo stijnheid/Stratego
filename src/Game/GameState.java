@@ -1,7 +1,8 @@
 package Game;
+import Renderer.Vector;
 
 import Renderer.Animation;
-import Renderer.RendererState;
+import Renderer.CameraState;
 
 /**
  * Keeps track of the Gameboard and other state information like timers and
@@ -15,7 +16,7 @@ public class GameState {
     // At most one animation can run at a time.
     // Simulation must not accept any action commands while an animation plays.
     private Animation animation;
-    private RendererState rendererState;
+    private CameraState rendererState;
 
     public GameState() {
         this.board = null;
@@ -43,7 +44,7 @@ public class GameState {
         this.board = board;
     }
     
-    public boolean isRunnning() {
+    public boolean isRunning() {
         return this.isRunning;
     }
     
@@ -78,12 +79,12 @@ public class GameState {
         this.currentTurn = currentTurn;
     }
 */
-    public RendererState getRendererState() {
+    public CameraState getCameraState() {
         return rendererState;
     }
 
-    public void setRendererState(RendererState rState) {
-        this.rendererState = rState;
+    public void setCameraState(CameraState cState) {
+        this.rendererState = cState;
     }
     
     
@@ -96,7 +97,7 @@ public class GameState {
         // Copy the start time, be aware that this must be done after setRunning
         // since setRunning also modifies the start time.
         clone.setStartTime(getStartTime());
-        clone.setRendererState(getRendererState());
+        clone.setCameraState(getCameraState());
         clone.setAnimation(getAnimation());
         return clone;
     }

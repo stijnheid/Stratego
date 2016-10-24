@@ -8,7 +8,7 @@ import static javax.media.opengl.GL.GL_FRONT_AND_BACK;
 import static javax.media.opengl.fixedfunc.GLLightingFunc.*;
 import static java.lang.Math.*;
 
-class AxisFrame {
+public class AxisFrame {
 	
 	double length;
 	
