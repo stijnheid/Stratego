@@ -15,7 +15,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import tools.deeplearning.BattleEngine;
 import tools.deeplearning.BattleTranscript;
-import tools.search.new_ai.DefenderOne;
+import tools.search.ai.AIBot;
+import tools.search.new_ai.DefenderThree;
 import tools.search.new_ai.DefenderTwo;
 import tools.search.new_ai.SparringAttacker;
 import tools.search.new_ai.WeightedAIBot;
@@ -51,7 +52,8 @@ public class HeuristicTraining implements WeightSetListener {
     }
     
     public static void main(String[] args) {
-        new HeuristicTraining().train();
+        //new HeuristicTraining().train();
+        new HeuristicTraining().competition();
     }
     
     private void train() {
@@ -243,6 +245,82 @@ public class HeuristicTraining implements WeightSetListener {
             }
         }
         return positions;
+    }
+    
+    private class BotScore {
+        private final WeightedAIBot bot;
+        private int wins;
+        private int draws;
+        private int lost;
+
+        public BotScore(WeightedAIBot bot) {
+            this.bot = bot;
+            this.wins = 0;
+            this.draws = 0;
+            this.lost = 0;
+        }
+    }
+    
+    private void competition() {
+        initialize();
+        System.out.println("Start Competition.");
+        this.attacker = new SparringAttacker(Team.RED);
+        this.engine = new BattleEngine();
+        
+        List<BotScore> botScores = new ArrayList<>();
+        BotScore first = new BotScore(new DefenderTwo(Team.BLUE));
+        BotScore second = new BotScore(new DefenderThree(Team.BLUE));
+        
+        // Add bots to list.
+        botScores.add(first);
+        botScores.add(second);
+        
+        first.bot.setWeights(new double[] { 1.0, 1.0 });
+        second.bot.setWeights(new double[] { 1.0, 1.0, 1.0, 1.0, 1.0, 1.0 });
+        
+        List<GameBoard> boards = loadDefensiveSetups();
+        long computationTime = 2000;
+        int maxIterations = 50;
+        
+        int rounds = 7;
+        for(int i=0; i<rounds; i++) {
+            System.out.println("Round " + i);
+            int setupID = 0;
+            for(GameBoard defensiveBoard : boards) {
+                // All bots should play with the same initial board.
+                GameBoard offensiveSetup = loadOffensiveSetup(getArmyComposition());
+                System.out.println("SetupID: " + setupID);
+                
+                for(BotScore bs : botScores) {
+                    // Clone the board.
+                    GameBoard battleBoard = ((GameBoard) offensiveSetup.clone());
+                    // Merge boards.
+                    battleBoard.mergeBoard(defensiveBoard);
+                    
+                    System.out.println("Board:\n" + battleBoard.transcript());
+                    
+                    AIBot bot = bs.bot;
+                    // For each setup.
+                    BattleTranscript result = this.engine.battle(
+                            battleBoard, this.attacker, bot, 
+                            computationTime, maxIterations);
+                    
+                    // Store result.
+                    Team winner = result.getWinner();
+                    if(winner != null) {
+                        if(winner == bot.getTeam()) {
+                            bs.wins++;
+                        } else {
+                            bs.lost++;
+                        }
+                    } else {
+                        bs.draws++;
+                    }
+                }
+                
+                setupID++;
+            }
+        }
     }
     
     private List<GameBoard> loadDefensiveSetups() {

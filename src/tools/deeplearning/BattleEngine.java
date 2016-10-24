@@ -357,7 +357,7 @@ public class BattleEngine {
             throw new RuntimeException("Invalid board setup");
         }
         
-        if(board.isEndState() == null) {
+        if(board.isEndState() != null) {
             throw new RuntimeException("Board is already in an end state.");
         }
         
