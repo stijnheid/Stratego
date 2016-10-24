@@ -16,7 +16,6 @@ import java.util.logging.Logger;
 import tools.deeplearning.BattleEngine;
 import tools.deeplearning.BattleTranscript;
 import tools.search.new_ai.DefenderOne;
-import tools.search.new_ai.DefenderTwo;
 import tools.search.new_ai.SparringAttacker;
 import tools.search.new_ai.WeightedAIBot;
 
@@ -60,10 +59,10 @@ public class HeuristicTraining implements WeightSetListener {
         // Setup the bots to be used.
         this.attacker = new SparringAttacker(Team.RED);
         //this.defender = new ModeratePlayer(Team.BLUE);        
-        this.defender = new DefenderTwo(Team.BLUE);
+        this.defender = new DefenderOne(Team.BLUE);
         
         int numberOfFeatures = this.defender.featureCount();
-        int rounds = 1; //50; // # of weight assignments that will be used.
+        int rounds = 50; // # of weight assignments that will be used.
         //SimulatedAnnealing generator = new SimulatedAnnealing(
         //        numberOfFeatures, rounds);
         this.algorithm = new SimulatedAnnealing(numberOfFeatures, rounds);
@@ -91,7 +90,6 @@ public class HeuristicTraining implements WeightSetListener {
             String filename = "";
             generator.savePlot(false, filename);
             System.out.println("TRAINING ENDED");
-            System.out.println(Arrays.toString(this.algorithm.getWeights()));
         } catch (IOException ex) {
             Logger.getLogger(HeuristicTraining.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -111,7 +109,7 @@ public class HeuristicTraining implements WeightSetListener {
     public double generated(double[] weights) {
         // Receive a set of weights apply them to the heuristic.
         int computationTime = 2000;
-        int maxIterations = 50; //2; //50;
+        int maxIterations = 50;
         
         // Run a single match with the given weight assignment for each
         // defensive board setup.
@@ -132,25 +130,16 @@ public class HeuristicTraining implements WeightSetListener {
         long start = System.currentTimeMillis();
         for(int i=0; i<rounds; i++) {
             for(GameBoard defensiveSetup : defensiveSetups) {
-                /*
-                if(matches >= loadDefensiveSetups().size()) {
-                    System.out.println("EARLY TERMINATION");
+                if(matches > loadDefensiveSetups().size()) {
+                    System.out.println("TERMINATE");
                     this.algorithm.stop();
                     break;
                 }
-                */
                 
                 // Generate a random attacker setup.
                 GameBoard attackerSetup = loadOffensiveSetup(getArmyComposition());
                 // Merge the board setups.
                 attackerSetup.mergeBoard(defensiveSetup);
-                // Check if the setup is valid.
-                if(!attackerSetup.isSetupValid()) {
-                    throw new RuntimeException("Setup is not valid.");
-                    //System.out.println("Setup is not valid.");
-                    //this.algorithm.stop();
-                    //return 0.0;
-                }
                 
                 // Simulate the battle.
                 System.out.println("Start Battle #" + matches);
@@ -171,13 +160,11 @@ public class HeuristicTraining implements WeightSetListener {
                     incomplete++;
                 }
                 
-                System.out.println("match#" + matches + ": winner=" + winner);
-                // Print match.
+                System.out.println(matches + ": winner=" + winner);
                 result.print();
                 
                 matches++;
             }
-            System.out.println("NEXT ROUND");
         }
         long end = System.currentTimeMillis();
         System.out.println("Weight Assignment Iteration Training lasted " + (end - start) + " ms.");
@@ -216,8 +203,7 @@ public class HeuristicTraining implements WeightSetListener {
         //System.out.println("List Type: " + army.getClass());
         SecureRandom random = new SecureRandom();
         
-        GameBoard board = new GameBoard(this.boardWidth, this.boardHeight, 
-                this.attackingTeam, this.defendingTeam);
+        GameBoard board = new GameBoard(this.boardWidth, this.boardHeight, this.attackingTeam, this.defendingTeam);
         int posIndex = 0;
         while(!army.isEmpty()) {
             int index = random.nextInt(army.size());

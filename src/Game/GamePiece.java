@@ -130,13 +130,11 @@ public class GamePiece {
     public Object clone() {
         GamePiece clone = new GamePiece(rank, team, (BoardPosition) position.clone());
         // Freshly created GamePiece is always alive, check if it is killed.
-        // isAlive in constructor is initialized to true.
         if(!isAlive) {
             clone.die();
         }
         // Freshly created GamePiece is not highlighted. Check if the newly
         // created GamePiece should be highlighted.
-        // isHighlighted in constructor is initialized to false.
         if(isHighlighted) {
             clone.toggleHighlight();
         }

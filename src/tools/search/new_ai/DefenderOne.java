@@ -20,6 +20,8 @@ import tools.search.ai.WeightedHeuristicTerm;
  */
 public class DefenderOne extends AbstractWeightedPlayer {
 
+    private int range;
+    
     public DefenderOne(Team team) {
         super(team);
         this.range = 8;
@@ -49,8 +51,6 @@ public class DefenderOne extends AbstractWeightedPlayer {
                 initialDepth, 
                 this.range, isMaxPlayer, moveOrdering);
         
-        this.searchResult = result;
-        
         if(this.search instanceof TreeSearch) {
             MySearchResult report = (MySearchResult) result;
             System.out.println("Principal Variation Path:");
@@ -65,6 +65,11 @@ public class DefenderOne extends AbstractWeightedPlayer {
         
         this.active = false;
         return move;
+    }
+    
+    @Override
+    public void setRange(int range) {
+        this.range = range;
     }
     
     private class MaterialCount extends WeightedHeuristicTerm {

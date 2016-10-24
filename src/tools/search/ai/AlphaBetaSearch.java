@@ -1120,7 +1120,6 @@ public class AlphaBetaSearch extends InterruptableSearch {
      * Interrupts the currently running algorithm and forces it
      * to return a move as fast as possible.
      */
-    @Override
     public void timeout() {
         timeout = true;
     }
@@ -1137,7 +1136,6 @@ public class AlphaBetaSearch extends InterruptableSearch {
         return this.cutoffs;
     }
     
-    @Override
     public void setHeuristic(HeuristicEvaluation evaluation) {
         this.evaluation = evaluation;
     }

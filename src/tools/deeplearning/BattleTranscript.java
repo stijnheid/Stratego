@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import tools.search.Player;
 
 /**
  * A battle can be described as an initial setup and a list of sequential
@@ -28,9 +27,6 @@ public class BattleTranscript {
     private long gameDuration;
     private final Team attacker;
     private final Team defender;
-    private int computationTime;
-    private Player redPlayer;
-    private Player bluePlayer;
     
     public BattleTranscript(GameBoard board, Team attacker, Team defender) {
         this.initialSetup = (GameBoard) board.clone();
@@ -89,35 +85,6 @@ public class BattleTranscript {
     public void endGame() {
         this.gameOver = true;
         this.gameDuration = System.currentTimeMillis() - this.gameStart;
-    }
-
-    public long getGameDuration() {
-        return gameDuration;
-    }
-
-
-    public int getComputationTime() {
-        return computationTime;
-    }
-
-    public void setComputationTime(int computationTime) {
-        this.computationTime = computationTime;
-    }
-
-    public Player getRedPlayer() {
-        return redPlayer;
-    }
-
-    public void setRedPlayer(Player redPlayer) {
-        this.redPlayer = redPlayer;
-    }
-
-    public Player getBluePlayer() {
-        return bluePlayer;
-    }
-
-    public void setBluePlayer(Player bluePlayer) {
-        this.bluePlayer = bluePlayer;
     }
     
     public void save(String filename) {

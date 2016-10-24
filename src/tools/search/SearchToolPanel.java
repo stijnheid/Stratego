@@ -19,11 +19,9 @@ import javax.swing.table.DefaultTableModel;
 import tools.deeplearning.BattleEngine;
 import tools.deeplearning.BattleTranscript;
 import tools.search.ai.AIBot;
+import tools.search.ai.SetupGenerator;
 import tools.search.ai.players.Attacker;
-import tools.search.new_ai.DefenderOne;
-import tools.search.new_ai.DefenderTwo;
-import tools.search.new_ai.SparringAttacker;
-import tools.search.new_ai.SparringAttackerV2;
+import tools.search.ai.players.DefaultPlayer;
 
 /**
  *
@@ -32,7 +30,6 @@ public class SearchToolPanel extends javax.swing.JPanel {
 
     //private SearchToolController controller;
     private UserInputController controller;
-    private GameState state;
     
     /**
      * Creates new form SearchToolPanel
@@ -120,7 +117,7 @@ public class SearchToolPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void startGameButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_startGameButtonActionPerformed
-        // Create a GameClock that repaints the UI periodically.
+        // Create a GameClock
         GameClock task = new GameClock(this.jTable1);
         task.execute();
         
@@ -128,61 +125,22 @@ public class SearchToolPanel extends javax.swing.JPanel {
         // Check if the player's setup is valid.
         
         // Create a simulation object and run the battle engine with two AI bots.
-        this.state = new GameState();
+        GameState state = new GameState();
         state.setRunning(true);
         
         // Setup the Table render.
         System.out.println("Set renderer");
-        GameBoardCellRenderer renderer = new GameBoardCellRenderer(this.state, true);
+        GameBoardCellRenderer renderer = new GameBoardCellRenderer(state, true);
         this.jTable1.setDefaultRenderer(Object.class, renderer);        
         
         // Create a board setup.
         //GameBoard board = new GameBoard(GlobalSettings.WIDTH, 
         //        GlobalSettings.HEIGHT, Team.RED, Team.RED);
-        /*
-        String setup = "r:6|r:9|r:2|r:8\n" +
-                        "--- --- --- ---\n" +
-                        "r:S|r:7|r:4|r:5\n" +
-                        "--- --- --- ---\n" +
-                        "   |   |   |   \n" +
-                        "--- --- --- ---\n" +
-                        "   |   |   |   \n" +
-                        "--- --- --- ---\n" +
-                        "b:B|b:6|b:4|b:7\n" +
-                        "--- --- --- ---\n" +
-                        "b:F|b:B|b:9|b:5";
-        */
-        /*
-        String setup = "r:4|r:8|r:5|r:2\n" +
-                        "--- --- --- ---\n" +
-                        "r:S|r:9|r:7|r:6\n" +
-                        "--- --- --- ---\n" +
-                        "   |   |   |   \n" +
-                        "--- --- --- ---\n" +
-                        "   |   |   |   \n" +
-                        "--- --- --- ---\n" +
-                        "b:B|b:6|b:4|b:7\n" +
-                        "--- --- --- ---\n" +
-                        "b:F|b:B|b:9|b:5";
-        */
-        
-        String setup = "r:4|r:2|r:S|r:7\n" +
-                        "--- --- --- ---\n" +
-                        "r:5|r:9|r:8|r:6\n" +
-                        "--- --- --- ---\n" +
-                        "   |   |   |   \n" +
-                        "--- --- --- ---\n" +
-                        "   |   |   |   \n" +
-                        "--- --- --- ---\n" +
-                        "b:B|b:6|b:4|b:7\n" +
-                        "--- --- --- ---\n" +
-                        "b:F|b:B|b:9|b:5";
-        
-        GameBoard board = GameBoard.loadBoard(setup, 4, 6);
-        //SetupGenerator generator = new SetupGenerator();
+        GameBoard board;
+        SetupGenerator generator = new SetupGenerator();
         //board = generator.generateSetup();
         //board = generator.mirroredSetup();
-        //board = generator.generateShowcaseTwo(); //generator.smallSetup();
+        board = generator.generateShowcaseTwo(); //generator.smallSetup();
         //board = generator.smallSetupTwo();
         
         // Set the JTable to the right dimensions.
@@ -193,21 +151,11 @@ public class SearchToolPanel extends javax.swing.JPanel {
         state.setGameBoard(board);
         
         // Start the BattleTask
-        //BattleTask battleTask = new BattleTask(state, this.jTable1);
-        //battleTask.execute();
+        BattleTask battleTask = new BattleTask(state, this.jTable1);
+        battleTask.execute();
         
         //flagReachabilityTest();
         //setup();
-        
-        // Setup the Simulation.
-        //Player first = new SparringAttacker(Team.RED);
-        //Player second = new DefenderOne(Team.BLUE);
-        
-        Player first = new SparringAttackerV2(Team.RED);
-        Player second = new DefenderTwo(Team.BLUE);
-        Simulation simulation = new Simulation(this.state, first, second);
-        // Start the game.
-        simulation.startGame();
     }//GEN-LAST:event_startGameButtonActionPerformed
 
     private void resetButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_resetButtonActionPerformed
@@ -222,7 +170,7 @@ public class SearchToolPanel extends javax.swing.JPanel {
     
     private void setup() {
         // Puts a custom renderer for the JTable.
-        this.state = new GameState();
+        GameState state = new GameState();
         state.setRunning(true);
         
         // Table Model not anymore needed?
@@ -236,7 +184,7 @@ public class SearchToolPanel extends javax.swing.JPanel {
         //this.jTable1.addMouseListener(this.controller);
         
         // Initialize the Simulation and setup controllers.
-        Simulation simulation = new Simulation(state, null, null);
+        Simulation simulation = new Simulation(state);
         this.controller = new UserInputController(state, simulation);
         // Make the table listen for mouse click input.
         this.jTable1.addMouseListener(this.controller);
@@ -306,9 +254,9 @@ public class SearchToolPanel extends javax.swing.JPanel {
             // While the game is playing redraw the game each seconds.
             while(true) {
                 // How to update the UI Thread here?
-                //this.component.repaint();
-                redrawUI();
-                //System.out.println("Repaint Component.");
+                this.component.repaint();
+                System.out.println("Repaint Component.");
+                
                 Thread.sleep(1000);
             }
         }
@@ -320,10 +268,7 @@ public class SearchToolPanel extends javax.swing.JPanel {
     }
     
     private void redrawUI() {
-        System.out.println("Redraw UI");
-        this.jTable1.repaint();
-        this.moveCountLabel.setText("MoveCount: " + this.state.getGameBoard().getMoveCount());
-        this.turnLabel.setText("Turn: " + this.state.getGameBoard().getCurrentTurn());
+        
     }
     
     private class BattleTask extends SwingWorker<Void, Void> {
@@ -338,7 +283,7 @@ public class SearchToolPanel extends javax.swing.JPanel {
         
         @Override
         protected Void doInBackground() throws Exception {
-            Simulation simulation = new Simulation(state, null, null);
+            Simulation simulation = new Simulation(state, this.component);
             BattleEngine battleEngine = new BattleEngine();
 
             //AIBot attacker = new DefaultPlayer(Team.RED);

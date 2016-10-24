@@ -3,7 +3,7 @@ package Game;
 /**
  *
  */
-public class InvalidPositionException extends RuntimeException {
+public class InvalidPositionException extends Exception {
 
     /**
      * Creates a new instance of <code>InvalidPositionException</code> without

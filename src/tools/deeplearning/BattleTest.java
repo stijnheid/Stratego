@@ -14,8 +14,8 @@ import tools.search.ai.players.AttackerTwo;
 import tools.search.ai.players.DefaultPlayer;
 import tools.search.ai.players.ModerateAttacker;
 import tools.search.ai.players.ModeratePlayer;
-import tools.search.new_ai.DefenderTwo;
-import tools.search.new_ai.SparringAttackerV2;
+import tools.search.new_ai.DefenderOne;
+import tools.search.new_ai.SparringAttacker;
 
 /**
  *
@@ -193,16 +193,14 @@ public class BattleTest {
                         "b:B|b:6|b:4|b:7\n" +
                         "--- --- --- ---\n" +
                         "b:F|b:B|b:9|b:5";
-        
         GameBoard board = GameBoard.loadBoard(setup, 4, 6);
         
         BattleEngine engine = new BattleEngine();
         
-        AIBot attacker = new SparringAttackerV2(Team.RED);
-        //AIBot defender = new DefenderOne(Team.BLUE);
-        AIBot defender = new DefenderTwo(Team.BLUE);
+        AIBot attacker = new SparringAttacker(Team.RED);
+        AIBot defender = new DefenderOne(Team.BLUE);
         long time = 2000;
-        int maxIterations = 50; //25; //20;
+        int maxIterations = 25; //20;
         BattleTranscript report = engine.battle(board, attacker, defender, time, maxIterations);
         report.print();
     }

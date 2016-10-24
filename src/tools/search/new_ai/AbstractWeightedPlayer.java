@@ -3,8 +3,8 @@ package tools.search.new_ai;
 import Game.GameState;
 import Game.Team;
 import actions.MoveAction;
+import tools.search.ai.AlphaBetaSearch;
 import tools.search.ai.InterruptableSearch;
-import tools.search.ai.SearchResult;
 import tools.search.ai.TreeSearch;
 import tools.search.ai.WeightedEvaluation;
 
@@ -17,29 +17,17 @@ public abstract class AbstractWeightedPlayer implements WeightedAIBot {
     protected Team team;
     protected InterruptableSearch search;
     protected WeightedEvaluation evaluation;
-    protected SearchResult searchResult;
-    protected int range;
 
     public AbstractWeightedPlayer(Team team) {
         this.team = team;
-        this.search = new TreeSearch(null);
-        //this.search = new AlphaBetaSearch(null);
+        //this.search = new TreeSearch(null);
+        this.search = new AlphaBetaSearch(null);
     }
-    
-    /**
-    public AbstractWeightedPlayer(Team team, Class<T extends AbstractWeightedPlayer> class) {
-        
-    }
-    */
+
     @Override
     public abstract MoveAction nextMove(GameState state);
     
-    public void setRange(int range) {
-        if(range < -1) {
-            throw new IllegalArgumentException("Bad range: " + range);
-        }
-        this.range = range;
-    }
+    public abstract void setRange(int range);
     
     @Override
     public final int featureCount() {
@@ -65,9 +53,5 @@ public abstract class AbstractWeightedPlayer implements WeightedAIBot {
     @Override
     public Team getTeam() {
         return this.team;
-    }
-    
-    public SearchResult getResult() {
-        return this.searchResult;
-    }
+    }    
 }

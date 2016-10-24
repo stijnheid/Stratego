@@ -20,12 +20,12 @@ import javax.swing.table.TableCellRenderer;
  */
 public class GameBoardCellRenderer extends JLabel implements TableCellRenderer {
 
-    //private final boolean isBordered;
+    private final boolean isBordered;
     private final GameState state;
     
     public GameBoardCellRenderer(GameState state, boolean isBordered) {
         this.state = state;
-        //this.isBordered = isBordered;
+        this.isBordered = isBordered;
         setOpaque(true); //MUST do this for background to show up.
     }
 
@@ -46,7 +46,7 @@ public class GameBoardCellRenderer extends JLabel implements TableCellRenderer {
                 
                 // Need to explicitly set the JLabel to empty since
                 // else the JTable Renderer will re-use the previous JLabel, so
-                // pieces are copied to following cells, while they not exist.
+                // pieces are copied, while they not exist.
                 setText("");
                 setToolTipText("Empty Cell");
             } else { 

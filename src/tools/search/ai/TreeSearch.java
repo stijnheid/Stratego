@@ -9,10 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 import tools.search.ai.players.Attacker;
-import tools.search.new_ai.DefenderOne;
-import tools.search.new_ai.DefenderTwo;
-import tools.search.new_ai.SparringAttacker;
-import tools.search.new_ai.SparringAttacker.SparringAttackerHeuristic;
 
 /**
  *
@@ -52,12 +48,10 @@ public class TreeSearch extends InterruptableSearch {
      * Interrupts the currently running algorithm and forces it
      * to return a move as fast as possible.
      */
-    @Override
     public void timeout() {
         this.timeout = true;
     }
     
-    @Override
     public void setHeuristic(HeuristicEvaluation evaluation) {
         this.evaluation = evaluation;
     }
@@ -555,7 +549,7 @@ public class TreeSearch extends InterruptableSearch {
     }
     
     public static void main(String[] args) {
-        new TreeSearch(null).endTest(); //minimizerTest(); //performanceTest();
+        new TreeSearch(null).performanceTest();
     }
     
     private void test() {
@@ -793,7 +787,7 @@ public class TreeSearch extends InterruptableSearch {
                 // not been set, since all moves are bad.
                 if(isMaxPlayer && score == Double.NEGATIVE_INFINITY ||
                         !isMaxPlayer && score == Double.POSITIVE_INFINITY) {
-                    System.out.println("Inevitable Loss! " + isMaxPlayer);
+                    System.out.println("Inevitable Loss!" + isMaxPlayer);
                     break;
                 }
                 
@@ -842,16 +836,15 @@ public class TreeSearch extends InterruptableSearch {
         // Reached a terminal node.
         double e = endStateReached(board);
         if(e != -1) {
-            //System.out.println("Max EndState: " + e);
             return e;
         }        
         
         // Reached maximum depth.
         if(depth == 0) {
             // Return heuristic score for this state.
-//            double score = this.evaluation.score(state);
-//            System.out.println("Leaf Score: " + score);
-//            return score;
+            //double score = this.evaluation.score(state);
+            //System.out.println("Leaf Score: " + score);
+            //return score;
             return this.evaluation.score(state);
         }
         
@@ -870,7 +863,7 @@ public class TreeSearch extends InterruptableSearch {
             //alpha = Math.max(alpha, alphaBetaMin(node, alpha, beta, depth - 1));
             GameNode next = new GameNode(state);
             double score = alphaBetaMin(next, alpha, beta, depth - 1, path);
-            if(score > alpha || node.getBestMove() == null && this.currentMaxDepth == depth) {
+            if(score > alpha) { // || node.getBestMove() == null) {
                 //System.out.println(depth + " Max Better Score: " + score + " > " + alpha);
                 path.addFirst(move);
                 bestPath = path;
@@ -920,16 +913,15 @@ public class TreeSearch extends InterruptableSearch {
         // Reached a terminal  node.
         double e = endStateReached(board);
         if(e != -1) {
-            //System.out.println("Min EndState: " + e);
             return e;
         }
         
         // Reached maximum depth.
         if(depth == 0) {
             // Return heuristic score for this state.
-//            double score = this.evaluation.score(state);
-//            System.out.println("Leaf Score: " + score);
-//            return score;
+            //double score = this.evaluation.score(state);
+            //System.out.println("Leaf Score: " + score);
+            //return score;
             return this.evaluation.score(state);
         }
         
@@ -953,7 +945,7 @@ public class TreeSearch extends InterruptableSearch {
             // node.getBestMove() will only occur for the first move.
             // It is needed to always set a move, since if all moves are
             // infinitely as bad, then no move will be set.
-            if(score < beta || node.getBestMove() == null && this.currentMaxDepth == depth) {
+            if(score < beta) {// || node.getBestMove() == null) {
                 //System.out.println(depth + " Min Better Score: " + score + " < " + beta);
                 path.addFirst(move);
                 bestPath = path;
@@ -1001,9 +993,9 @@ public class TreeSearch extends InterruptableSearch {
             } else {
                 // Root player wins.
                 if(winner == Team.BLUE) {
-                    return Double.NEGATIVE_INFINITY;
-                } else { // Root player loses.
                     return Double.POSITIVE_INFINITY;
+                } else { // Root player loses.
+                    return Double.NEGATIVE_INFINITY;
                 }
             }
         }
@@ -1089,65 +1081,11 @@ public class TreeSearch extends InterruptableSearch {
         moves.set(index, first);
     }
     
-    private void endTest() {
-        //SparringAttacker defender = new SparringAttacker(Team.RED);        
-        DefenderTwo defender = new DefenderTwo(Team.BLUE);
-        GameState state = new GameState();
-        /*
-        String setup = "r:3|   \n" +
-                        "--- ---\n" +
-                        "b:4|   \n" +
-                        "--- ---\n" +
-                        "b:F|r:4";
-        */
-        String setup = "r:7|   |r:8|r:5\n" +
-                        "--- --- --- ---\n" + 
-                        "   |r:4|r:2|   \n" +
-                        "--- --- --- ---\n" +
-                        "   |r:6|   |   \n" +
-                        "--- --- --- ---\n" +
-                        "r:S|   |   |   \n" +
-                        "--- --- --- ---\n" +
-                        "   |b:B|b:B|   \n" +
-                        "--- --- --- ---\n" + 
-                        "   |b:6|b:F|r:9";
-        GameBoard board = GameBoard.loadBoard(setup, 4, 6);
-        defender.setRange(8);
-        //GameBoard board = GameBoard.loadBoard(setup, 2, 3);
-        
-        System.out.println("Board Setup:\n" + board.transcript());
-        state.setGameBoard(board);
-        // Run algorithm.
-        MoveAction move = defender.nextMove(state);
-        System.out.println("Next Move: " + move);
-        MySearchResult result = (MySearchResult) defender.getResult();        
-    }
-    
-    private void minimizerTest() {
-        DefenderOne defender = new DefenderOne(Team.BLUE);        
-        GameState state = new GameState();
-        String setup = "r:3|   \n" +
-                        "--- ---\n" +
-                        "b:4|   \n" +
-                        "--- ---\n" +
-                        "   |r:4";
-        defender.setRange(8);
-        GameBoard board = GameBoard.loadBoard(setup, 2, 3);
-        
-        System.out.println("Board Setup:\n" + board.transcript());
-        state.setGameBoard(board);
-        // Run algorithm.
-        MoveAction move = defender.nextMove(state);
-        System.out.println("Next Move: " + move);
-        MySearchResult result = (MySearchResult) defender.getResult();
-    }
-    
     private void performanceTest() {
         System.out.println("Run Performance Test");
-        //HeuristicEvaluation heuristic = new Attacker.AttackerHeuristic();
-        SparringAttacker attacker = new SparringAttacker(Team.RED);
-        WeightedEvaluation heuristic = attacker.new SparringAttackerHeuristic();
-        
+        HeuristicEvaluation heuristic = new Attacker.AttackerHeuristic();
+        //SparringAttacker attacker = new SparringAttacker(Team.RED);
+        //WeightedEvaluation heuristic = attacker.new SparringAttackerHeuristic();
         
         //AlphaBetaSearch search = new AlphaBetaSearch(heuristic);
         
@@ -1156,16 +1094,8 @@ public class TreeSearch extends InterruptableSearch {
         GameState state = new GameState();
         SetupGenerator generator = new SetupGenerator();
         //GameBoard board = generator.generateFourBySix();
-        //GameBoard board = generator.generateWholeSetup();
+        GameBoard board = generator.generateWholeSetup();
         
-        String setup = "r:3|   \n" +
-                        "--- ---\n" +
-                        "b:4|   \n" +
-                        "--- ---\n" +
-                        "   |r:4";
-        GameBoard board = GameBoard.loadBoard(setup, 2, 3);
-        
-        /**
         String setup = "r:3|r:4|r:3|r:4\n" +
                         "--- --- --- ---\n" + 
                         "r:4|r:8|r:S|r:4\n" +
@@ -1177,7 +1107,6 @@ public class TreeSearch extends InterruptableSearch {
                         "b:4|b:9|b:3|b:4\n" +
                         "--- --- --- ---\n" + 
                         "b:4|b:3|b:4|b:3";
-        */ 
         //GameBoard board = GameBoard.loadBoard(setup, 4, 6);
         System.out.println(board.transcript());
         state.setGameBoard(board);
@@ -1187,15 +1116,12 @@ public class TreeSearch extends InterruptableSearch {
         int initialDepth = 1;
         int range = 7; //8; //9; //10; //9; //9; //3; //1; //9; //2; //5; //9; //5; //1; //9; //6; //-1;
         //SearchResult result = iterativeDeepeningAlphaBeta(node, initialDepth, range, true);
-        /**
         MySearchResult result = IDAlphaBeta(node, initialDepth, range, true, moveOrdering);
         MoveAction m = result.getBestMove();
         board.applyMove(m);
-        */
-        
         System.out.println("Board:\n" + board.transcript());
         long start = System.currentTimeMillis();
-        MySearchResult result = IDAlphaBeta(node, initialDepth, range, true, moveOrdering);
+        result = IDAlphaBeta(node, initialDepth, range, true, moveOrdering);
         //search.iterativeDeepeningAlphaBeta(node, initialDepth, range, true);
         long end = System.currentTimeMillis();
         System.out.println("IDAlphaBeta ended in " +

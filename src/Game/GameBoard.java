@@ -501,6 +501,7 @@ public class GameBoard {
         
         // Has the flag been captured? Count the # of flags on the defending
         // side.
+        
         List<GamePiece> defenderFlag = getPieces(this.defender, Pieces.FLAG);
         if(defenderFlag.isEmpty()) {
             //System.out.println("Defender has no flag.");
@@ -612,7 +613,6 @@ public class GameBoard {
     
     /**
      * Method intended for the AI to apply a move.
-     * This method does not check if the game board is already in an end state.
      * 
      * @param move 
      */
@@ -996,39 +996,17 @@ public class GameBoard {
         
         for(int row=0; row<other.height; row++) {
             for(int column=0; column<other.width; column++) {
-                // Must create a new GamePiece to prevent state corruption.
-                // With boards that use the same reference, changes are reflected
-                // and can corrupt state.
+                // Re-use the original reference, do not create a new GamePiece.
                 GamePiece piece = other.board[row][column];
                 if(piece != null) {
                     // Transfer piece to this board.
                     if(this.board[row][column] == null) { // Empty cell.
-                        this.board[row][column] = ((GamePiece) piece.clone());
+                        this.board[row][column] = piece;
                     } else {
                         throw new IllegalStateException("Cannot merge boards, positiion already occupied.");
                     }
                 }
             }
         }
-    }
-    
-    public boolean isSetupValid() {
-        boolean valid = true;
-        for(int row=0; row<this.height; row++) {
-            for(int column=0; column<this.width; column++) {
-                GamePiece piece = this.board[row][column];
-                if(piece != null) {
-                    if(this.board[row][column] != null) {
-                        // Verify that the position stored within the piece
-                        // object is correct.
-                        if(!(new BoardPosition(column, row)).equals(piece.getPosition())) {
-                            valid = false;
-                            return valid;
-                        }
-                    }
-                }
-            }
-        }
-        return valid;
     }
 }

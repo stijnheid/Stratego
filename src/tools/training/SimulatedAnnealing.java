@@ -45,7 +45,7 @@ public class SimulatedAnnealing {
         // Random weight within the range [-1,1] are assigned.
         for(int i=0; i<this.weights.length;i++){
             //this.weights[i] = (double)(this.random.nextInt(20) - 10) / 10.0;
-            this.weights[i] = ((double) (this.random.nextInt(10) + 1)) / 10.0;
+            this.weights[i] = ((double) this.random.nextInt(10)) / 10.0;
         }
         System.out.println("Initial Weights: " + Arrays.toString(this.weights));
         
@@ -120,7 +120,7 @@ public class SimulatedAnnealing {
         if(weights[index] > 0.9){
             System.out.println("add -0.1");
             return weights[index] - 0.1; // subtracting 0.1 if 1
-        } else if(weights[index] <= 0.1) { //-0.9){ // Prevent a value of 0.1 going to 0, by using <=
+        } else if(weights[index] < 0.1) { //-0.9){
             System.out.println(" add 0.1");
             return weights[index] + 0.1; // adding 0.1 if -1
         } else {

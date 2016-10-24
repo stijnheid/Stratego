@@ -19,6 +19,8 @@ import tools.search.ai.WeightedHeuristicTerm;
  */
 public class SparringAttacker extends AbstractWeightedPlayer {
 
+    private int range;
+
     public SparringAttacker(Team team) {
         super(team);
         this.range = 8;
@@ -42,13 +44,16 @@ public class SparringAttacker extends AbstractWeightedPlayer {
         boolean moveOrdering = false;
         SearchResult result = this.search.search(node, initialDepth, 
                 this.range, true, moveOrdering);
-        
-        this.searchResult = result;
         // Best move.
         MoveAction move = result.getBestMove();
         
         this.active = false;
         return move;
+    }    
+    
+    @Override
+    public void setRange(int range) {
+        this.range = range;
     }
     
     // Put all Heuristic stuff after here.
@@ -115,6 +120,14 @@ public class SparringAttacker extends AbstractWeightedPlayer {
             }
             return (redScore - blueScore);
         }
+    }
+    
+    private class CellValues extends WeightedHeuristicTerm {
+
+        @Override
+        public double computeScore(GameState state) {
+            return 0;
+        }        
     }
     
     private final static HashMap<Pieces, Integer> attackerValues;
