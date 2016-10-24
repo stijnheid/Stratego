@@ -337,7 +337,7 @@ public class TreeSearch extends InterruptableSearch {
         Team winner = board.isEndState();
         // If winner != null, means we reached an end state.
         if(winner != null) {
-            System.out.println("ENDSTATE REACHED");
+            //System.out.println("ENDSTATE REACHED");
             // The end state should be evaluated with respect to the perspective
             // of the player at the root. The maximizing player is assumed to be
             // the RED team and the minimizing player is assumed to be the BLUE
@@ -379,7 +379,7 @@ public class TreeSearch extends InterruptableSearch {
             List<MoveAction> moves = board.getMoves(Team.RED);
             // Sort the moves.
             if(this.moveOrderOn) {
-                System.out.println("Order Moves (Max) at " + depth);
+                //System.out.println("Order Moves (Max) at " + depth);
                 orderMoves(moves, previousBestMove);
             }
             
@@ -450,7 +450,7 @@ public class TreeSearch extends InterruptableSearch {
             List<MoveAction> moves = board.getMoves(Team.BLUE);
             // Sort the moves.
             if(this.moveOrderOn) {
-                System.out.println("Order Moves (Min) at " + depth);
+                //System.out.println("Order Moves (Min) at " + depth);
                 orderMoves(moves, previousBestMove);            
             }
             
@@ -462,7 +462,7 @@ public class TreeSearch extends InterruptableSearch {
                 //System.out.println("MinPlayer Applied move: " + move.toString());
                 
                 if(i == 0) {
-                    System.out.println("Min Init Push: " + move.toString());
+                    //System.out.println("Min Init Push: " + move.toString());
                     //this.alphaBetaPVPath[this.currentMaxDepth - depth] = move;
                     //this.alphaBetaPVScore[this.currentMaxDepth - depth] = Double.POSITIVE_INFINITY;
                 }
@@ -522,7 +522,7 @@ public class TreeSearch extends InterruptableSearch {
         
         // Store best move on stack.
         this.alphaBetaBestMoves.push(bestMove);
-        System.out.println("BestMove at depth: " + depth + " -> " + bestMove.toString());
+        //System.out.println("BestMove at depth: " + depth + " -> " + bestMove.toString());
         
         //System.out.println(depth + " bestValue = " + bestValue);
         //System.out.println("Best move: " + bestMove.toString());
@@ -649,7 +649,7 @@ public class TreeSearch extends InterruptableSearch {
         this.initialPlayer = isMaxPlayer;
         
         MoveAction bestMove = null;
-        System.out.println("isMaxPlayer: " + isMaxPlayer);
+        //System.out.println("isMaxPlayer: " + isMaxPlayer);
         MySearchResult result = new MySearchResult();
         Stack<Integer> exploredNodes = new Stack<>();
         Stack<Long> iterationTimes = new Stack<>();
@@ -670,14 +670,14 @@ public class TreeSearch extends InterruptableSearch {
             while(!this.timeout) {
                 // Check if range has been exceeded.
                 if(range != -1 && depth - initialDepth > range) {
-                    System.out.println("Exceeded range.");
+                    //System.out.println("Exceeded range.");
                     break;
                 }
                 
                 // Reset best move.
                 node.setBestMove(null);
                 // Run alpha beta.
-                System.out.println("Run IDAlphaBeta with max depth: " + depth);
+                //System.out.println("Run IDAlphaBeta with max depth: " + depth);
                 
                 // Reset counters.
                 //this.exploredNodes = 0;
@@ -717,7 +717,7 @@ public class TreeSearch extends InterruptableSearch {
                     this.moveOrderState = new boolean[this.currentPVPath.size()];                    
                 }
                 
-                System.out.println("Move Ordering: " + this.moveOrderOn);
+                //System.out.println("Move Ordering: " + this.moveOrderOn);
                 
                 double score;
                 double alpha = Double.NEGATIVE_INFINITY; // Worst case maximizing player.
@@ -725,10 +725,10 @@ public class TreeSearch extends InterruptableSearch {
                 LinkedList<MoveAction> path = new LinkedList<>();
                 long start = System.currentTimeMillis();
                 if(isMaxPlayer) {
-                    System.out.println("alphaBetaMax");
+                    //System.out.println("alphaBetaMax");
                     score = alphaBetaMax(node, alpha, beta, depth, path);
                 } else {
-                    System.out.println("alphaBetaMin");
+                    //System.out.println("alphaBetaMin");
                     score = alphaBetaMin(node, alpha, beta, depth, path);
                 }
                 long end = System.currentTimeMillis();
@@ -785,7 +785,7 @@ public class TreeSearch extends InterruptableSearch {
                 // deepening.
                 if(isMaxPlayer && score == Double.POSITIVE_INFINITY || 
                         !isMaxPlayer && score == Double.NEGATIVE_INFINITY) {
-                    System.out.println("Inevitable Win! " + isMaxPlayer);
+                    //System.out.println("Inevitable Win! " + isMaxPlayer);
                     break;
                 }
                 
@@ -793,12 +793,13 @@ public class TreeSearch extends InterruptableSearch {
                 // not been set, since all moves are bad.
                 if(isMaxPlayer && score == Double.NEGATIVE_INFINITY ||
                         !isMaxPlayer && score == Double.POSITIVE_INFINITY) {
-                    System.out.println("Inevitable Loss! " + isMaxPlayer);
+                    //System.out.println("Inevitable Loss! " + isMaxPlayer);
                     break;
                 }
                 
                 // Print statistical information.
                 long begin = System.currentTimeMillis();
+                /*
                 System.out.println("BestMove: " + bestMove.toString());
                 System.out.println("Score: " + score);
                 System.out.println("Cutoffs: " + this.cutoffs);
@@ -807,6 +808,7 @@ public class TreeSearch extends InterruptableSearch {
                 long termination = System.currentTimeMillis();
                 System.out.println("Message output took " + (termination - begin) + " ms.");
                 System.out.println();
+                */
                 
                 // Increment depth.
                 depth++;

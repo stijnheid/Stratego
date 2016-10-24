@@ -16,6 +16,7 @@ import java.util.logging.Logger;
 import tools.deeplearning.BattleEngine;
 import tools.deeplearning.BattleTranscript;
 import tools.search.new_ai.DefenderOne;
+import tools.search.new_ai.DefenderThree;
 import tools.search.new_ai.DefenderTwo;
 import tools.search.new_ai.SparringAttacker;
 import tools.search.new_ai.WeightedAIBot;
@@ -31,6 +32,7 @@ public class HeuristicTraining implements WeightSetListener {
     private BattleEngine engine;
     //private List<GameBoard> defensiveSetups;
     private List<BoardPosition> offensiveSide;
+    private WeightSetListener listener;
     
     private Team attackingTeam = Team.RED;
     private Team defendingTeam = Team.BLUE;
@@ -50,6 +52,10 @@ public class HeuristicTraining implements WeightSetListener {
         this.offensiveSide = fillPositions(4, 2);
     }
     
+    public void setListener(WeightSetListener listener) {
+        this.listener = listener;
+    }
+    
     public static void main(String[] args) {
         new HeuristicTraining().train();
     }
@@ -60,13 +66,16 @@ public class HeuristicTraining implements WeightSetListener {
         // Setup the bots to be used.
         this.attacker = new SparringAttacker(Team.RED);
         //this.defender = new ModeratePlayer(Team.BLUE);        
-        this.defender = new DefenderTwo(Team.BLUE);
+        this.defender = new DefenderThree(Team.BLUE);
+        
         
         int numberOfFeatures = this.defender.featureCount();
         int rounds = 1; //50; // # of weight assignments that will be used.
         //SimulatedAnnealing generator = new SimulatedAnnealing(
         //        numberOfFeatures, rounds);
+        long start = System.currentTimeMillis();
         this.algorithm = new SimulatedAnnealing(numberOfFeatures, rounds);
+        long end = System.currentTimeMillis();
         SimulatedAnnealing generator = this.algorithm;
 
         // Create battle engine.
@@ -85,13 +94,14 @@ public class HeuristicTraining implements WeightSetListener {
             
             // Get the resulting weights.
             double[] weights = generator.getWeights();
-            System.out.println("Final Weights: " + Arrays.toString(weights));
+            //System.out.println("Final Weights: " + Arrays.toString(weights));
             
             // Save the plot.
             String filename = "";
-            generator.savePlot(false, filename);
+            generator.savePlot(true, filename);
             System.out.println("TRAINING ENDED");
-            System.out.println(generated(weights));
+            System.out.println("Weight Assignment Iteration Training lasted " + (end - start) + " ms.");
+            System.out.println(Arrays.toString(this.algorithm.getWeights()));
         } catch (IOException ex) {
             Logger.getLogger(HeuristicTraining.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -120,6 +130,7 @@ public class HeuristicTraining implements WeightSetListener {
         List<GameBoard> defensiveSetups = loadDefensiveSetups();
         
         double winRate = 0; // # of won finished matches.
+        double redWin = 0;// # of matches with team red winning
         double incomplete = 0; // # of unfinished matches.
         int matches = 0; // # of total matches.
         
@@ -129,7 +140,6 @@ public class HeuristicTraining implements WeightSetListener {
         int rounds = 3;
         // The attacker plays against each setup #rounds times, but each time
         // with a different setup.
-        long start = System.currentTimeMillis();
         for(int i=0; i<rounds; i++) {
             for(GameBoard defensiveSetup : defensiveSetups) {
                 /*
@@ -166,6 +176,9 @@ public class HeuristicTraining implements WeightSetListener {
                     if(winner == this.subject.getTeam()) {
                         winRate++;
                     }
+                    if (winner == this.subject.getTeam().opposite()) {
+                        redWin++;
+                    }
                 } else {
                     // Game did not end.
                     incomplete++;
@@ -179,8 +192,10 @@ public class HeuristicTraining implements WeightSetListener {
             }
             System.out.println("NEXT ROUND");
         }
-        long end = System.currentTimeMillis();
-        System.out.println("Weight Assignment Iteration Training lasted " + (end - start) + " ms.");
+        System.out.println("Blue won: " + winRate);
+        System.out.println("Red won: " + redWin);
+        System.out.println("draw: " + incomplete);
+        System.out.println("WinRate " + (winRate + (incomplete / 2.0d)) / (double) matches);
         // Can store the transcript here with the given weight set and
         // the WeightedAIBot algorithms used.
         

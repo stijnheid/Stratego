@@ -34,6 +34,9 @@ public class SimulatedAnnealing {
     private final List<NamedDataSet> plot = new ArrayList();
     private boolean busy;
     
+    double bestWinRate = 0;
+    double[] bestWeightAssignment = null;
+    
     //Constructor to create a SimulatedAnnealing class for the given amount of weights
     public SimulatedAnnealing(int num_weights, int temp){
         this.temperature = temp;
@@ -79,11 +82,17 @@ public class SimulatedAnnealing {
             */
             
             // Notify the listener. (Blocking method)
-            double winRate = listener.generated(weights);
+            double currentWinRate = listener.generated(weights);
+            if (currentWinRate >= bestWinRate) {
+                bestWinRate = currentWinRate;
+                bestWeightAssignment = this.weights;          
+            }
+            System.out.println("Current Weights: " + Arrays.toString(this.weights));
+            System.out.println("Best Weights Assignemt: " + Arrays.toString(bestWeightAssignment));
             // Process the result.
             
             // If the adjustment is accepted, copy it to the original weights array
-            double e = 1 - winRate; //getEnergy(weightsCopy);
+            double e = 1 - currentWinRate; //getEnergy(weightsCopy);
             System.out.println("Proposed energy: "+e);
             if(checkAccepted(weightsCopy, e)){
                 this.weights = weightsCopy; // updates the weights
