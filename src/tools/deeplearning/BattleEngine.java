@@ -353,6 +353,13 @@ public class BattleEngine {
         AIBot currentTurn = attacker;
         
         // Check if setups are valid.
+        if(!board.isSetupValid()) {
+            throw new RuntimeException("Invalid board setup");
+        }
+        
+        if(board.isEndState() == null) {
+            throw new RuntimeException("Board is already in an end state.");
+        }
         
         // Simulate the game.
         state.setRunning(true);
@@ -369,7 +376,7 @@ public class BattleEngine {
         
         transcript.startGame();
         
-        int loopLimit = 5; // maximum allowed # of consecutive back and forth moves.
+        int loopLimit = 20; //5; // maximum allowed # of consecutive back and forth moves.
         Team winner;
         while((winner = board.isEndState()) == null) {
             if(maxIterations != -1 && iterations >= maxIterations) {
@@ -380,13 +387,9 @@ public class BattleEngine {
             System.out.println("Next Move for " + currentTurn.getClass().getSimpleName());
             
             //System.out.println("Invoke Move");
-            MoveAction move = timedAIMove((GameState) state.clone(), 
+            MoveAction move = timedAIMove(state, 
                     currentTurn, 
                     computationTime);
-            // Player unable to supply a move, should not happen.
-            if(move == null) {
-                throw new RuntimeException("Player has no move: " + currentTurn.getTeam());
-            }
             
             //System.out.println("Received Move");
             Team team = move.getPiece().getTeam();
@@ -398,47 +401,11 @@ public class BattleEngine {
                     ") to (" +
                     destination.getX() + "," + destination.getY() + ")");
             
-            // Apply move.
-            // Put in back the reference to the original GamePiece rather than
-            // the clone GamePiece reference.
-            GamePiece originalPiece = null;
-            try {
-                originalPiece = board.getPiece(move.getOrigin());
-            } catch (InvalidPositionException ex) {
-                Logger.getLogger(BattleEngine.class.getName()).log(Level.SEVERE, null, ex);
-            }            
-            
-            // DEBUG Check if the move is incorrect.
-            /*
-            GamePiece pieceToMove = move.getPiece();
-            if(!pieceToMove.getPosition().equals(move.getOrigin())) {
-                throw new RuntimeException("Incorrect MoveAction: " 
-                        + pieceToMove.getPosition().toString() 
-                        + " != " + move.getOrigin().toString() 
-                        + " Original Move: " + move.toString()
-                        + " Applied: " + move.isApplied()
-                        + " notOriginal: " + (pieceToMove != originalPiece));
-            }*/
-            
-            if(originalPiece == null) {
-                throw new RuntimeException("No original piece at " + 
-                        move.getOrigin().toString() + " for move " + 
-                        move.toString());
-            }
-            
-            if(!originalPiece.getPosition().equals(move.getOrigin())) {
-                throw new RuntimeException("Incorrect origin for move: piece=" + 
-                        originalPiece.toString() + ", move=" + move.toString());
-            }
-            
-            MoveAction originalMove = new MoveAction(move.getTeam(), originalPiece, 
-                    move.getOrigin(), move.getDestination());
-            
             // Store move in transcript.
-            transcript.addMove(originalMove);            
+            transcript.addMove(move);
             
             // Apply the move.
-            state.getGameBoard().applyMove(originalMove);
+            state.getGameBoard().applyMove(move);
             
             System.out.println("BoardState:\n" + state.getGameBoard().transcript());
             
@@ -532,10 +499,63 @@ public class BattleEngine {
         };
         
         timer.schedule(task, computationTime);
-        MoveAction move = bot.nextMove(state);
+        // It is important to clone the GameState since search algorithms that
+        // are interrupted during execution do not get the chance of undoing
+        // all moves and there cause a corrupt state.
+        // Beware that the returned MoveAction contains a piece reference
+        // to a copy, created by cloning GameState, and not the real piece.
+        // GameBoard.applyMove() takes care of using the real piece object for
+        // actually applying the move rather than the copy reference, since this
+        // the copied piece state can mismatch with the real piece, because
+        // the search algorithm was interrupted and did not have the chance to
+        // undo move. Therefore it can have a different position than the real
+        // piece or can be killed.
+        MoveAction move = bot.nextMove((GameState) state.clone());
+        
+        // Player unable to supply a move, should not happen.
+        if(move == null) {
+            throw new RuntimeException("Player has no move: " + bot.getTeam());
+        }        
+        
+        // Replace the reference of the copied piece with that of the original
+        // piece.
+        GameBoard board = state.getGameBoard();
+        GamePiece originalPiece = null;
+        try {
+            originalPiece = board.getPiece(move.getOrigin());
+        } catch (InvalidPositionException ex) {
+            Logger.getLogger(BattleEngine.class.getName()).log(Level.SEVERE, null, ex);
+        }            
+
+        // DEBUG Check if the move is incorrect.
+        /*
+        GamePiece pieceToMove = move.getPiece();
+        if(!pieceToMove.getPosition().equals(move.getOrigin())) {
+            throw new RuntimeException("Incorrect MoveAction: " 
+                    + pieceToMove.getPosition().toString() 
+                    + " != " + move.getOrigin().toString() 
+                    + " Original Move: " + move.toString()
+                    + " Applied: " + move.isApplied()
+                    + " notOriginal: " + (pieceToMove != originalPiece));
+        }*/
+
+        if(originalPiece == null) {
+            throw new RuntimeException("No original piece at " + 
+                    move.getOrigin().toString() + " for move " + 
+                    move.toString());
+        }
+
+        if(!originalPiece.getPosition().equals(move.getOrigin())) {
+            throw new RuntimeException("Incorrect origin for move: originalPiece=" + 
+                    originalPiece.toString() + ", move=" + move.toString());
+        }
+
+        MoveAction originalMove = new MoveAction(move.getTeam(), originalPiece, 
+                move.getOrigin(), move.getDestination());        
+        
         //System.out.println("Interrupted: " + interrupted);
         task.cancel();
-        return move;
+        return originalMove;
     }
     
     public void debug() throws InvalidPositionException {
