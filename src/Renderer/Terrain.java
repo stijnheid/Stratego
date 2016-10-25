@@ -5,7 +5,6 @@
  */
 package Renderer;
 
-import robotrace.Camera;
 import Game.BoardPosition;
 import Game.GameBoard;
 import Game.GamePiece;
@@ -81,8 +80,7 @@ public class Terrain extends Base {
     GameBoard board;
     GamePiece piece;
     
-    public Terrain(GameState gs, GameBoard gb, Simulation s){ 
-        super(s);
+    public Terrain(GameState gs, GameBoard gb){ 
         //form game setup.
         if (gs == null || gb == null){
             gamestate = new GameState();
@@ -110,7 +108,7 @@ public class Terrain extends Base {
         }
         
         //get everything going.
-        run();
+        //run();
     }
     
        /**
@@ -470,16 +468,16 @@ public class Terrain extends Base {
     }
     
     public static void main (String[] args){
-        Terrain terrain = new Terrain(null, null, null);
+        //Terrain terrain = new Terrain(null, null, null);
     }
     
-        public double heightAt(double x, double y) {
+    public double heightAt(double x, double y) {
         double formula1 = 0.6*cos(0.3*x + 0.2*y) + 0.4*cos(x-0.5* y);
         double ding = 2*((abs(x)-boardsize/2)*(abs(y)-boardsize/2))/terrainsize/2;
         return (ding*formula1);
     }
         
-        public double[] texPos(double x, double y) {
+    public double[] texPos(double x, double y) {
         double xPos = (terrainsize/2+x)/terrainsize;
         double yPos = (terrainsize/2+y)/terrainsize;
         double position[] = new double[]{xPos,yPos};

@@ -107,9 +107,7 @@ abstract public class Base {
     /**
      * Constructs base class.
      */
-    public Base(Simulation s) {
-        this.simulation = s;
-                
+    public Base() {
         // Global state.
         this.gs = new GameState();
         
@@ -191,6 +189,10 @@ abstract public class Base {
         }
 
         return result;
+    }
+    
+    public void setSimulation(Simulation simulation) {
+        this.simulation = simulation;
     }
     
     /**

@@ -1,5 +1,6 @@
 package robotrace;
 
+import Renderer.Camera;
 import com.jogamp.opengl.util.texture.Texture;
 
 import java.io.File;

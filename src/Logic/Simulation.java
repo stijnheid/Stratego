@@ -10,6 +10,11 @@ import Game.Pieces;
 import Game.Team;
 import Renderer.Animation;
 import Renderer.AnimationCallback;
+import Renderer.AttackAnimation;
+import Renderer.DeathAnimation;
+import Renderer.DrawAnimation;
+import Renderer.Terrain;
+import Renderer.WalkAnimation;
 import actions.Action;
 import actions.MoveAction;
 import actions.SelectAction;
@@ -17,7 +22,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JComponent;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import tools.deeplearning.BattleEngine;
@@ -43,15 +47,17 @@ public class Simulation implements AnimationCallback {
     private Player second;
     private Player turn;
     private final int computationTime;
-    private Animation runningAnimation;
+    //private Animation runningAnimation;
+    private boolean animationBusy;
     private MoveAction pendingMove;
     private BattleTranscript transcript;
     private boolean aiBusy;
+    private Terrain terrain;
     
     //private final Renderer renderer;
     //private final JComponent uiComponent;
     
-    public Simulation(GameState state, Player first, Player second) {
+    public Simulation(GameState state, Player first, Player second, Terrain terrain) {
         // Human vs Human matches are unsupported.
         if(first.isHuman() && second.isHuman()) {
             throw new IllegalArgumentException("Human vs Human not supported.");
@@ -66,9 +72,11 @@ public class Simulation implements AnimationCallback {
         this.first = first;
         this.second = second;
         this.turn = first;
+        this.terrain = terrain;
         //this.uiComponent = null;
         this.computationTime = GlobalSettings.AI_COMPUTATION_TIME;
-        this.runningAnimation = null;
+        //this.runningAnimation = null;
+        this.animationBusy = false;
         this.pendingMove = null;
     }
     
@@ -95,7 +103,7 @@ public class Simulation implements AnimationCallback {
         }
         
         // Do not accept any new action while an animation is running.
-        if(this.runningAnimation != null) {
+        if(this.animationBusy) {
             System.out.println("Rejected Action during animation from " + action.getTeam());
             return;
         }
@@ -146,28 +154,67 @@ public class Simulation implements AnimationCallback {
         }
 
         // Decide which animation must be played. Regular Move or an Attack.
-        Animation animation;
-        if(move.isIsAttack()) {
+        if(move.isIsAttack()) { 
+            Animation attackAnimation;
+            Animation deathAnimation;
+            
+            GamePiece attacker = move.getPiece();
+            // Not safe can currently point to a cloned piece that has a different
+            // position, due to an interrupted search.
+            //GamePiece enemy = move.getEnemy();
+            
+            GamePiece enemy = this.state.getGameBoard().getPiece(move.getDestination());
+            
             // Create an attack animation.
-            // Determine the board positions required.
-            animation = null;
+            int result = attacker.attack(enemy);
+            System.out.println("ATTACK PIECE --> " + result);
+            if(result == 1) {
+                // Attacker kills enemy.
+                attackAnimation = new AttackAnimation(this.terrain, attacker, move.getDestination(), this);
+                attackAnimation.execute();
+                
+                deathAnimation = new DeathAnimation(this.terrain, enemy, move.getOrigin(), this);
+                deathAnimation.execute();
+            } else if(result == -1) {
+                // The piece that is being attacked, wins.
+                attackAnimation = new AttackAnimation(this.terrain, enemy, move.getOrigin(), this);
+                attackAnimation.execute();
+                
+                deathAnimation = new DeathAnimation(this.terrain, attacker, move.getDestination(), this);
+                deathAnimation.execute();
+            } else { // Tie
+                // Both pieces die.
+                attackAnimation = new DrawAnimation(this.terrain, attacker, move.getDestination(), this, true);
+                attackAnimation.execute();
+                
+                Animation secondAnimation = new DrawAnimation(this.terrain, enemy, move.getOrigin(), this, false);
+                secondAnimation.execute();
+                
+                DeathAnimation firstDeath = new DeathAnimation(this.terrain, attacker, move.getDestination(), this);
+                firstDeath.execute();
+                
+                DeathAnimation secondDeath = new DeathAnimation(this.terrain, enemy, move.getOrigin(), this);
+                secondDeath.execute();
+            }
         } else {
             // Create a regular move animation.
-            animation = null;
+            WalkAnimation walk = new WalkAnimation(this.terrain, move.getPiece(), move.getDestination(), this);
+            walk.execute();
         }
         
         // Store the running animation and pending move to be applied after
         // the animation is finished.
-        this.runningAnimation = animation;
+        //this.runningAnimation = animation;
         this.pendingMove = move;
         
-       // Run animation.
+        // Run animation.
+        /**
         if(animation != null) {
             animation.execute();
         } else {
-            // No animation, trigger turn switch directly.
+            // No animation, trigger turn switch directly. (For testing)
             applyMove();
-        }        
+        }*/      
     }
     
     private void processSelection(SelectAction selection) {
@@ -239,7 +286,6 @@ public class Simulation implements AnimationCallback {
                         switchTurn();
                     }
 
-
                 } catch (InvalidPositionException ex) {
                     Logger.getLogger(Simulation.class.getName()).log(Level.SEVERE, null, ex);
                 }
@@ -254,7 +300,7 @@ public class Simulation implements AnimationCallback {
 
     @Override
     public void animationEnded() {
-        if(this.runningAnimation == null) {
+        if(!this.animationBusy) {
             throw new RuntimeException("No running animation.");
         }
         if(this.pendingMove == null) {
@@ -264,7 +310,7 @@ public class Simulation implements AnimationCallback {
         applyMove();
         
         // Reset animation variables.
-        this.runningAnimation = null;
+        this.animationBusy = false;
         //this.pendingMove = null;
     }
     

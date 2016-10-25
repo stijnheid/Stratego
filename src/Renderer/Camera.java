@@ -1,4 +1,4 @@
-package robotrace;
+package Renderer;
 import static java.lang.Math.*;
 import Renderer.Vector;
 import Renderer.CameraState;
