@@ -61,7 +61,14 @@ public class Main {
 
         }
         */
-        new Main().initialize();
+        //new Main().initialize();
+        new Main().test();
+    }
+    
+    private void test() {
+        List<GameBoard> boards = loadDefensiveSetups();
+        //boards.get(0);
+        System.out.println(boards.get(0).transcript());
     }
     
     private void initialize() {
@@ -119,9 +126,9 @@ public class Main {
                        "--- --- --- --- --- ---\n" +
                        "b:B|b:6|b:4|b:7|b:4|b:B\n" + 
                        "--- --- --- --- --- ---\n" +
-                       "b:F|b:B|b:9|b:5|b:5|b:4\n";
+                       "b:F|b:B|b:9|b:5|b:5|b:4";
         
-        boards.add(GameBoard.loadBoard(setup, 4, 6));
+        boards.add(GameBoard.loadBoard(setup, 6, 6));
 
         setup = "   |   |   |   |   |   \n" +
                 "--- --- --- --- --- ---\n" +
@@ -133,9 +140,9 @@ public class Main {
                 "--- --- --- --- --- ---\n" +
                 "b:4|b:B|b:B|b:5|b:5|b:4\n" + 
                 "--- --- --- --- --- ---\n" +
-                "b:B|b:F|b:4|b:9|b:7|b:6\n";
+                "b:B|b:F|b:4|b:9|b:7|b:6";
         
-        boards.add(GameBoard.loadBoard(setup, 4, 6));
+        boards.add(GameBoard.loadBoard(setup, 6, 6));
 
         setup = "   |   |   |   |   |   \n" +
                 "--- --- --- --- --- ---\n" +
@@ -147,8 +154,8 @@ public class Main {
                 "--- --- --- --- --- ---\n" +
                 "b:6|b:9|b:7|b:B|b:4|b:4\n" + 
                 "--- --- --- --- --- ---\n" +
-                "b:B|b:F|b:5|b:4|b:5|b:B\n";
-        boards.add(GameBoard.loadBoard(setup, 4, 6));
+                "b:B|b:F|b:5|b:4|b:5|b:B";
+        boards.add(GameBoard.loadBoard(setup, 6, 6));
         
         setup = "   |   |   |   |   |   \n" +
                 "--- --- --- --- --- ---\n" +
@@ -160,9 +167,9 @@ public class Main {
                 "--- --- --- --- --- ---\n" +
                 "b:4|b:7|b:6|b:9|b:B|b:B\n" + 
                 "--- --- --- --- --- ---\n" +
-                "b:B|b:F|b:5|b:5|b:4|b:4\n";
+                "b:B|b:F|b:5|b:5|b:4|b:4";
         
-        boards.add(GameBoard.loadBoard(setup, 4, 6));
+        boards.add(GameBoard.loadBoard(setup, 6, 6));
 
         setup = "   |   |   |   |   |   \n" +
                 "--- --- --- --- --- ---\n" +
@@ -174,9 +181,9 @@ public class Main {
                 "--- --- --- --- --- ---\n" +
                 "b:4|b:B|b:5|b:6|b:4|b:B\n" + 
                 "--- --- --- --- --- ---\n" +
-                "b:5|b:4|b:9|b:7|b:B|b:F\n";
+                "b:5|b:4|b:9|b:7|b:B|b:F";
         
-        boards.add(GameBoard.loadBoard(setup, 4, 6));
+        boards.add(GameBoard.loadBoard(setup, 6, 6));
 
         setup = "   |   |   |   |   |   \n" +
                 "--- --- --- --- --- ---\n" +
@@ -188,9 +195,9 @@ public class Main {
                 "--- --- --- --- --- ---\n" +
                 "b:B|b:4|b:6|b:9|b:4|b:F\n" + 
                 "--- --- --- --- --- ---\n" +
-                "b:B|b:B|b:4|b:7|b:5|b:5\n";
+                "b:B|b:B|b:4|b:7|b:5|b:5";
         
-        boards.add(GameBoard.loadBoard(setup, 4, 6));
+        boards.add(GameBoard.loadBoard(setup, 6, 6));
         
         // Return list of boards.
         return boards;
