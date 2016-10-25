@@ -174,7 +174,7 @@ public class SetupGUI extends javax.swing.JFrame {
         JTextAreaPieces.setEditable(false);
         JTextAreaPieces.setColumns(20);
         JTextAreaPieces.setRows(5);
-        JTextAreaPieces.setText("Available Pieces:\n1 Marshall :\t9\n1 General : \t8\n1 Colonel : \t7\n1 Major : \t6\n2 Captains :\t5\n2 Lieutenants :\t4\n3 Miners : \tM\n1 Spy : \tS\n");
+        JTextAreaPieces.setText("Available Pieces:\n1 Marshall :\t9\n1 General : \t8\n1 Colonel : \t7\n1 Major : \t6\n2 Captains :\t5\n2 Lieutenants :\t4\n3 Miners : \t2\n1 Spy : \tS\n");
         JTextAreaPieces.setMaximumSize(new java.awt.Dimension(140, 184));
         jScrollPane1.setViewportView(JTextAreaPieces);
 

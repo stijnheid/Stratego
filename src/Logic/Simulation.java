@@ -164,6 +164,7 @@ public class Simulation implements AnimationCallback {
     private void processMove(MoveAction move) {
         // These type of actions are supplied by the AI bots.
         System.out.println("MoveAction from " + move.getTeam());
+        System.out.println(move);
         // Check if the move representation is valid.
         if(!move.isOkay()) {
             throw new RuntimeException("Invalid move: " + move);
