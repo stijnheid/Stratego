@@ -17,6 +17,9 @@ import java.util.HashMap;
  */
 public class CameraState {
     
+    public static Vector defaultloc = new Vector(0, 7, 7);
+    public static Vector defaultcnt = new Vector(0, 0, 0);
+    
     public float tAnim;         // Time since start of animation in seconds.
     private long frameCount;     //Amount of frames having been drawn since init.
     

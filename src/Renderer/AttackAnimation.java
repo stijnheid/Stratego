@@ -59,7 +59,7 @@ public class AttackAnimation extends Animation {
             faceForward();
             skel.swordOpacity = 0;
             //move Camera back to original location.
-            moveCamera(eye, center);
+            moveCamera(CameraState.defaultloc, CameraState.defaultcnt);
             //signal to end animation.
             endAnimation();
         });
