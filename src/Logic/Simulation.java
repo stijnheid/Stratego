@@ -131,7 +131,17 @@ public class Simulation implements AnimationCallback {
             System.out.println("Process move.");
             processMove((MoveAction) action);
         } else if(action instanceof PlyAction) {
+            PlyAction ply = (PlyAction) action;
+            GamePiece piece = this.state.getGameBoard().getPiece(ply.getOrigin());
+            MoveAction move = new MoveAction(ply.getTeam(), piece, ply.getOrigin(), ply.getDestination());
             
+            GamePiece target = this.state.getGameBoard().getPiece(ply.getDestination());
+            if(target != null) {
+                move.setEnemy(target);
+                move.setAttack();
+            }
+            
+            processAction(move);
         }
         
         // Update UI interface.
@@ -209,6 +219,7 @@ public class Simulation implements AnimationCallback {
         // the animation is finished.
         //this.runningAnimation = animation;
         this.pendingMove = move;
+        this.animationBusy = true;
         
         // Run animation.
         /**
@@ -303,6 +314,7 @@ public class Simulation implements AnimationCallback {
 
     @Override
     public void animationEnded() {
+        System.out.println("ANIMATION ENDED");
         if(!this.animationBusy) {
             throw new RuntimeException("No running animation.");
         }

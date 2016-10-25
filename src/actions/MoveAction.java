@@ -46,6 +46,7 @@ public class MoveAction extends Action {
         this.deadAttacker = null;
         this.deadOpponent = null;
         this.isApplied = false;
+        this.isAttack = false;
     }
 
     public GamePiece getPiece() {
@@ -202,6 +203,4 @@ public class MoveAction extends Action {
         }
         return true;
     }
-    
-    
 }

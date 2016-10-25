@@ -98,6 +98,7 @@ public class Terrain extends Base {
         camera = new Camera();
         
         //test/debug stuff.
+        /*
         pan = true;
         lastframe = System.currentTimeMillis();
         try {
@@ -106,6 +107,7 @@ public class Terrain extends Base {
         }   catch (Exception e){
             System.out.println("Test skeleton failed to load.");
         }
+        */
         
         //get everything going.
         //run();
