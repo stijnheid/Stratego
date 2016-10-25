@@ -5,10 +5,10 @@ import Game.GameState;
 import Game.Pieces;
 import Game.Team;
 import Logic.Simulation;
-import NeuralNetwork.NeuralNetwork;
-import Renderer.SetupGUI;
 import Renderer.Terrain;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import tools.search.Player;
 import tools.search.ai.SetupGenerator;
 import tools.search.new_ai.DefenderTwo;
@@ -61,9 +61,20 @@ public class Main {
         GameState state = new GameState();
         // Set game board.
         SetupGenerator generator = new SetupGenerator();
-        GameBoard board = new GameBoard(6, 6, Team.RED, Team.BLUE);
-        addAttackerSetup(board, userSetup);
-        //GameBoard board = generator.generateWholeSetup();
+        GameBoard board = generator.generateWholeSetup();
+        
+        // Request offensive setup from human player.
+        
+        // Merge offensive setup with defensive setup.
+        List<GameBoard> defensiveSetups = loadDefensiveSetups();
+        // Pick a random defensive setup.
+        Random random = new Random();
+        int index = random.nextInt(defensiveSetups.size());
+        GameBoard defenderSetup = defensiveSetups.get(index);
+        board.mergeBoard(defenderSetup);
+        
+        System.out.println("Intial setup:\n" + board.transcript());
+        
         state.setGameBoard(board);
         
         Terrain terrain = new Terrain(state, state.getGameBoard());
@@ -86,6 +97,94 @@ public class Main {
         this.board = board;
     }
     
+    public List<GameBoard> loadDefensiveSetups() {
+        List<GameBoard> boards = new ArrayList<>();
+        
+        String setup = "   |   |   |   |   |   \n" +
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" +
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "b:B|b:6|b:4|b:7|b:4|b:B\n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "b:F|b:B|b:9|b:5|b:5|b:4\n";
+        
+        boards.add(GameBoard.loadBoard(setup, 4, 6));
+
+        setup = "   |   |   |   |   |   \n" +
+                "--- --- --- --- --- ---\n" +
+                "   |   |   |   |   |   \n" +
+                "--- --- --- --- --- ---\n" +
+                "   |   |   |   |   |   \n" + 
+                "--- --- --- --- --- ---\n" +
+                "   |   |   |   |   |   \n" + 
+                "--- --- --- --- --- ---\n" +
+                "b:4|b:B|b:B|b:5|b:5|b:4\n" + 
+                "--- --- --- --- --- ---\n" +
+                "b:B|b:F|b:4|b:9|b:7|b:6\n";
+        
+        boards.add(GameBoard.loadBoard(setup, 4, 6));
+
+        setup = "   |   |   |   |   |   \n" +
+                "--- --- --- --- --- ---\n" +
+                "   |   |   |   |   |   \n" +
+                "--- --- --- --- --- ---\n" +
+                "   |   |   |   |   |   \n" + 
+                "--- --- --- --- --- ---\n" +
+                "   |   |   |   |   |   \n" + 
+                "--- --- --- --- --- ---\n" +
+                "b:6|b:9|b:7|b:B|b:4|b:4\n" + 
+                "--- --- --- --- --- ---\n" +
+                "b:B|b:F|b:5|b:4|b:5|b:B\n";
+        boards.add(GameBoard.loadBoard(setup, 4, 6));
+        
+        setup = "   |   |   |   |   |   \n" +
+                "--- --- --- --- --- ---\n" +
+                "   |   |   |   |   |   \n" +
+                "--- --- --- --- --- ---\n" +
+                "   |   |   |   |   |   \n" + 
+                "--- --- --- --- --- ---\n" +
+                "   |   |   |   |   |   \n" + 
+                "--- --- --- --- --- ---\n" +
+                "b:4|b:7|b:6|b:9|b:B|b:B\n" + 
+                "--- --- --- --- --- ---\n" +
+                "b:B|b:F|b:5|b:5|b:4|b:4\n";
+        
+        boards.add(GameBoard.loadBoard(setup, 4, 6));
+
+        setup = "   |   |   |   |   |   \n" +
+                "--- --- --- --- --- ---\n" +
+                "   |   |   |   |   |   \n" +
+                "--- --- --- --- --- ---\n" +
+                "   |   |   |   |   |   \n" + 
+                "--- --- --- --- --- ---\n" +
+                "   |   |   |   |   |   \n" + 
+                "--- --- --- --- --- ---\n" +
+                "b:4|b:B|b:5|b:6|b:4|b:B\n" + 
+                "--- --- --- --- --- ---\n" +
+                "b:5|b:4|b:9|b:7|b:B|b:F\n";
+        
+        boards.add(GameBoard.loadBoard(setup, 4, 6));
+
+        setup = "   |   |   |   |   |   \n" +
+                "--- --- --- --- --- ---\n" +
+                "   |   |   |   |   |   \n" +
+                "--- --- --- --- --- ---\n" +
+                "   |   |   |   |   |   \n" + 
+                "--- --- --- --- --- ---\n" +
+                "   |   |   |   |   |   \n" + 
+                "--- --- --- --- --- ---\n" +
+                "b:B|b:4|b:6|b:9|b:4|b:F\n" + 
+                "--- --- --- --- --- ---\n" +
+                "b:B|b:B|b:4|b:7|b:5|b:5\n";
+        
+        boards.add(GameBoard.loadBoard(setup, 4, 6));
+        
+        // Return list of boards.
+        return boards;
     private void addAttackerSetup(GameBoard board, String[] userSetup){
         for (int i=0; i < userSetup.length; i++){
             board.setupPiece(5-(i%6),i/6, Pieces.bySymbol(userSetup[i]), Team.RED);
