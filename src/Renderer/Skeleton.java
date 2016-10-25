@@ -417,27 +417,27 @@ public class Skeleton {
                 break;
             case LIEUTENANT:
                 Terrain.Lieutenant.bind(gl);
-                reank = '6';
+                reank = rank.getPieceSymbol().charAt(0);
                 break;
             case CAPTAIN:
                 Terrain.Captain.bind(gl);
-                reank = '5';
+                reank = rank.getPieceSymbol().charAt(0);
                 break;
             case MAJOR:
                 Terrain.Major.bind(gl);
-                reank = '4';
+                reank = rank.getPieceSymbol().charAt(0);
                 break;
             case COLONEL:
                 Terrain.Colonel.bind(gl);
-                reank = '3';
+                reank = rank.getPieceSymbol().charAt(0);
                 break;
             case MARSHALL:
                 Terrain.Marshall.bind(gl);
-                reank = '1';
+                reank = rank.getPieceSymbol().charAt(0);
                 break;
             case GENERAL:
                 Terrain.General.bind(gl);
-                reank = '2';
+                reank = rank.getPieceSymbol().charAt(0);
                 break;
             default:
                 
