@@ -62,7 +62,7 @@ public class DrawAnimation extends Animation{
                         }
                     }   catch (Exception e){}
                 }
-                moveCamera(eye, center);
+                moveCamera(CameraState.defaultloc, CameraState.defaultcnt);
             }   else {//MOVECAM == FALSE.
                 startloc = new Vector(skel.offset);//re-init startloc for attack().
                 for(int i=1; i <= (8d/3d)*duration; i++){
