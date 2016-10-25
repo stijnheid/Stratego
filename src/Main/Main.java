@@ -2,6 +2,7 @@ package Main;
 
 import Game.GameBoard;
 import Game.GameState;
+import Game.Pieces;
 import Game.Team;
 import Logic.Simulation;
 import NeuralNetwork.NeuralNetwork;
@@ -24,17 +25,7 @@ public class Main {
     private GameBoard board;
 
     public Main() {
-        /**
         SetupGUI setupGUI = new SetupGUI(this); // creates a SetupGUI object, creating an attacker setup and storing this in the instance variable
-
-        synchronized (this) {
-            try {
-                wait();
-            } catch (Exception e) {
-
-            }
-        }
-        */
         //The neural net requires the CORRECT attacker setup, so in between here there needs to be a callback to make sure we don't run this code before the user is
         // done creating a setup 
         /**
@@ -61,16 +52,18 @@ public class Main {
 
         }
         */
-        new Main().initialize();
+        Main main = new Main();
     }
     
-    private void initialize() {
+    public void initialize(String[] userSetup) {
         Player human = new HumanPlayer(Team.RED);
         Player bot = new DefenderTwo(Team.BLUE);
         GameState state = new GameState();
         // Set game board.
         SetupGenerator generator = new SetupGenerator();
-        GameBoard board = generator.generateWholeSetup();
+        GameBoard board = new GameBoard(6, 6, Team.RED, Team.BLUE);
+        addAttackerSetup(board, userSetup);
+        //GameBoard board = generator.generateWholeSetup();
         state.setGameBoard(board);
         
         Terrain terrain = new Terrain(state, state.getGameBoard());
@@ -91,5 +84,11 @@ public class Main {
 
     public void setGameBoard(GameBoard board) {
         this.board = board;
+    }
+    
+    private void addAttackerSetup(GameBoard board, String[] userSetup){
+        for (int i=0; i < userSetup.length; i++){
+            board.setupPiece(5-(i%6),i/6, Pieces.bySymbol(userSetup[i]), Team.RED);
+        }
     }
 }

@@ -185,7 +185,7 @@
             <Property name="editable" type="boolean" value="false"/>
             <Property name="columns" type="int" value="20"/>
             <Property name="rows" type="int" value="5"/>
-            <Property name="text" type="java.lang.String" value="Available Pieces:&#xa;1 Marshal :&#x9;1&#xa;1 Sergeant : &#x9;2&#xa;1 Colonel : &#x9;3&#xa;1 Major : &#x9;4&#xa;2 Captains :&#x9;5&#xa;2 Lieutenants :&#x9;6&#xa;3 Miners : &#x9;7&#xa;1 Spy : &#x9;8&#xa;"/>
+            <Property name="text" type="java.lang.String" value="Available Pieces:&#xa;1 Marshall :&#x9;9&#xa;1 General : &#x9;8&#xa;1 Colonel : &#x9;7&#xa;1 Major : &#x9;6&#xa;2 Captains :&#x9;5&#xa;2 Lieutenants :&#x9;4&#xa;3 Miners : &#x9;M&#xa;1 Spy : &#x9;S&#xa;"/>
             <Property name="maximumSize" type="java.awt.Dimension" editor="org.netbeans.beaninfo.editors.DimensionEditor">
               <Dimension value="[140, 184]"/>
             </Property>

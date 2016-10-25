@@ -81,7 +81,9 @@ public class DrawAnimation extends Animation{
                 }
             }
             //signal to end animation.
-            endAnimation();
+            if (moveCam){
+                endAnimation();            
+            }
         });
         draw.start();        
     }

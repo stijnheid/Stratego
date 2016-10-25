@@ -5,6 +5,7 @@
  */
 package Renderer;
 import javax.swing.JTextField;
+import Main.Main;
 
 /**
  * Simple GUI to let user pick Attacker setup pre-game.
@@ -12,16 +13,19 @@ import javax.swing.JTextField;
 public class SetupGUI extends javax.swing.JFrame {
 
     /**Data object holding the submitted setup.*/
-    private int[] setup;
+    private String[] setup;
     
     /**Array holding the text fields (for easier iteration).*/
     private JTextField[] fields;
     
+    /*Parent that created this GUI.*/
+    private Main parent;
+    
     /**
      * Creates new form SetupGUI
      */
-    public SetupGUI() {
-        setup = new int[12];
+    public SetupGUI(Main parent) {
+        setup = new String[12];
         
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
@@ -169,7 +173,7 @@ public class SetupGUI extends javax.swing.JFrame {
         JTextAreaPieces.setEditable(false);
         JTextAreaPieces.setColumns(20);
         JTextAreaPieces.setRows(5);
-        JTextAreaPieces.setText("Available Pieces:\n1 Marshal :\t1\n1 Sergeant : \t2\n1 Colonel : \t3\n1 Major : \t4\n2 Captains :\t5\n2 Lieutenants :\t6\n3 Miners : \t7\n1 Spy : \t8\n");
+        JTextAreaPieces.setText("Available Pieces:\n1 Marshall :\t9\n1 General : \t8\n1 Colonel : \t7\n1 Major : \t6\n2 Captains :\t5\n2 Lieutenants :\t4\n3 Miners : \tM\n1 Spy : \tS\n");
         JTextAreaPieces.setMaximumSize(new java.awt.Dimension(140, 184));
         jScrollPane1.setViewportView(JTextAreaPieces);
 
@@ -205,13 +209,10 @@ public class SetupGUI extends javax.swing.JFrame {
 
     private void jButtonConfirmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConfirmActionPerformed
         for (int i=0; i < setup.length; i++){
-            int contents = Integer.parseInt(fields[i].getText());
-            if (!isValidNumber(contents)){
-                throw new IllegalArgumentException("Input is not a valid number in range [1,9]");
-            }
-            setup[i] = contents;
+            setup[i] = fields[i].getText();
         }
         /*Now pass this setup on to the AI to deliver a defensive setup.*/
+        parent.initialize(setup);
     }//GEN-LAST:event_jButtonConfirmActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -233,12 +234,4 @@ public class SetupGUI extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     // End of variables declaration//GEN-END:variables
-
-    public boolean isValidNumber(int in){
-        return in > 0 && in < 9;
-    }
-    
-    public static void main(String[] args){
-        SetupGUI setup = new SetupGUI();
-    }
 }

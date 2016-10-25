@@ -37,8 +37,6 @@ public class DeathAnimation extends Animation {
                 }   catch (Exception e){}
             }
             skel.showRank = false;
-            //signal to end animation.
-            endAnimation();
         });
         die.start();        
     }
