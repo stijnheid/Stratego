@@ -412,46 +412,46 @@ abstract public class Base {
                                                 cs.cnt.z - CENTER_POINT_CHANGE);
                             break;
             }
-                switch(e.getKeyCode()) {
-                            
-                case KeyEvent.VK_UP:
-                            if (selectPiece[1]<5){
-                                selectPiece[1]++; 
-                            }
-                    break;
-                case KeyEvent.VK_DOWN:
-                            if (selectPiece[1]>0){
-                                selectPiece[1]--; 
-                            }
-                            break;
-                case KeyEvent.VK_LEFT:
-                            if (selectPiece[0]<5){
-                                selectPiece[0]++; 
-                            }
-                            break;
-                case KeyEvent.VK_RIGHT :
-                            if (selectPiece[0]>0){
-                                selectPiece[0]--; 
-                            }
-                            break;
-                case KeyEvent.VK_ENTER :
-                    selectedPiece = selectPiece.clone();       
-                    if (movecounter == 0){
-                        origin = selectedPiece;
-                        movecounter++;
-                    }
-                    if (movecounter == 1 && origin != selectedPiece){
-                            destination = selectedPiece;
-                            PlyAction action;
-                            try {
-                                action = new PlyAction(Team.RED, new Game.BoardPosition(origin[0], origin[1]), new Game.BoardPosition(destination[0], destination[1]));                            
-                                Base.this.simulation.processAction(action);
-                            } catch (Exception err){}
-                            
-                            movecounter = 0;
-                    }
+            switch(e.getKeyCode()) {
 
-                            break;
+            case KeyEvent.VK_UP:
+                        if (selectPiece[1]<5){
+                            selectPiece[1]++; 
+                        }
+                break;
+            case KeyEvent.VK_DOWN:
+                        if (selectPiece[1]>0){
+                            selectPiece[1]--; 
+                        }
+                        break;
+            case KeyEvent.VK_LEFT:
+                        if (selectPiece[0]<5){
+                            selectPiece[0]++; 
+                        }
+                        break;
+            case KeyEvent.VK_RIGHT :
+                        if (selectPiece[0]>0){
+                            selectPiece[0]--; 
+                        }
+                        break;
+            case KeyEvent.VK_ENTER :
+                selectedPiece = selectPiece.clone();       
+                if (movecounter == 0){
+                    origin = selectedPiece;
+                    movecounter++;
+                }
+                if (movecounter == 1 && origin != selectedPiece){
+                        destination = selectedPiece;
+                        PlyAction action;
+                        try {
+                            action = new PlyAction(Team.RED, new Game.BoardPosition(origin[0], origin[1]), new Game.BoardPosition(destination[0], destination[1]));                            
+                            Base.this.simulation.processAction(action);
+                        } catch (Exception err){}
+
+                        movecounter = 0;
+                }
+
+                break;
             }
         }
 

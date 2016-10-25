@@ -17,6 +17,7 @@ import Renderer.Terrain;
 import Renderer.WalkAnimation;
 import actions.Action;
 import actions.MoveAction;
+import actions.PlyAction;
 import actions.SelectAction;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -129,6 +130,8 @@ public class Simulation implements AnimationCallback {
         } else if(action instanceof MoveAction) {
             System.out.println("Process move.");
             processMove((MoveAction) action);
+        } else if(action instanceof PlyAction) {
+            
         }
         
         // Update UI interface.

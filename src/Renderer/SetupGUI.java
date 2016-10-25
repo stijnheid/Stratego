@@ -26,6 +26,7 @@ public class SetupGUI extends javax.swing.JFrame {
      */
     public SetupGUI(Main parent) {
         setup = new String[12];
+        this.parent = parent;
         
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">

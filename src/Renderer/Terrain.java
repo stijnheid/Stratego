@@ -443,8 +443,8 @@ public class Terrain extends Base {
                 Animation ani2 = new DeathAnimation(this,
                     board.getPiece(new BoardPosition(3,4)),
                     new BoardPosition(4,4), null);
-                playAnimation(ani1);
-                playAnimation(ani2);
+                //playAnimation(ani1);
+                //playAnimation(ani2);
                 pan = false;
             }   catch (Game.InvalidPositionException e){
                 //Screw you Stevie.

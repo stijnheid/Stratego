@@ -5,8 +5,10 @@ import Game.GameState;
 import Game.Pieces;
 import Game.Team;
 import Logic.Simulation;
+import Renderer.SetupGUI;
 import Renderer.Terrain;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import tools.search.Player;
@@ -53,14 +55,24 @@ public class Main {
         }
         */
         //new Main().initialize();
-        new Main().test();
+        //new Main().test();
+        
+        Main main = new Main();
     }
     
     private void test() {
         List<GameBoard> boards = loadDefensiveSetups();
         //boards.get(0);
-        System.out.println(boards.get(0).transcript());
-        Main main = new Main();
+        GameBoard board = boards.get(0);
+        GameBoard initial = new GameBoard(6, 6, Team.RED, Team.BLUE);
+        
+        //System.out.println(boards.get(0).transcript());
+        String[] setup = new String[] { "S", "1", "2", "3", "4", "5", "6", "7", "8", "9", "2", "F" };
+        addAttackerSetup(initial, setup);
+        
+        initial.mergeBoard(board);
+        System.out.println(initial.transcript());
+        
     }
     
     public void initialize(String[] userSetup) {
@@ -69,9 +81,11 @@ public class Main {
         GameState state = new GameState();
         // Set game board.
         SetupGenerator generator = new SetupGenerator();
-        GameBoard board = generator.generateWholeSetup();
+        this.board = new GameBoard(6, 6, Team.RED, Team.BLUE);
         
         // Request offensive setup from human player.
+        System.out.println("Arr: " + Arrays.toString(userSetup));
+        addAttackerSetup(board, userSetup);
         
         // Merge offensive setup with defensive setup.
         List<GameBoard> defensiveSetups = loadDefensiveSetups();
@@ -85,6 +99,7 @@ public class Main {
         
         state.setGameBoard(board);
         
+        System.out.println("Build Terrain");
         Terrain terrain = new Terrain(state, state.getGameBoard());
         Simulation simulation = new Simulation(state, human, bot, terrain);
         // Attach the simulation to the terrain.
@@ -94,7 +109,7 @@ public class Main {
         terrain.run();
         
         // Start the game.
-        //simulation.startGame();
+        simulation.startGame();
     }
 
     public void setAttackerSetup(int[] setup) {
@@ -193,9 +208,11 @@ public class Main {
         
         // Return list of boards.
         return boards;
+    }
+    
     private void addAttackerSetup(GameBoard board, String[] userSetup){
         for (int i=0; i < userSetup.length; i++){
-            board.setupPiece(5-(i%6),i/6, Pieces.bySymbol(userSetup[i]), Team.RED);
+            board.setupPiece(i % 6, i / 6, Pieces.bySymbol(userSetup[i]), Team.RED);
         }
     }
 }
