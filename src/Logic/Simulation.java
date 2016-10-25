@@ -14,6 +14,7 @@ import Renderer.AttackAnimation;
 import Renderer.DeathAnimation;
 import Renderer.DrawAnimation;
 import Renderer.Terrain;
+import Renderer.Vector;
 import Renderer.WalkAnimation;
 import actions.Action;
 import actions.MoveAction;
@@ -54,6 +55,7 @@ public class Simulation implements AnimationCallback {
     private BattleTranscript transcript;
     private boolean aiBusy;
     private Terrain terrain;
+    private Vector offset;
     
     //private final Renderer renderer;
     //private final JComponent uiComponent;
@@ -79,6 +81,7 @@ public class Simulation implements AnimationCallback {
         //this.runningAnimation = null;
         this.animationBusy = false;
         this.pendingMove = null;
+        this.offset = null;
     }
     
     /*
@@ -167,7 +170,7 @@ public class Simulation implements AnimationCallback {
         }
 
         // Decide which animation must be played. Regular Move or an Attack.
-        if(move.isIsAttack()) { 
+        if(move.isIsAttack()) {
             Animation attackAnimation;
             Animation deathAnimation;
             
@@ -182,13 +185,21 @@ public class Simulation implements AnimationCallback {
             int result = attacker.attack(enemy);
             System.out.println("ATTACK PIECE --> " + result);
             if(result == 1) {
+                System.out.println("Positive Attack Animation");
                 // Attacker kills enemy.
                 attackAnimation = new AttackAnimation(this.terrain, attacker, move.getDestination(), this);
                 attackAnimation.execute();
                 
                 deathAnimation = new DeathAnimation(this.terrain, enemy, move.getOrigin(), this);
                 deathAnimation.execute();
+                
+                this.offset = new Vector(move.getDestination().getX(), move.getDestination().getY(), 0);
+                if(move.getTeam() == Team.RED) {
+                    this.offset.rotate(180);
+                }
+                
             } else if(result == -1) {
+                System.out.println("Negative Attack Animation");
                 // The piece that is being attacked, wins.
                 attackAnimation = new AttackAnimation(this.terrain, enemy, move.getOrigin(), this);
                 attackAnimation.execute();
@@ -196,6 +207,7 @@ public class Simulation implements AnimationCallback {
                 deathAnimation = new DeathAnimation(this.terrain, attacker, move.getDestination(), this);
                 deathAnimation.execute();
             } else { // Tie
+                System.out.println("Tie Animation");
                 // Both pieces die.
                 attackAnimation = new DrawAnimation(this.terrain, attacker, move.getDestination(), this, true);
                 attackAnimation.execute();
@@ -210,6 +222,7 @@ public class Simulation implements AnimationCallback {
                 secondDeath.execute();
             }
         } else {
+            System.out.println("Walk Animation");
             // Create a regular move animation.
             WalkAnimation walk = new WalkAnimation(this.terrain, move.getPiece(), move.getDestination(), this);
             walk.execute();
@@ -330,14 +343,26 @@ public class Simulation implements AnimationCallback {
     }
     
     private void applyMove() {
+        System.out.println("APPLY MOVE " + this.pendingMove.toString());
         GameBoard board = this.state.getGameBoard();
 
         // Store move in battle transcript. (Store before applying.)
         this.transcript.addMove(this.pendingMove);
 
+        System.out.println("BoardState Before:\n" + board.transcript());
+        
+        
+        // If an offset is set, apply it.
+        if(this.offset != null) {
+            this.pendingMove.getPiece().getSkeleton().offset = this.offset;
+            this.offset = null;
+        }        
+        
         // This function takes care of applying the move and incrementing
         // the move counter if the move is made by the attacker.
         board.applyMove(this.pendingMove);
+        
+        System.out.println("BoardState After:\n" + board.transcript());
         
         // Check if the board state is still valid after applying the move.
         // This is not done inside applyMove at all times, since that would only

@@ -34,7 +34,7 @@ public class DrawAnimation extends Animation{
             //Current Camera location.
             Vector center = terrain.camera.center;
             Vector eye = terrain.camera.eye;
-            if (moveCam){
+            if (moveCam) {
                 //Calculate camera location.
                 Vector cameraloc = direction.cross(new Vector(0,0,1)).scale(-1);
                 cameraloc = cameraloc.scale(3d/cameraloc.length());
