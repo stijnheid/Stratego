@@ -205,7 +205,7 @@ public class SearchToolPanel extends javax.swing.JPanel {
         
         Player first = new SparringAttackerV2(Team.RED);
         Player second = new DefenderTwo(Team.BLUE);
-        Simulation simulation = new Simulation(this.state, first, second);
+        Simulation simulation = new Simulation(this.state, first, second, null);
         // Start the game.
         simulation.startGame();
     }//GEN-LAST:event_startGameButtonActionPerformed
@@ -236,7 +236,7 @@ public class SearchToolPanel extends javax.swing.JPanel {
         //this.jTable1.addMouseListener(this.controller);
         
         // Initialize the Simulation and setup controllers.
-        Simulation simulation = new Simulation(state, null, null);
+        Simulation simulation = new Simulation(state, null, null, null);
         this.controller = new UserInputController(state, simulation);
         // Make the table listen for mouse click input.
         this.jTable1.addMouseListener(this.controller);
@@ -338,7 +338,7 @@ public class SearchToolPanel extends javax.swing.JPanel {
         
         @Override
         protected Void doInBackground() throws Exception {
-            Simulation simulation = new Simulation(state, null, null);
+            Simulation simulation = new Simulation(state, null, null, null);
             BattleEngine battleEngine = new BattleEngine();
 
             //AIBot attacker = new DefaultPlayer(Team.RED);
