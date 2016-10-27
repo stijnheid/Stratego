@@ -24,7 +24,7 @@ public enum Pieces {
             case FLAG:
                 return "F";
             case SPY:
-                return "S";
+                return "0";
             case SCOUT:
                 return "1";
             case MINER:

@@ -142,7 +142,7 @@ public class DefenderThree extends AbstractWeightedPlayer {
                 score = attacker.get(Pieces.MINER) * (4 - (getPiecesAmount(state, DefenderThree.super.team.opposite(), Pieces.MINER)));
             }
             else {
-                score = defender.get(Pieces.MINER);
+                score = attacker.get(Pieces.MINER);
             }
             
             return -score * getPiecesAmount(state, DefenderThree.super.team.opposite(), Pieces.MINER);
@@ -198,7 +198,7 @@ public class DefenderThree extends AbstractWeightedPlayer {
             double score = 0;
             GameBoard board = state.getGameBoard();            
             
-            
+            /*
             String setup =  "0|0|0|0\n" +
                             "50|50|50|50\n" +
                             "100|100|100|100\n" +
@@ -214,15 +214,14 @@ public class DefenderThree extends AbstractWeightedPlayer {
                             "0|0|0\n" +
                             "0|0|0\n";
             */
-            /**
-            /*
+
             String setup = "25|25|25|25|25|25\n" +
                             "50|50|50|50|50|50\n" +
                             "100|100|100|100|100|100\n" +
                             "150|150|150|150|150|150\n" +
                             "200|200|200|200|200|200\n" +
                             "200|200|200|200|200|200\n";
-            */
+            
             HashMap<BoardPosition, Integer> map = loadMap(setup);
             
             for (Map.Entry<BoardPosition, Integer> entrys: map.entrySet()) {
