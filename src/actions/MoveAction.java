@@ -109,7 +109,26 @@ public class MoveAction extends Action {
         //    return false;
         //}
         int distance = GameBoard.distance(this.origin, this.destination);
-        if(distance > 1) {
+        // A piece is only allowed to move to orthogonally adjacent cells and
+        // it not allowed to do a null-move, a move to its current position.
+        if(distance > 1 || distance == 0) {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    public boolean representationOkay() {
+        if(!isOkay()) {
+            return false;
+        }
+        
+        // Check if the given piece matches the player's team.
+        if(this.team != this.piece.getTeam()) {
+            return false;
+        }
+        
+        if(this.isAttack && this.team != this.enemy.getTeam()) {
             return false;
         }
         
@@ -122,7 +141,8 @@ public class MoveAction extends Action {
                 ", origin=" + origin +
                 ", destination=" + destination +
                 ", isApplied=" + isApplied +
-                ", isAttack=" + isAttack + '}';
+                ", isAttack=" + isAttack +
+                ", enemy=" + enemy + '}';
     }
     
     /**
@@ -151,7 +171,7 @@ public class MoveAction extends Action {
         return clone;
     }
 
-    public boolean isIsAttack() {
+    public boolean isAttack() {
         return isAttack;
     }
     

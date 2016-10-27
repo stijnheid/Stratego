@@ -13,6 +13,7 @@ import Renderer.AnimationCallback;
 import Renderer.AttackAnimation;
 import Renderer.DeathAnimation;
 import Renderer.DrawAnimation;
+import Renderer.Skeleton;
 import Renderer.Terrain;
 import Renderer.Vector;
 import Renderer.WalkAnimation;
@@ -56,6 +57,9 @@ public class Simulation implements AnimationCallback {
     private boolean aiBusy;
     private Terrain terrain;
     private Vector offset;
+    
+    private GamePiece subject;
+    private BoardPosition subjectDestination;
     
     //private final Renderer renderer;
     //private final JComponent uiComponent;
@@ -106,6 +110,12 @@ public class Simulation implements AnimationCallback {
             throw new RuntimeException("Action does not originate from a UI thread");
         }
         
+        // Reject all actions if no game is running.
+        if(this.transcript.gameOver()) {
+            System.out.println("Rejected Action during game over " + action.getTeam());
+            return;
+        }
+        
         // Do not accept any new action while an animation is running.
         if(this.animationBusy) {
             System.out.println("Rejected Action during animation from " + action.getTeam());
@@ -131,19 +141,34 @@ public class Simulation implements AnimationCallback {
             System.out.println("Process selection.");
             processSelection((SelectAction) action);
         } else if(action instanceof MoveAction) {
+            MoveAction move = (MoveAction) action;
+            if(!move.representationOkay()) {
+                System.out.println("Rejected malformed move action: " + move);
+                return;
+            }
+            
             System.out.println("Process move.");
-            processMove((MoveAction) action);
+            processMove(move);
         } else if(action instanceof PlyAction) {
+            System.out.println("Process ply.");
             PlyAction ply = (PlyAction) action;
             GamePiece piece = this.state.getGameBoard().getPiece(ply.getOrigin());
+            System.out.println("Create Move from Ply");
+            // TODO why is a null pointer not caught here?
             MoveAction move = new MoveAction(ply.getTeam(), piece, ply.getOrigin(), ply.getDestination());
             
+            // TODO should check that the target is not the same piece.
+            System.out.println("Get Target");
             GamePiece target = this.state.getGameBoard().getPiece(ply.getDestination());
             if(target != null) {
                 move.setEnemy(target);
                 move.setAttack();
             }
             
+            // Deliver the converted ply action into a move action to this
+            // same method, such that it is finally processed and influences
+            // the game state.
+            System.out.println("Deliver Ply to MoveAction: " + move);
             processAction(move);
         }
         
@@ -164,13 +189,14 @@ public class Simulation implements AnimationCallback {
     private void processMove(MoveAction move) {
         // These type of actions are supplied by the AI bots.
         System.out.println("MoveAction from " + move.getTeam());
+        System.out.println("Move: " + move);
         // Check if the move representation is valid.
-        if(!move.isOkay()) {
+        if(!move.representationOkay()) {
             throw new RuntimeException("Invalid move: " + move);
         }
 
         // Decide which animation must be played. Regular Move or an Attack.
-        if(move.isIsAttack()) {
+        if(move.isAttack()) {
             Animation attackAnimation;
             Animation deathAnimation;
             
@@ -180,6 +206,7 @@ public class Simulation implements AnimationCallback {
             //GamePiece enemy = move.getEnemy();
             
             GamePiece enemy = this.state.getGameBoard().getPiece(move.getDestination());
+            System.out.println("Enemy: " + enemy.toString());
             
             // Create an attack animation.
             int result = attacker.attack(enemy);
@@ -192,12 +219,9 @@ public class Simulation implements AnimationCallback {
                 
                 deathAnimation = new DeathAnimation(this.terrain, enemy, move.getOrigin(), this);
                 deathAnimation.execute();
-                
-                this.offset = new Vector(move.getDestination().getX(), move.getDestination().getY(), 0);
-                if(move.getTeam() == Team.RED) {
-                    this.offset.rotate(180);
-                }
-                
+
+                this.subject = attacker;
+                this.subjectDestination = move.getDestination();
             } else if(result == -1) {
                 System.out.println("Negative Attack Animation");
                 // The piece that is being attacked, wins.
@@ -206,6 +230,11 @@ public class Simulation implements AnimationCallback {
                 
                 deathAnimation = new DeathAnimation(this.terrain, attacker, move.getDestination(), this);
                 deathAnimation.execute();
+                
+                this.subject = enemy;
+                // If an enemy is being attacked and wins it should remain put
+                // on its original position so not go to origin, but destination.
+                this.subjectDestination = move.getDestination();
             } else { // Tie
                 System.out.println("Tie Animation");
                 // Both pieces die.
@@ -242,6 +271,30 @@ public class Simulation implements AnimationCallback {
             // No animation, trigger turn switch directly. (For testing)
             applyMove();
         }*/      
+    }
+    
+    /**
+     * Must manually update the offset vector in the skeleton attached to the
+     * GamePiece object in case of an attack animation. This is not necessary in
+     * case of a walk animation there it is done automagically.
+     * 
+     * @param piece
+     * @param position 
+     */
+    private void updateSkeletonPosition(GamePiece piece, BoardPosition position) {
+        System.out.println("Update Skeleton Position");
+        Skeleton skeleton = piece.getSkeleton();
+        int x = position.getX();
+        int y = position.getY();
+        Vector offset = new Vector(-2.5 + x, 2.5 - y, 0);
+        
+        // If it is the attacker we need to rotate 180 degrees.
+        if(piece.getTeam() == this.state.getGameBoard().getAttacker()) {
+            offset.rotate(180);
+        }
+        
+        // Assign new offset to skeleton.
+        skeleton.offset = offset;
     }
     
     private void processSelection(SelectAction selection) {
@@ -353,10 +406,24 @@ public class Simulation implements AnimationCallback {
         
         
         // If an offset is set, apply it.
+        /**
         if(this.offset != null) {
             this.pendingMove.getPiece().getSkeleton().offset = this.offset;
             this.offset = null;
-        }        
+        }  */
+        
+        // If this is an attack than the offset vector of the skeletons must
+        // be updated.
+        if(this.pendingMove.isAttack()) {
+            if(this.subject == null || this.subjectDestination == null) {
+                throw new RuntimeException("Offset helper variables not set.");
+            }
+            
+            updateSkeletonPosition(this.subject, this.subjectDestination);
+            // Reset helper variables.
+            this.subject = null;
+            this.subjectDestination = null;
+        }
         
         // This function takes care of applying the move and incrementing
         // the move counter if the move is made by the attacker.
@@ -470,6 +537,7 @@ public class Simulation implements AnimationCallback {
     }
     
     private void runAITask() {
+        System.out.println("Run AI Task");
         AIBot bot = (AIBot) this.turn;
         AINextMoveTask task = new AINextMoveTask(bot, this.computationTime, this.state);
         // Run task. Task will asynchronously deliver a MoveAction to processAction()

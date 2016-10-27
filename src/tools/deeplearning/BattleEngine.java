@@ -515,7 +515,11 @@ public class BattleEngine {
         // Player unable to supply a move, should not happen.
         if(move == null) {
             throw new RuntimeException("Player has no move: " + bot.getTeam());
-        }        
+        }
+        
+        if(move.isApplied()) {
+            throw new RuntimeException("Retrieved move is already applied.");
+        }
         
         // Replace the reference of the copied piece with that of the original
         // piece.
@@ -550,8 +554,22 @@ public class BattleEngine {
                     originalPiece.toString() + ", move=" + move.toString());
         }
 
+        // Unsafe, this does not copy the isAttack state and enemy.
         MoveAction originalMove = new MoveAction(move.getTeam(), originalPiece, 
-                move.getOrigin(), move.getDestination());        
+                move.getOrigin(), move.getDestination());
+        
+        if(move.isAttack()) {
+            originalMove.setAttack();
+            
+            // Define the enemy.
+            GamePiece enemy = board.getPiece(move.getDestination());
+            if(enemy == null) {
+                throw new RuntimeException("Attack with no enemy.");
+            }
+            // TODO maybe perform a deeper check that the enemy on the original
+            // state board has the same rank as the enemy in the move object.
+            originalMove.setEnemy(enemy);
+        }
         
         //System.out.println("Interrupted: " + interrupted);
         task.cancel();

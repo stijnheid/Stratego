@@ -15,6 +15,7 @@ import tools.search.Player;
 import tools.search.ai.SetupGenerator;
 import tools.search.new_ai.DefenderTwo;
 import tools.search.new_ai.HumanPlayer;
+import tools.search.new_ai.WeightedAIBot;
 
 /**
  * Main class which handles creating all the objects and running the game
@@ -77,14 +78,16 @@ public class Main {
     
     public void initialize(String[] userSetup) {
         Player human = new HumanPlayer(Team.RED);
-        Player bot = new DefenderTwo(Team.BLUE);
+        WeightedAIBot bot = new DefenderTwo(Team.BLUE);
+        // Assign best playing weights to AI bot.
+        bot.setWeights(new double[] { 0.9, 0.3 });
         GameState state = new GameState();
         // Set game board.
         SetupGenerator generator = new SetupGenerator();
         this.board = new GameBoard(6, 6, Team.RED, Team.BLUE);
         
         // Request offensive setup from human player.
-        System.out.println("Arr: " + Arrays.toString(userSetup));
+        System.out.println("SetupArray: " + Arrays.toString(userSetup));
         addAttackerSetup(board, userSetup);
         
         // Merge offensive setup with defensive setup.
@@ -123,17 +126,18 @@ public class Main {
     public List<GameBoard> loadDefensiveSetups() {
         List<GameBoard> boards = new ArrayList<>();
         
-        String setup = "   |   |   |   |   |   \n" +
-                       "--- --- --- --- --- ---\n" +
-                       "   |   |   |   |   |   \n" +
-                       "--- --- --- --- --- ---\n" +
-                       "   |   |   |   |   |   \n" + 
-                       "--- --- --- --- --- ---\n" +
-                       "   |   |   |   |   |   \n" + 
-                       "--- --- --- --- --- ---\n" +
-                       "b:B|b:6|b:4|b:7|b:4|b:B\n" + 
-                       "--- --- --- --- --- ---\n" +
-                       "b:F|b:B|b:9|b:5|b:5|b:4";
+        String setup;
+        setup = "   |   |   |   |   |   \n" +
+                "--- --- --- --- --- ---\n" +
+                "   |   |   |   |   |   \n" +
+                "--- --- --- --- --- ---\n" +
+                "   |   |   |   |   |   \n" + 
+                "--- --- --- --- --- ---\n" +
+                "   |   |   |   |   |   \n" + 
+                "--- --- --- --- --- ---\n" +
+                "b:B|b:6|b:4|b:7|b:4|b:B\n" + 
+                "--- --- --- --- --- ---\n" +
+                "b:F|b:B|b:9|b:5|b:5|b:4";
         
         boards.add(GameBoard.loadBoard(setup, 6, 6));
 
