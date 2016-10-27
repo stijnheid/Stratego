@@ -10,5 +10,5 @@ public class GlobalSettings {
     public final static int OFFENSIVE_ARMY_SIZE = 12;
     public final static int DEFENSIVE_ARMY_SIZE = 12;
     public final static String BATTLE_SAVE_FOLDER = "/battles";
-    public final static int AI_COMPUTATION_TIME = 2000; // (in ms.)
+    public final static int AI_COMPUTATION_TIME = 5000; //2000; // (in ms.)
 }
