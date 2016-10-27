@@ -123,12 +123,13 @@ public class MoveAction extends Action {
             return false;
         }
         
-        // Check if the given piece matches the player's team.
+        // Check if the given piece does not match the player's team.
         if(this.team != this.piece.getTeam()) {
             return false;
         }
         
-        if(this.isAttack && this.team != this.enemy.getTeam()) {
+        // Check if it is an attack on a friendly unit.
+        if(this.isAttack && this.team == this.enemy.getTeam()) {
             return false;
         }
         

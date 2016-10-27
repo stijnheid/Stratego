@@ -212,6 +212,8 @@ public class SetupGUI extends javax.swing.JFrame {
         for (int i=0; i < setup.length; i++){
             setup[i] = fields[i].getText();
         }
+        dispose();
+        
         /*Now pass this setup on to the AI to deliver a defensive setup.*/
         parent.initialize(setup);
     }//GEN-LAST:event_jButtonConfirmActionPerformed
