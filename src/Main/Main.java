@@ -216,7 +216,7 @@ public class Main {
     
     private void addAttackerSetup(GameBoard board, String[] userSetup){
         for (int i=0; i < userSetup.length; i++){
-            board.setupPiece(5 - (i % 6), i / 6, Pieces.bySymbol(userSetup[i]), Team.RED);
+            board.setupPiece(5 - (i % 6), 1 - (i / 6), Pieces.bySymbol(userSetup[i]), Team.RED);
         }
     }
 }

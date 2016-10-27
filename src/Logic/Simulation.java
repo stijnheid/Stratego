@@ -507,6 +507,9 @@ public class Simulation implements AnimationCallback {
         this.transcript.endGame();
         System.out.println("Duration: " + this.transcript.getGameDuration() + " ms.");
         
+        //Prompt user with Game Over message.
+        String message = "Game Ended. Winner is "+winner+".";
+        javax.swing.JOptionPane.showMessageDialog(new javax.swing.JFrame(), message);
         // Print battle transcript.
         this.transcript.print();
     }
