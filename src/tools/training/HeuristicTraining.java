@@ -363,7 +363,7 @@ public class HeuristicTraining implements WeightSetListener {
     
     private List<GameBoard> loadDefensiveSetups() {
         List<GameBoard> boards = new ArrayList<>();
-        String s1 = "   |   |   |   |   |   \n" +
+        String s1 =    "   |   |   |   |   |   \n" +
                        "--- --- --- --- --- ---\n" +
                        "   |   |   |   |   |   \n" +
                        "--- --- --- --- --- ---\n" +
@@ -377,7 +377,7 @@ public class HeuristicTraining implements WeightSetListener {
         GameBoard one = GameBoard.loadBoard(s1, this.boardWidth, this.boardHeight);
         boards.add(one);
 
-        String s2 = "   |   |   |   |   |   \n" +
+        String s2 =    "   |   |   |   |   |   \n" +
                        "--- --- --- --- --- ---\n" +
                        "   |   |   |   |   |   \n" +
                        "--- --- --- --- --- ---\n" +
@@ -391,7 +391,7 @@ public class HeuristicTraining implements WeightSetListener {
         GameBoard two = GameBoard.loadBoard(s2, this.boardWidth, this.boardHeight);
         boards.add(two);
 
-        String s3 = "   |   |   |   |   |   \n" +
+        String s3 =    "   |   |   |   |   |   \n" +
                        "--- --- --- --- --- ---\n" +
                        "   |   |   |   |   |   \n" +
                        "--- --- --- --- --- ---\n" +

@@ -15,6 +15,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import tools.deeplearning.BattleEngine;
 import tools.deeplearning.BattleTranscript;
+import tools.search.ai.AIBot;
 import tools.search.new_ai.DefenderOne;
 import tools.search.new_ai.DefenderThree;
 import tools.search.new_ai.DefenderTwo;
@@ -24,40 +25,56 @@ import tools.search.new_ai.WeightedAIBot;
 /**
  *
  */
-public class HeuristicTrainingTwo {
+public class HeuristicTrainingTwo implements WeightSetListener {
     
     private WeightedAIBot attacker;
-    private WeightedAIBot defenderOne;
-    private WeightedAIBot defenderTwo;
+    private WeightedAIBot defender;
     //private GameBoard board;
     private BattleEngine engine;
     //private List<GameBoard> defensiveSetups;
     private List<BoardPosition> offensiveSide;
+    private WeightSetListener listener;
     
     private Team attackingTeam = Team.RED;
     private Team defendingTeam = Team.BLUE;
-    private final int boardWidth = 4;
+    
+    private final int boardWidth = 6;
     private final int boardHeight = 6;
     private final int matchesPerWeightAssigment = 10;
-    private WeightedAIBot subjectOne; // The subject that is being trained.
-    private WeightedAIBot subjectTwo; // The subject that is being trained.
+    private WeightedAIBot subject; // The subject that is being trained.
     private SimulatedAnnealing algorithm;
-    
-    private double[] weightsOne;
-    private double[] weightsTwo;
     
     public HeuristicTrainingTwo() {
         
     }
     
+    private class BotScore {
+        private final WeightedAIBot bot;
+        private int wins;
+        private int lost;
+        private int draws;
+        
+        public BotScore (WeightedAIBot bot) {
+            this.bot = bot;
+            this.wins = 0;
+            this.lost = 0;
+            this.draws = 0;
+        }
+    }
+    
     private void initialize() {
         // Load defensive setups.
         //this.defensiveSetups = loadDefensiveSetups();
-        this.offensiveSide = fillPositions(4, 2);
+        this.offensiveSide = fillPositions(6, 2);
+    }
+    
+    public void setListener(WeightSetListener listener) {
+        this.listener = listener;
     }
     
     public static void main(String[] args) {
         new HeuristicTrainingTwo().train();
+        //new HeuristicTraining().competition();
     }
     
     private void train() {
@@ -65,46 +82,46 @@ public class HeuristicTrainingTwo {
         
         // Setup the bots to be used.
         this.attacker = new SparringAttacker(Team.RED);
-        //this.defender = new ModeratePlayer(Team.BLUE);
-        this.defenderOne = new DefenderTwo(Team.BLUE);        
-        this.defenderTwo = new DefenderThree(Team.BLUE);
+        //this.defender = new ModeratePlayer(Team.BLUE);        
+        this.defender = new DefenderThree(Team.BLUE);
         
         
-        int numberOfFeatures = this.defenderOne.featureCount();
+        int numberOfFeatures = this.defender.featureCount();
         int rounds = 1; //50; // # of weight assignments that will be used.
         //SimulatedAnnealing generator = new SimulatedAnnealing(
-        //        numberOfFeatures, rounds);
-        System.out.println("Start training...");
-        long start = System.currentTimeMillis();
-        //this.algorithm = new SimulatedAnnealing(numberOfFeatures, rounds);
-        long end = System.currentTimeMillis();
-        //SimulatedAnnealing generator = this.algorithm;
+        //        numberOfFeatures, rounds)
+        this.algorithm = new SimulatedAnnealing(numberOfFeatures, rounds);
+        SimulatedAnnealing generator = this.algorithm;
 
         // Create battle engine.
         this.engine = new BattleEngine();
         
         // Attach this class as single listener.
-        //generator.setListener(this);
+        generator.setListener(this);
         
         // Set the training subject.
-        this.subjectOne = this.defenderOne;
-        this.subjectTwo = this.defenderTwo;
+        this.subject = this.defender;
         
-        this.weightsOne = new double[]{0.9, 0.3};
-        this.weightsTwo = new double[]{0.3, 0.3, 0.6, 0.5, 0.1, 0.7};
-        
-        double winRateOne = this.generated(subjectOne, weightsOne);
-        
-        double winRateTwo = this.generated(subjectTwo, weightsTwo);
-        
-        if(winRateOne > winRateTwo) {
-            System.out.println("DefenderOne is better");
+        try {
+            // Run the generator, this is a blocking method not a Thread.
+            long start = System.currentTimeMillis();
+            System.out.println("Start training...");
+            generator.start();
+            
+            // Get the resulting weights.
+            double[] weights = generator.getWeights();
+            //System.out.println("Final Weights: " + Arrays.toString(weights));
+            
+            // Save the plot.
+            String filename = "";
+            generator.savePlot(true, filename);
+            System.out.println("TRAINING ENDED");
+            long end = System.currentTimeMillis();
+            System.out.println("Weight Assignment Iteration Training lasted " + (end - start) + " ms.");
+            System.out.println(Arrays.toString(this.algorithm.getWeights()));
+        } catch (IOException ex) {
+            Logger.getLogger(HeuristicTrainingTwo.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        String filename = "";
-        System.out.println("TRAINING ENDED");
-        System.out.println("Weight Assignment Iteration Training lasted " + (end - start) + " ms.");
-        System.out.println(Arrays.toString(this.algorithm.getWeights()));
     }
 
     /**
@@ -114,11 +131,11 @@ public class HeuristicTrainingTwo {
      * Algorithm. And returns the win rate with the given set of weights over
      * the matches against the defensive setups.
      * 
-     * @param subject
      * @param weights array of weights to be assigned to heuristic function terms.
      * @return win rate.
      */
-    public double generated(WeightedAIBot subject, double[] weights) {
+    @Override
+    public double generated(double[] weights) {
         // Receive a set of weights apply them to the heuristic.
         int computationTime = 2000;
         int maxIterations = 50; //2; //50;
@@ -135,9 +152,9 @@ public class HeuristicTrainingTwo {
         int matches = 0; // # of total matches.
         
         // Assign the new weights to the defensive heuristic.
-        subject.setWeights(weights);
+        this.subject.setWeights(weights);
         
-        int rounds = 7;
+        int rounds = 3;
         // The attacker plays against each setup #rounds times, but each time
         // with a different setup.
         for(int i=0; i<rounds; i++) {
@@ -165,22 +182,18 @@ public class HeuristicTrainingTwo {
                 // Simulate the battle.
                 System.out.println("Start Battle #" + matches);
                 BattleTranscript result = this.engine.battle(
-                        attackerSetup, this.attacker, this.defenderOne, 
+                        attackerSetup, this.attacker, this.defender, 
                         computationTime, maxIterations);
                 
                 // Save results to a file. Put onto a queue and save in batches.
 
                 // How to affect the win rate if the game does not end?
-                
-                BattleTranscript resultTwo = this.engine.battle(
-                        attackerSetup, this.attacker, subject, 
-                        computationTime, maxIterations);
-                Team winner = resultTwo.getWinner();
+                Team winner = result.getWinner();
                 if(winner != null) { // There is an actual winner.
-                    if(winner == subject.getTeam()) {
+                    if(winner == this.subject.getTeam()) {
                         winRate++;
                     }
-                    if (winner == subject.getTeam().opposite()) {
+                    if (winner == this.subject.getTeam().opposite()) {
                         redWin++;
                     }
                 } else {
@@ -189,6 +202,7 @@ public class HeuristicTrainingTwo {
                 }
                 
                 System.out.println("match#" + matches + ": winner=" + winner);
+                // Print match.
                 result.print();
                 
                 matches++;
@@ -207,9 +221,93 @@ public class HeuristicTrainingTwo {
         return (winRate + (incomplete / 2.0d)) / (double) matches;
     }
     
+    private void competition() {
+        initialize();
+        System.out.println("Start Competition.");
+        this.attacker = new SparringAttacker(Team.RED);
+        this.engine = new BattleEngine();
+        
+        List<BotScore> botScores = new ArrayList<>();
+        BotScore first = new BotScore(new DefenderTwo(Team.BLUE));
+        BotScore second = new BotScore(new DefenderThree(Team.BLUE));
+        
+        // Add bots to list.
+        botScores.add(first);
+        botScores.add(second);
+        
+        first.bot.setWeights(new double[] { 0.9, 0.3 });
+        second.bot.setWeights(new double[] { 0.3, 0.3, 0.6, 0.5, 0.1, 0.7 });
+        
+        List<GameBoard> boards = loadDefensiveSetups();
+        long computationTime = 2000;
+        int maxIterations = 50;
+        
+        int rounds = 7;
+        for(int i=0; i<rounds; i++) {
+            System.out.println("Round " + i);
+            int setupID = 0;
+            for(GameBoard defensiveBoard : boards) {
+                // All bots should play with the same initial board.
+                GameBoard offensiveSetup = loadOffensiveSetup(getArmyComposition());
+                System.out.println("SetupID: " + setupID);
+                
+                for(BotScore bs : botScores) {
+                    // Clone the board.
+                    GameBoard battleBoard = ((GameBoard) offensiveSetup.clone());
+                    // Merge boards.
+                    battleBoard.mergeBoard(defensiveBoard);
+                    
+                    System.out.println("Board:\n" + battleBoard.transcript());
+                    
+                    AIBot bot = bs.bot;
+                    // For each setup.
+                    BattleTranscript result = this.engine.battle(
+                            battleBoard, this.attacker, bot, 
+                            computationTime, maxIterations);
+                    
+                    // Store result.
+                    Team winner = result.getWinner();
+                    if(winner != null) {
+                        if(winner == bot.getTeam()) {
+                            bs.wins++;
+                        } else {
+                            bs.lost++;
+                        }
+                    } else {
+                        bs.draws++;
+                    }
+                }
+                System.out.println("DefenderTwo win: " + first.wins);
+                System.out.println("DefenderTwo lost: " + first.lost);
+                System.out.println("DefenderTwo draw: " + first.draws);
+                System.out.println("DefenderThree win: " + second.wins);
+                System.out.println("DefenderThree lost: " + second.lost);
+                System.out.println("DefenderThree draw: " + second.draws);
+                setupID++;
+            }
+        }
+        
+        double defenderOneWinRate;
+        defenderOneWinRate = ((first.wins + (first.draws / 2.0d)) / (double) (first.wins + first.lost + first.draws));
+        System.out.println("DefenderOne Win rate: " + defenderOneWinRate);
+        
+        double defenderTwoWinRate;
+        defenderTwoWinRate = ((second.wins + (second.draws / 2.0d)) / (double) (second.wins + second.lost + second.draws));
+        System.out.println("DefenderTwo Win rate: " + defenderTwoWinRate);
+        if (defenderOneWinRate > defenderTwoWinRate) {
+            System.out.println("DefenderOne is better");
+        }
+        else if (defenderOneWinRate < defenderTwoWinRate) {
+            System.out.println("DefenderTwo is better");
+        }
+        else {
+            System.out.println("They are the same");
+        }
+    }
+    
     private List<Pieces> getArmyComposition() {
         Pieces[] army = new Pieces[] { 
-            MARSHALL, SPY, MINER, GENERAL, LIEUTENANT, COLONEL, MAJOR, CAPTAIN };
+            MARSHALL, SPY, MINER, GENERAL, LIEUTENANT, COLONEL, MAJOR, CAPTAIN, CAPTAIN, LIEUTENANT, MINER, MINER };
         List<Pieces> list = new ArrayList<>();
         for(Pieces type : army) {
             list.add(type);
@@ -246,7 +344,7 @@ public class HeuristicTrainingTwo {
                 // Place piece on the board.
                 board.setupPiece(positions.get(posIndex), type, this.attackingTeam);
             } catch (InvalidPositionException ex) {
-                Logger.getLogger(HeuristicTraining.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(HeuristicTrainingTwo.class.getName()).log(Level.SEVERE, null, ex);
             }
             posIndex++;
         }
@@ -265,87 +363,87 @@ public class HeuristicTrainingTwo {
     
     private List<GameBoard> loadDefensiveSetups() {
         List<GameBoard> boards = new ArrayList<>();
-        String s1 = "   |   |   |   \n" +
-                       "--- --- --- ---\n" +
-                       "   |   |   |   \n" +
-                       "--- --- --- ---\n" +
-                       "   |   |   |   \n" + 
-                       "--- --- --- ---\n" +
-                       "   |   |   |   \n" + 
-                       "--- --- --- ---\n" +
-                       "b:B|b:6|b:4|b:7\n" + 
-                       "--- --- --- ---\n" +
-                       "b:F|b:B|b:9|b:5\n";
+        String s1 =    "   |   |   |   |   |   \n" +
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" +
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "b:B|b:6|b:4|b:7|b:4|b:B\n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "b:F|b:B|b:9|b:5|b:5|b:4\n";
         GameBoard one = GameBoard.loadBoard(s1, this.boardWidth, this.boardHeight);
         boards.add(one);
 
-        String s2 = "   |   |   |   \n" +
-                       "--- --- --- ---\n" +
-                       "   |   |   |   \n" +
-                       "--- --- --- ---\n" +
-                       "   |   |   |   \n" + 
-                       "--- --- --- ---\n" +
-                       "   |   |   |   \n" + 
-                       "--- --- --- ---\n" +
-                       "b:4|b:B|b:B|b:5\n" + 
-                       "--- --- --- ---\n" +
-                       "b:9|b:6|b:F|b:7\n";
+        String s2 =    "   |   |   |   |   |   \n" +
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" +
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "b:4|b:B|b:B|b:5|b:5|b:4\n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "b:B|b:F|b:4|b:9|b:7|b:6\n";
         GameBoard two = GameBoard.loadBoard(s2, this.boardWidth, this.boardHeight);
         boards.add(two);
 
-        String s3 = "   |   |   |   \n" +
-                       "--- --- --- ---\n" +
-                       "   |   |   |   \n" +
-                       "--- --- --- ---\n" +
-                       "   |   |   |   \n" + 
-                       "--- --- --- ---\n" +
-                       "   |   |   |   \n" + 
-                       "--- --- --- ---\n" +
-                       "b:6|b:9|b:7|b:B\n" + 
-                       "--- --- --- ---\n" +
-                       "b:B|b:F|b:5|b:4\n";
+        String s3 =    "   |   |   |   |   |   \n" +
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" +
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "b:6|b:9|b:7|b:B|b:4|b:4\n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "b:B|b:F|b:5|b:4|b:5|b:B\n";
         GameBoard three = GameBoard.loadBoard(s3, this.boardWidth, this.boardHeight);
         boards.add(three);
 
-        String s4 = "   |   |   |   \n" +
-                       "--- --- --- ---\n" +
-                       "   |   |   |   \n" +
-                       "--- --- --- ---\n" +
-                       "   |   |   |   \n" + 
-                       "--- --- --- ---\n" +
-                       "   |   |   |   \n" + 
-                       "--- --- --- ---\n" +
-                       "b:B|b:9|b:7|b:5\n" + 
-                       "--- --- --- ---\n" +
-                       "b:4|b:6|b:F|b:B\n";
+        String s4 = "   |   |   |   |   |   \n" +
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" +
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "b:4|b:7|b:6|b:9|b:B|b:B\n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "b:B|b:F|b:5|b:5|b:4|b:4\n";
         GameBoard four = GameBoard.loadBoard(s4, this.boardWidth, this.boardHeight);
         boards.add(four);
 
-        String s5 = "   |   |   |   \n" +
-                       "--- --- --- ---\n" +
-                       "   |   |   |   \n" +
-                       "--- --- --- ---\n" +
-                       "   |   |   |   \n" + 
-                       "--- --- --- ---\n" +
-                       "   |   |   |   \n" + 
-                       "--- --- --- ---\n" +
-                       "b:B|b:5|b:6|b:B\n" + 
-                       "--- --- --- ---\n" +
-                       "b:4|b:9|b:7|b:F\n";
+        String s5 = "   |   |   |   |   |   \n" +
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" +
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "b:4|b:B|b:5|b:6|b:4|b:B\n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "b:5|b:4|b:9|b:7|b:B|b:F\n";
         GameBoard five = GameBoard.loadBoard(s5, this.boardWidth, this.boardHeight);
         boards.add(five);
 
-        String s6 = "   |   |   |   \n" +
-                       "--- --- --- ---\n" +
-                       "   |   |   |   \n" +
-                       "--- --- --- ---\n" +
-                       "   |   |   |   \n" + 
-                       "--- --- --- ---\n" +
-                       "   |   |   |   \n" + 
-                       "--- --- --- ---\n" +
-                       "b:B|b:6|b:9|b:F\n" + 
-                       "--- --- --- ---\n" +
-                       "b:B|b:4|b:7|b:5\n";
+        String s6 = "   |   |   |   |   |   \n" +
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" +
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "   |   |   |   |   |   \n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "b:B|b:4|b:6|b:9|b:4|b:F\n" + 
+                       "--- --- --- --- --- ---\n" +
+                       "b:B|b:B|b:4|b:7|b:5|b:5\n";
         GameBoard six = GameBoard.loadBoard(s6, this.boardWidth, this.boardHeight);
         boards.add(six);
 
@@ -372,4 +470,3 @@ public class HeuristicTrainingTwo {
         System.out.println("Merged board:\n" + offense.transcript());
     }
 }
-

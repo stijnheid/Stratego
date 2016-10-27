@@ -87,7 +87,7 @@ public class DataPointGenerator {
         System.out.println(Arrays.toString(setup));
    
         for (int i = 0; i < setup.length; i++) {
-            builder.append(setup[i]);
+            builder.append(setup[i]);             
             builder.append(",");
         }
         
