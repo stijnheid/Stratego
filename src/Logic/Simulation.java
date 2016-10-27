@@ -60,6 +60,7 @@ public class Simulation implements AnimationCallback {
     
     private GamePiece subject;
     private BoardPosition subjectDestination;
+    private boolean updateSkeleton;
     
     //private final Renderer renderer;
     //private final JComponent uiComponent;
@@ -220,6 +221,7 @@ public class Simulation implements AnimationCallback {
                 deathAnimation = new DeathAnimation(this.terrain, enemy, move.getOrigin(), this);
                 deathAnimation.execute();
 
+                this.updateSkeleton = true;
                 this.subject = attacker;
                 this.subjectDestination = move.getDestination();
             } else if(result == -1) {
@@ -231,6 +233,7 @@ public class Simulation implements AnimationCallback {
                 deathAnimation = new DeathAnimation(this.terrain, attacker, move.getDestination(), this);
                 deathAnimation.execute();
                 
+                this.updateSkeleton = true;
                 this.subject = enemy;
                 // If an enemy is being attacked and wins it should remain put
                 // on its original position so not go to origin, but destination.
@@ -414,13 +417,14 @@ public class Simulation implements AnimationCallback {
         
         // If this is an attack than the offset vector of the skeletons must
         // be updated.
-        if(this.pendingMove.isAttack()) {
+        if(this.pendingMove.isAttack() && this.updateSkeleton) {
             if(this.subject == null || this.subjectDestination == null) {
                 throw new RuntimeException("Offset helper variables not set.");
             }
             
             updateSkeletonPosition(this.subject, this.subjectDestination);
             // Reset helper variables.
+            this.updateSkeleton = false;
             this.subject = null;
             this.subjectDestination = null;
         }

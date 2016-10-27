@@ -138,7 +138,9 @@ public class MoveAction extends Action {
 
     @Override
     public String toString() {
-        return "MoveAction{" + "piece=" + piece +
+        return "MoveAction{" +
+                "team=" + team + 
+                ", piece=" + piece +
                 ", origin=" + origin +
                 ", destination=" + destination +
                 ", isApplied=" + isApplied +
