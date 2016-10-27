@@ -511,8 +511,18 @@ public class Simulation implements AnimationCallback {
         this.transcript.endGame();
         System.out.println("Duration: " + this.transcript.getGameDuration() + " ms.");
         
-        //Prompt user with Game Over message.
-        String message = "Game Ended. Winner is "+winner+".";
+        // Prompt user with Game Over message.
+        String message = "Game Over: Winner is " + winner + ".";
+        // Challenge the human player.
+        if(this.state.getGameBoard().getDefender() == winner) {
+            message+= " You royally suck.";
+        }
+        
+        // Was the move limit reached.
+        if(this.transcript.getMoves().size() == ((GlobalSettings.MAXIMUM_MOVES * 2) - 1)) {
+            message+= " (Move Limit reached)";
+        }
+        
         javax.swing.JOptionPane.showMessageDialog(new javax.swing.JFrame(), message);
         // Print battle transcript.
         this.transcript.print();
