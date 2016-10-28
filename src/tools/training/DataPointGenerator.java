@@ -41,7 +41,7 @@ public class DataPointGenerator {
     }
     
     public static void main(String[] args) throws IOException {
-        new DataPointGenerator().generateData(10, getArmyComposition());
+        new DataPointGenerator().generateData(100);
     }
     
     public void setListner(AttackerSetupListener listener) {
@@ -60,39 +60,42 @@ public class DataPointGenerator {
         //return Arrays.asList(army); // Return a List that does not support remove()
     }
     
-    private void generateData(int rounds, List<Pieces> army) throws IOException {
+    private void generateData(int rounds) throws IOException {
         for (int i = 0; i < rounds; i++) {
-            setup = new int[0];
-            SecureRandom random = new SecureRandom();
-
-            String csvFilename = "src/csv/setupTest.csv";
-            FileWriter writer = new FileWriter(csvFilename, true);
-            StringBuilder builder = new StringBuilder();
-
-
-            while(!army.isEmpty()) {
-                int index = random.nextInt(army.size());
-                Pieces type = army.get(index);
-                String symbol = type.getPieceSymbol();
-                army.remove(index);
-
-                setup = addInt(setup, Integer.parseInt(symbol));
-            }
-
-            System.out.println(Arrays.toString(setup));
-
-            for (int j = 0; j < setup.length; j++) {
-                builder.append(setup[i]);             
-                builder.append(",");
-                builder.append("Army Size:" + army.size());
-            }
-            builder.append("x");
-
-            writer.append(builder.toString());
-            writer.append("\n");
-            writer.flush();
-            writer.close();
+            new DataPointGenerator().createOffensiveSetup(getArmyComposition());
         }
+    }
+    
+    private void createOffensiveSetup(List<Pieces> army) throws IOException {
+        setup = new int[0];
+        SecureRandom random = new SecureRandom();
+        
+        String csvFilename = "src/csv/setupTest.csv";
+        FileWriter writer = new FileWriter(csvFilename, true);
+        StringBuilder builder = new StringBuilder();
+        
+        
+        while(!army.isEmpty()) {
+            int index = random.nextInt(army.size());
+            Pieces type = army.get(index);
+            String symbol = type.getPieceSymbol();
+            army.remove(index);
+            
+            setup = addInt(setup, Integer.parseInt(symbol));
+        }
+        
+        System.out.println(Arrays.toString(setup));
+   
+        for (int i = 0; i < setup.length; i++) {
+            builder.append(setup[i]);
+            builder.append(",");
+        }
+        int bestSetup = 3;       
+        writer.append(builder.toString());
+        writer.append(Integer.toString(bestSetup));
+        writer.append("\n");
+        writer.flush();
+        writer.close();
     }
     
     public static int[] addInt(int[] setup, int newPiece){

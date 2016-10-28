@@ -27,7 +27,7 @@ import static tools.training.DataPointGenerator.addInt;
 /**
  *
  */
-public class HeuristicTrainingTwo implements WeightSetListener {
+public class NeuralTraining {
     
     private WeightedAIBot attacker;
     private WeightedAIBot defender;
@@ -48,11 +48,10 @@ public class HeuristicTrainingTwo implements WeightSetListener {
     
     private int[] setup;
     
-    String csvFilename = "src/csv/setup.csv";
+    String csvFilename = "src/csv/dataPoint.csv";
     FileWriter writer;
-    StringBuilder builder = new StringBuilder();
     
-    public HeuristicTrainingTwo() throws IOException {
+    public NeuralTraining() throws IOException {
         this.writer = new FileWriter(csvFilename, true);
         
     }
@@ -77,166 +76,14 @@ public class HeuristicTrainingTwo implements WeightSetListener {
         this.offensiveSide = fillPositions(6, 2);
     }
     
-    public void setListener(WeightSetListener listener) {
-        this.listener = listener;
-    }
-    
     public static void main(String[] args) throws IOException {
         //new HeuristicTrainingTwo().train();
-        new HeuristicTrainingTwo().competition();
+        new NeuralTraining().dataGenerator();
     }
     
-    private void train() {
+    private void dataGenerator() throws IOException {
         initialize();
-        
-        // Setup the bots to be used.
-        this.attacker = new SparringAttacker(Team.RED);
-        //this.defender = new ModeratePlayer(Team.BLUE);        
-        this.defender = new DefenderThree(Team.BLUE);
-        
-        
-        int numberOfFeatures = this.defender.featureCount();
-        int rounds = 1; //50; // # of weight assignments that will be used.
-        //SimulatedAnnealing generator = new SimulatedAnnealing(
-        //        numberOfFeatures, rounds)
-        this.algorithm = new SimulatedAnnealing(numberOfFeatures, rounds);
-        SimulatedAnnealing generator = this.algorithm;
-
-        // Create battle engine.
-        this.engine = new BattleEngine();
-        
-        // Attach this class as single listener.
-        generator.setListener(this);
-        
-        // Set the training subject.
-        this.subject = this.defender;
-        
-        try {
-            // Run the generator, this is a blocking method not a Thread.
-            long start = System.currentTimeMillis();
-            System.out.println("Start training...");
-            generator.start();
-            
-            // Get the resulting weights.
-            double[] weights = generator.getWeights();
-            //System.out.println("Final Weights: " + Arrays.toString(weights));
-            
-            // Save the plot.
-            String filename = "";
-            generator.savePlot(true, filename);
-            System.out.println("TRAINING ENDED");
-            long end = System.currentTimeMillis();
-            System.out.println("Weight Assignment Iteration Training lasted " + (end - start) + " ms.");
-            System.out.println(Arrays.toString(this.algorithm.getWeights()));
-        } catch (IOException ex) {
-            Logger.getLogger(HeuristicTrainingTwo.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-
-    /**
-     * Callback.
-     * Will be notified by the Genetic Annealing Algorithm once a set of weights
-     * has been generated. This method blocks the execution of the Annealing
-     * Algorithm. And returns the win rate with the given set of weights over
-     * the matches against the defensive setups.
-     * 
-     * @param weights array of weights to be assigned to heuristic function terms.
-     * @return win rate.
-     */
-    @Override
-    public double generated(double[] weights) {
-        // Receive a set of weights apply them to the heuristic.
-        int computationTime = 2000;
-        int maxIterations = 50; //2; //50;
-        
-        // Run a single match with the given weight assignment for each
-        // defensive board setup.
-        
-        // Get a fresh list of defensive setups.
-        List<GameBoard> defensiveSetups = loadDefensiveSetups();
-        
-        double winRate = 0; // # of won finished matches.
-        double redWin = 0;// # of matches with team red winning
-        double incomplete = 0; // # of unfinished matches.
-        int matches = 0; // # of total matches.
-        
-        // Assign the new weights to the defensive heuristic.
-        this.subject.setWeights(weights);
-        
-        int rounds = 1;
-        // The attacker plays against each setup #rounds times, but each time
-        // with a different setup.
-        for(int i=0; i<rounds; i++) {
-            for(GameBoard defensiveSetup : defensiveSetups) {
-                /*
-                if(matches >= loadDefensiveSetups().size()) {
-                    System.out.println("EARLY TERMINATION");
-                    this.algorithm.stop();
-                    break;
-                }
-                */
-                
-                // Generate a random attacker setup.
-                GameBoard attackerSetup;
-                try {
-                    attackerSetup = loadOffensiveSetup(getArmyComposition());
-                    // Merge the board setups.
-                    attackerSetup.mergeBoard(defensiveSetup);  
-                    // Check if the setup is valid.
-                    if(!attackerSetup.isSetupValid()) {
-                        throw new RuntimeException("Setup is not valid.");
-                        //System.out.println("Setup is not valid.");
-                        //this.algorithm.stop();
-                        //return 0.0;
-                    }
-                    // Simulate the battle.
-                    System.out.println("Start Battle #" + matches);
-                    BattleTranscript result = this.engine.battle(
-                        attackerSetup, this.attacker, this.defender, 
-                        computationTime, maxIterations);
-                    // Save results to a file. Put onto a queue and save in batches.
-
-                    // How to affect the win rate if the game does not end?
-                   Team winner = result.getWinner();
-                   if(winner != null) { // There is an actual winner.
-                        if(winner == this.subject.getTeam()) {
-                            winRate++;
-                        }
-                        if (winner == this.subject.getTeam().opposite()) {
-                            redWin++;
-                        }
-                    } else {
-                        // Game did not end.
-                        incomplete++;
-                    }
-
-                    System.out.println("match#" + matches + ": winner=" + winner);
-                    // Print match.
-                    result.print();
-
-                    matches++;
-                } catch (IOException ex) {
-                    Logger.getLogger(HeuristicTrainingTwo.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                
-            }
-            System.out.println("NEXT ROUND");
-        }
-        System.out.println("Blue won: " + winRate);
-        System.out.println("Red won: " + redWin);
-        System.out.println("draw: " + incomplete);
-        System.out.println("WinRate " + (winRate + (incomplete / 2.0d)) / (double) matches);
-        // Can store the transcript here with the given weight set and
-        // the WeightedAIBot algorithms used.
-        
-        // Return the win rate, is the fraction of the winRate summed with
-        // half of the incomplete matches divided by the total # of matches.
-        return (winRate + (incomplete / 2.0d)) / (double) matches;
-    }
-    
-    private void competition() throws IOException {
-        initialize();
-        System.out.println("Start Competition.");
+        System.out.println("Start Training.");
         this.attacker = new SparringAttacker(Team.RED);
         this.engine = new BattleEngine();
         
@@ -247,6 +94,7 @@ public class HeuristicTrainingTwo implements WeightSetListener {
         botScores.add(first);
         
         double bestWinRate = 0;
+        int bestSetup = 0;
         
         first.bot.setWeights(new double[] { 0.9, 0.3 });
         
@@ -254,39 +102,51 @@ public class HeuristicTrainingTwo implements WeightSetListener {
         long computationTime = 2000;
         int maxIterations = 50;
         
-        int rounds = 7;
+        //Number of attacker setups
+        int rounds = 5;
+        //Number of matches for each defensive setup 
+        int turns = 3;
         for(int i=0; i<rounds; i++) {
             System.out.println("Round " + i);
-            int setupID = 0;
+            int setupID = 1;
             GameBoard offensiveSetup = loadOffensiveSetup(getArmyComposition());
             for(GameBoard defensiveBoard : boards) {
                 // All bots should play with the same initial board.
+                first.wins = 0;
+                first.lost = 0;
+                first.draws = 0;
                 System.out.println("SetupID: " + setupID);
-                
-                for(BotScore bs : botScores) {
+                for (int j=0; j<turns; j++) {
                     // Clone the board.
                     GameBoard battleBoard = ((GameBoard) offensiveSetup.clone());
                     // Merge boards.
                     battleBoard.mergeBoard(defensiveBoard);
-                    
+
                     System.out.println("Board:\n" + battleBoard.transcript());
-                    
-                    AIBot bot = bs.bot;
+
+                    AIBot bot = first.bot;
                     // For each setup.
                     BattleTranscript result = this.engine.battle(
                             battleBoard, this.attacker, bot, 
                             computationTime, maxIterations);
-                    
+
                     // Store result.
                     Team winner = result.getWinner();
                     if(winner != null) {
                         if(winner == bot.getTeam()) {
-                            bs.wins++;
+                            first.wins++;
                         } else {
-                            bs.lost++;
+                            first.lost++;
                         }
                     } else {
-                        bs.draws++;
+                        first.draws++;
+                    }
+                    
+                    double winRate = ((first.wins + (first.draws / 2.0d)) / (double) (first.wins + first.lost + first.draws));
+                    
+                    if (winRate > bestWinRate) {
+                        bestWinRate = winRate;
+                        bestSetup = setupID;
                     }
                 }
                 
@@ -295,11 +155,13 @@ public class HeuristicTrainingTwo implements WeightSetListener {
                 System.out.println("DefenderTwo draw: " + first.draws);
                 setupID++;
             }
+            System.out.println("Best Setup: " + bestSetup);
+            writer.append(Integer.toString(bestSetup));
+            writer.append("\n");
         }
         
-        double defenderOneWinRate;
-        defenderOneWinRate = ((first.wins + (first.draws / 2.0d)) / (double) (first.wins + first.lost + first.draws));
-        System.out.println("DefenderOne Win rate: " + defenderOneWinRate);
+        writer.flush();
+        writer.close();
     }
     
     private List<Pieces> getArmyComposition() {
@@ -316,6 +178,8 @@ public class HeuristicTrainingTwo implements WeightSetListener {
     
     private GameBoard loadOffensiveSetup(List<Pieces> army) throws IOException {     
         setup = new int[0];
+        
+        StringBuilder builder = new StringBuilder();
         
         if(this.offensiveSide == null) {
             this.offensiveSide = fillPositions(this.boardWidth, this.boardHeight);
@@ -346,7 +210,7 @@ public class HeuristicTrainingTwo implements WeightSetListener {
                 // Place piece on the board.
                 board.setupPiece(positions.get(posIndex), type, this.attackingTeam);       
             } catch (InvalidPositionException ex) {
-                Logger.getLogger(HeuristicTrainingTwo.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(NeuralTraining.class.getName()).log(Level.SEVERE, null, ex);
             }
             posIndex++;
         }
@@ -356,9 +220,6 @@ public class HeuristicTrainingTwo implements WeightSetListener {
             builder.append(",");
         }
         writer.append(builder.toString());
-        writer.flush();
-        writer.close();
-        setup = null;
         return board;
     }
     
