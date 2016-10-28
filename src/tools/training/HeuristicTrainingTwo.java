@@ -48,7 +48,12 @@ public class HeuristicTrainingTwo implements WeightSetListener {
     
     private int[] setup;
     
-    public HeuristicTrainingTwo() {
+    String csvFilename = "src/csv/setup.csv";
+    FileWriter writer;
+    StringBuilder builder = new StringBuilder();
+    
+    public HeuristicTrainingTwo() throws IOException {
+        this.writer = new FileWriter(csvFilename, true);
         
     }
     
@@ -158,7 +163,7 @@ public class HeuristicTrainingTwo implements WeightSetListener {
         // Assign the new weights to the defensive heuristic.
         this.subject.setWeights(weights);
         
-        int rounds = 6;
+        int rounds = 1;
         // The attacker plays against each setup #rounds times, but each time
         // with a different setup.
         for(int i=0; i<rounds; i++) {
@@ -176,7 +181,7 @@ public class HeuristicTrainingTwo implements WeightSetListener {
                 try {
                     attackerSetup = loadOffensiveSetup(getArmyComposition());
                     // Merge the board setups.
-                    attackerSetup.mergeBoard(defensiveSetup);
+                    attackerSetup.mergeBoard(defensiveSetup);  
                     // Check if the setup is valid.
                     if(!attackerSetup.isSetupValid()) {
                         throw new RuntimeException("Setup is not valid.");
@@ -184,18 +189,16 @@ public class HeuristicTrainingTwo implements WeightSetListener {
                         //this.algorithm.stop();
                         //return 0.0;
                     }
-
                     // Simulate the battle.
                     System.out.println("Start Battle #" + matches);
                     BattleTranscript result = this.engine.battle(
-                            attackerSetup, this.attacker, this.defender, 
-                            computationTime, maxIterations);
-
+                        attackerSetup, this.attacker, this.defender, 
+                        computationTime, maxIterations);
                     // Save results to a file. Put onto a queue and save in batches.
 
                     // How to affect the win rate if the game does not end?
-                    Team winner = result.getWinner();
-                    if(winner != null) { // There is an actual winner.
+                   Team winner = result.getWinner();
+                   if(winner != null) { // There is an actual winner.
                         if(winner == this.subject.getTeam()) {
                             winRate++;
                         }
@@ -215,6 +218,7 @@ public class HeuristicTrainingTwo implements WeightSetListener {
                 } catch (IOException ex) {
                     Logger.getLogger(HeuristicTrainingTwo.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                
             }
             System.out.println("NEXT ROUND");
         }
@@ -242,19 +246,21 @@ public class HeuristicTrainingTwo implements WeightSetListener {
         // Add bots to list.
         botScores.add(first);
         
+        double bestWinRate = 0;
+        
         first.bot.setWeights(new double[] { 0.9, 0.3 });
         
         List<GameBoard> boards = loadDefensiveSetups();
         long computationTime = 2000;
         int maxIterations = 50;
         
-        int rounds = 5;
+        int rounds = 7;
         for(int i=0; i<rounds; i++) {
             System.out.println("Round " + i);
             int setupID = 0;
+            GameBoard offensiveSetup = loadOffensiveSetup(getArmyComposition());
             for(GameBoard defensiveBoard : boards) {
                 // All bots should play with the same initial board.
-                GameBoard offensiveSetup = loadOffensiveSetup(getArmyComposition());
                 System.out.println("SetupID: " + setupID);
                 
                 for(BotScore bs : botScores) {
@@ -283,6 +289,7 @@ public class HeuristicTrainingTwo implements WeightSetListener {
                         bs.draws++;
                     }
                 }
+                
                 System.out.println("DefenderTwo win: " + first.wins);
                 System.out.println("DefenderTwo lost: " + first.lost);
                 System.out.println("DefenderTwo draw: " + first.draws);
@@ -307,11 +314,8 @@ public class HeuristicTrainingTwo implements WeightSetListener {
         //return Arrays.asList(army); // Return a List that does not support remove()
     }
     
-    private GameBoard loadOffensiveSetup(List<Pieces> army) throws IOException {
+    private GameBoard loadOffensiveSetup(List<Pieces> army) throws IOException {     
         setup = new int[0];
-        String csvFilename = "src/csv/setup.csv";
-        FileWriter writer = new FileWriter(csvFilename, true);
-        StringBuilder builder = new StringBuilder();
         
         if(this.offensiveSide == null) {
             this.offensiveSide = fillPositions(this.boardWidth, this.boardHeight);
@@ -335,26 +339,26 @@ public class HeuristicTrainingTwo implements WeightSetListener {
             Pieces type = army.get(index);
             String symbol = type.getPieceSymbol();
             army.remove(index);
-            setup = addInt(setup, Integer.parseInt(symbol));
             
-            for (int i = 0; i < setup.length; i++) {
-                builder.append(setup[i]);             
-                builder.append(",");
-                builder.append("x");
-            }
-            writer.append(builder.toString());
-            writer.append("\n");
-            writer.flush();
-            writer.close();
+            setup = addInt(setup, Integer.parseInt(symbol));
             
             try {
                 // Place piece on the board.
-                board.setupPiece(positions.get(posIndex), type, this.attackingTeam);
+                board.setupPiece(positions.get(posIndex), type, this.attackingTeam);       
             } catch (InvalidPositionException ex) {
                 Logger.getLogger(HeuristicTrainingTwo.class.getName()).log(Level.SEVERE, null, ex);
             }
             posIndex++;
         }
+        
+        for (int i = 0; i < setup.length; i++) {
+            builder.append(setup[i]);
+            builder.append(",");
+        }
+        writer.append(builder.toString());
+        writer.flush();
+        writer.close();
+        setup = null;
         return board;
     }
     

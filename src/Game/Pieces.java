@@ -54,7 +54,7 @@ public enum Pieces {
                 return BOMB;
             case "F":
                 return FLAG;
-            case "S":
+            case "0":
                 return SPY;
             case "1":
                 return SCOUT;

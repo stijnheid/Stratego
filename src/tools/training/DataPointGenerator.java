@@ -65,7 +65,7 @@ public class DataPointGenerator {
             setup = new int[0];
             SecureRandom random = new SecureRandom();
 
-            String csvFilename = "src/csv/setup.csv";
+            String csvFilename = "src/csv/setupTest.csv";
             FileWriter writer = new FileWriter(csvFilename, true);
             StringBuilder builder = new StringBuilder();
 
@@ -84,6 +84,7 @@ public class DataPointGenerator {
             for (int j = 0; j < setup.length; j++) {
                 builder.append(setup[i]);             
                 builder.append(",");
+                builder.append("Army Size:" + army.size());
             }
             builder.append("x");
 
