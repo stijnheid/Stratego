@@ -137,9 +137,6 @@
           </Properties>
         </Component>
         <Component class="javax.swing.JTextField" name="Pos51">
-          <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="Pos51ActionPerformed"/>
-          </Events>
         </Component>
         <Component class="javax.swing.JTextField" name="Pos41">
         </Component>

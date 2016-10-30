@@ -57,6 +57,7 @@ public class SetupGUI extends javax.swing.JFrame {
                 setVisible(true);
                 initComponents();
                 fields = new JTextField[]{Pos51, Pos41, Pos31, Pos21, Pos11, Pos01, Pos50, Pos40, Pos30, Pos20, Pos10, Pos00};
+                getRootPane().setDefaultButton(jButtonConfirm);
             }
         });        
     }
@@ -91,12 +92,6 @@ public class SetupGUI extends javax.swing.JFrame {
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
         jLabelSetupText.setText("Attacker Setup");
-
-        Pos51.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                Pos51ActionPerformed(evt);
-            }
-        });
 
         jButtonConfirm.setText("Confirm");
         jButtonConfirm.addActionListener(new java.awt.event.ActionListener() {
@@ -203,10 +198,6 @@ public class SetupGUI extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
-    private void Pos51ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_Pos51ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_Pos51ActionPerformed
 
     private void jButtonConfirmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConfirmActionPerformed
         for (int i=0; i < setup.length; i++){

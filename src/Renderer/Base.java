@@ -104,6 +104,9 @@ abstract public class Base {
     // Textures.
     public static Texture track, brick, head, torso;
     
+    //Animator object.
+    protected FPSAnimator animator;
+    
     /**
      * Constructs base class.
      */
@@ -151,11 +154,11 @@ abstract public class Base {
         
         // Attach animator to OpenGL panel and begin refresh
         // at the specified number of frames per second.
-        final FPSAnimator animator =
+        animator =
                 new FPSAnimator((GLJPanel) frame.glPanel, FPS, true);
         animator.setIgnoreExceptions(false);
         animator.setPrintExceptions(true);
-        
+        animator.setUpdateFPSFrames(5, null);
         animator.start();
 
         // Stop animator when window is closed.

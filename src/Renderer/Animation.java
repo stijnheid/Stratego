@@ -14,7 +14,7 @@ import Game.Team;
 public class Animation {
     
     /*Duration of the animation (in frames).*/
-    protected final static double duration = 30; //120;
+    protected final static double duration = 60; //120;
     
     /*GamePiece on which this animation acts.*/
     protected final GamePiece subject;

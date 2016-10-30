@@ -67,8 +67,6 @@ public class Terrain extends Base {
     
     //test stuff
     boolean pan;
-    double lastframe;
-    double thisframe;
     Tree tree1, tree2, tree3;
     Stone stone1, stone2, stone3;
     
@@ -437,29 +435,6 @@ public class Terrain extends Base {
         drawTerrain();
         drawBoard();
         drawPieces();
-        if(pan){
-            try {
-                Animation ani1 = new AttackAnimation(this, 
-                    board.getPiece(new BoardPosition(4,4)), 
-                    new BoardPosition(3,4), null);
-                Animation ani2 = new DeathAnimation(this,
-                    board.getPiece(new BoardPosition(3,4)),
-                    new BoardPosition(4,4), null);
-                //playAnimation(ani1);
-                //playAnimation(ani2);
-                pan = false;
-            }   catch (Game.InvalidPositionException e){
-                //Screw you Stevie.
-            }   catch (Exception e){
-                throw e;
-            }
-        }
-        /**Increment frame count AFTER rendering.*/
-        cs.frameTick();
-        thisframe = System.currentTimeMillis();
-        //System.out.println("Currently displaying "+(int)(1000/(thisframe-lastframe))+" frames per second");
-        lastframe = thisframe;
-        //System.out.println(camera.eye.x+" "+camera.eye.y+" "+camera.eye.z);
         tree1.draw(gl, cs.tAnim);
         tree2.draw(gl, cs.tAnim);
         tree3.draw(gl, cs.tAnim);
@@ -467,6 +442,10 @@ public class Terrain extends Base {
         stone1.draw(gl);
         stone2.draw(gl);
         stone3.draw(gl);
+        
+        //System.out.println("Current FPS: "+animator.getLastFPS()); 
+        /**Increment frame count AFTER rendering.*/
+        cs.frameTick();
     }
     
     public static void main (String[] args){
