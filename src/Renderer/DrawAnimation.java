@@ -113,12 +113,11 @@ public class DrawAnimation extends Animation{
             skel.shoulderLRotX = -20d * c;
             skel.swordRotX = -80d * c;
         }   else {//die a painful death.
-            c = (frame-((5d*duration)/6d))*(6/duration);
+            c = (frame - (5d*duration/6d))*(6d/duration);
             skel.shoulderLRotX = -20d*(1-c);
             skel.shoulderRRotX = 45d*(1-c);
             skel.shoulderRRotY = 45d*(1-c);
-            skel.elbowLRotX = 90d*(1-c);
-            skel.elbowLRotY = 20d*(1-c);
+            skel.elbowLRotX = 20d*(1-c);
             skel.hipLRotX = 20d*c;
             skel.hipRRotX = 20d*c;
             skel.kneeLRotX = -120d*c;

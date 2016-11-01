@@ -59,21 +59,18 @@ public class Terrain extends Base {
     /** Instance of the camera. */
     public final Camera camera;
     
-    /** Instances of different textures */
+    /** Instances of different textures. */
     public static Texture grass, vakje ,leaves, water, wood, selectvakje, selectedvakje, Bomb, Captain, Colonel, General, Lieutenant, Major, Marshall, Miner, Scout, Sergeant, Spy, Flag, skybox;
     
+    /** Environment properties. */
     private final int boardsize = 6;
     private final int terrainsize = 20;
     
-    //test stuff
-    boolean pan;
+    /** Objects drawn in the environment. */
     Tree tree1, tree2, tree3;
     Stone stone1, stone2, stone3;
     
-    Skeleton test;
-    SkeletonTester skeltest;
-    
-    //package Game variables.
+    /** Game variables. */
     GameState gamestate;
     GameBoard board;
     GamePiece piece;
@@ -90,25 +87,9 @@ public class Terrain extends Base {
             gamestate = gs;
             board = gb;
         }
-        
-                
+    
         // Initialize the camera
         camera = new Camera();
-        
-        //test/debug stuff.
-        /*
-        pan = true;
-        lastframe = System.currentTimeMillis();
-        try {
-            test = board.getPiece(new BoardPosition(0,4)).getSkeleton();
-            skeltest = new SkeletonTester(test);
-        }   catch (Exception e){
-            System.out.println("Test skeleton failed to load.");
-        }
-        */
-        
-        //get everything going.
-        //run();
     }
     
        /**
@@ -326,10 +307,7 @@ public class Terrain extends Base {
                 gl.glVertex3d(-terrainsize/2, terrainsize/2, 6); 
                 gl.glTexCoord2d(1, 1);
                 gl.glVertex3d(terrainsize/2, terrainsize/2, 6); 
-            gl.glEnd(); 
-        
-        
-        
+            gl.glEnd();    
     }
     
     /**
@@ -362,9 +340,7 @@ public class Terrain extends Base {
                 }
                 else
                 this.vakje.bind(gl);
-                
-                //System.out.println(Arrays.toString(selectedPiece));
-                
+                                
                 gl.glBegin(GL_QUAD_STRIP);
                 gl.glTexCoord2d(0, 0);
                 gl.glVertex3d(x, y, z);
@@ -446,10 +422,6 @@ public class Terrain extends Base {
         //System.out.println("Current FPS: "+animator.getLastFPS()); 
         /**Increment frame count AFTER rendering.*/
         cs.frameTick();
-    }
-    
-    public static void main (String[] args){
-        //Terrain terrain = new Terrain(null, null, null);
     }
     
     public double heightAt(double x, double y) {

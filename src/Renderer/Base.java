@@ -71,7 +71,7 @@ abstract public class Base {
     static public float CENTER_POINT_CHANGE = 1f;
     
     // Desired frames per second.
-    static public int FPS = 60;
+    static public int FPS = 30;
     
     // holds the selected square on the board.
     static public int selectPiece[] = {0,0};
