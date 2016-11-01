@@ -59,7 +59,7 @@ public class NeuralNetwork {
         
         //Parses the string array, and changes the letters in the string to the correct number
         for(int i=0; i<setup.length;i++){
-            if(setup[i] == "S"){
+            if(setup[i].equals("S")){
                 attackersetup[i] = 0; // sets the value to 0 if the piece is a spy
             } else {
                 attackersetup[i] = Integer.parseInt(setup[i]); // parses the number in the string to an integer
