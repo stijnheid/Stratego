@@ -215,7 +215,13 @@ public class SetupGUI extends javax.swing.JFrame {
         dispose();
         
         /*Now pass this setup on to the AI to deliver a defensive setup.*/
-        parent.initialize(setup);
+        //use this when not using the neural network
+        //parent.initialize(setup);
+        
+        //use this when using the neural network (just sets the attacker setup, doesn't run the initialize)
+        parent.setAttackerSetup(setup);
+        
+        
     }//GEN-LAST:event_jButtonConfirmActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

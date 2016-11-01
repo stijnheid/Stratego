@@ -5,6 +5,7 @@ import Game.GameState;
 import Game.Pieces;
 import Game.Team;
 import Logic.Simulation;
+import NeuralNetwork.NeuralNetwork;
 import Renderer.SetupGUI;
 import Renderer.Terrain;
 import java.util.ArrayList;
@@ -24,15 +25,19 @@ import tools.search.new_ai.WeightedAIBot;
  */
 public class Main {
 
-    private int[] attackersetup;
+    private String[] attackersetup;
+    private int defendersetup;
     private GameBoard board;
 
-    public Main() {
+    public Main() throws Exception{
         SetupGUI setupGUI = new SetupGUI(this); // creates a SetupGUI object, creating an attacker setup and storing this in the instance variable
         //The neural net requires the CORRECT attacker setup, so in between here there needs to be a callback to make sure we don't run this code before the user is
         // done creating a setup 
-        /**
+        
+        
+        //Somewhere there probably needs to be some synchronisation but I can't seem to figure out how to do this.
         NeuralNetwork neuralnetwork = new NeuralNetwork(this, attackersetup); // creates a NeuralNetwork object, creating a defensive setup and a complete GameBoard, and storing this in the instance variable
+        /*
         GameState gamestate = new GameState();
         gamestate.setGameBoard(board);
         */
@@ -47,7 +52,7 @@ public class Main {
         // Something needs to call the animations too!
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         /**
         try {
             Main main = new Main();
@@ -92,10 +97,16 @@ public class Main {
         
         // Merge offensive setup with defensive setup.
         List<GameBoard> defensiveSetups = loadDefensiveSetups();
-        // Pick a random defensive setup.
+        // Pick a random defensive setup. Use when not working with the neural network
+        /*
         Random random = new Random();
         int index = random.nextInt(defensiveSetups.size());
         GameBoard defenderSetup = defensiveSetups.get(index);
+        */
+        //use this if you are using the neural network
+        
+        GameBoard defenderSetup = defensiveSetups.get(defendersetup);
+        
         board.mergeBoard(defenderSetup);
         
         System.out.println("Intial setup:\n" + board.transcript());
@@ -115,8 +126,12 @@ public class Main {
         simulation.startGame();
     }
 
-    public void setAttackerSetup(int[] setup) {
+    public void setAttackerSetup(String[] setup) {
         this.attackersetup = setup;
+    }
+    
+    public void setDefenderSetup(int index){
+        this.defendersetup = index;
     }
 
     public void setGameBoard(GameBoard board) {
