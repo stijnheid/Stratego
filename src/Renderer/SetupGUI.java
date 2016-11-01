@@ -21,6 +21,8 @@ public class SetupGUI extends javax.swing.JFrame {
     /*Parent that created this GUI.*/
     private Main parent;
     
+    private final static String[] validPieces = new String[]{"S","2","4","5","6","7","8","9"};
+    
     /**
      * Creates new form SetupGUI
      */
@@ -201,6 +203,10 @@ public class SetupGUI extends javax.swing.JFrame {
 
     private void jButtonConfirmActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonConfirmActionPerformed
         for (int i=0; i < setup.length; i++){
+            if (!isValid(fields[i].getText())){
+                javax.swing.JOptionPane.showMessageDialog(this, "Found invalid entry at position "+i+" : "+fields[i].getText()+".");
+                return;
+            }
             setup[i] = fields[i].getText();
         }
         dispose();
@@ -208,6 +214,15 @@ public class SetupGUI extends javax.swing.JFrame {
         parent.initialize(setup);
     }//GEN-LAST:event_jButtonConfirmActionPerformed
 
+    private boolean isValid(String s){
+        boolean contains = false;
+        for(String t : validPieces){
+            if (t.equals(s)){
+                contains = true;
+            }
+        }
+        return contains;
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextArea JTextAreaPieces;
     private javax.swing.JTextField Pos00;

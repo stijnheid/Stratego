@@ -84,10 +84,10 @@ public class AttackAnimation extends Animation {
             c = frame * (2d/duration);
             skel.shoulderL = new Vector(-0.2,c/10,1.6);
             skel.shoulderR = new Vector(0.2,-c/10,1.6);
-            skel.elbowRRotX = 90 * c;
-            skel.elbowLRotX = 45 * c;
-            skel.shoulderRRotX = 90 * c;
-            skel.shoulderRRotY = -45 * c;
+            skel.elbowRRotX = 90d * c;
+            skel.elbowLRotX = 45d * c;
+            skel.shoulderRRotX = 90d * c;
+            skel.shoulderRRotY = -45d * c;
             skel.hipLRotX = 30d * c;
             skel.hipRRotX = -30d * c;
             skel.kneeLRotX = -30d * c;

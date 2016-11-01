@@ -246,12 +246,6 @@ public class Simulation implements AnimationCallback {
                 
                 Animation secondAnimation = new DrawAnimation(this.terrain, enemy, move.getOrigin(), this, false);
                 secondAnimation.execute();
-                
-                DeathAnimation firstDeath = new DeathAnimation(this.terrain, attacker, move.getDestination(), this);
-                firstDeath.execute();
-                
-                DeathAnimation secondDeath = new DeathAnimation(this.terrain, enemy, move.getOrigin(), this);
-                secondDeath.execute();
             }
         } else {
             System.out.println("Walk Animation");

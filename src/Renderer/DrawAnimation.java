@@ -107,9 +107,9 @@ public class DrawAnimation extends Animation{
             skel.shoulderL = new Vector(-0.2,0.1-(c/5d),1.6);
             skel.shoulderR = new Vector(0.2, -0.1+(c/5d),1.6);
             skel.elbowRRotX = 90d * (1-c);
-            skel.elbowLRotX = 45d - 25d * c;
-            skel.shoulderRRotX = 90d - 45d * c;
-            skel.shoulderRRotY = -45d + 90d * c;
+            skel.elbowLRotX = 45d - (25d * c);
+            skel.shoulderRRotX = 90d - (45d * c);
+            skel.shoulderRRotY = -45d + (90d * c);
             skel.shoulderLRotX = -20d * c;
             skel.swordRotX = -80d * c;
         }   else {//die a painful death.
@@ -122,8 +122,7 @@ public class DrawAnimation extends Animation{
             skel.hipRRotX = 20d*c;
             skel.kneeLRotX = -120d*c;
             skel.kneeRRotX = -120d*c;
-            skel.shoulderL = new Vector(-0.2, -0.1+(c/10d), 1.6);
-            skel.shoulderR = new Vector(0.2, 0.1-(c/10d), 1.6);
+            skel.shoulderL = new Vector(-0.2, -0.1+(c/5d), 1.6);
             skel.neck = new Vector(0, c/10d, 1.6);
             skel.head = new Vector(0, c/5d, 1.8);
             skel.offset = new Vector(startloc.x, startloc.y + 0.3*c, startloc.z - 0.3*c);

@@ -203,10 +203,7 @@ public class Terrain extends Base {
         Scout = loadTexture(pwd + "Scout.jpg");
         Sergeant = loadTexture(pwd + "Sergeant.jpg");
         Spy = loadTexture(pwd + "Spy.jpg");
-        Flag = loadTexture(pwd + "Flag.jpg");
-        
-        
-        
+        Flag = loadTexture(pwd + "Flag.jpg");     
     }
     
     /**
