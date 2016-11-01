@@ -33,7 +33,7 @@ public class NeuralNetwork {
     public NeuralNetwork(Main main, String[] setup) throws IOException{
         this.main = main;
         this.attackersetup = setup;
-        MultiLayerNetwork network = ModelSerializer.restoreMultiLayerNetwork("src/NeuralNetwork/network.zip");        //Loads in the neural network trained before hand from a file
+        this.network = ModelSerializer.restoreMultiLayerNetwork("src/NeuralNetwork/network.zip");        //Loads in the neural network trained before hand from a file
     }
     /*
     Uses the neural network to predict the defender setup
@@ -41,21 +41,21 @@ public class NeuralNetwork {
     */
     public int predict(){
         
-        int[] numberedattacksetup = generateAttackerSetup(attackersetup);
+        double[] numberedattacksetup = generateAttackerSetup(attackersetup);
         
         INDArray attacksetup = Nd4j.create(numberedattacksetup); // generates an INDArray object from the integer array setup, to be used in the neural network
+        System.out.println("parsed setup: "+attacksetup);
         int[] result = network.predict(attacksetup); // predicting the best defender setup with the neural network. This generates an array of classifications for each input INDArray
                                                      // Which in this case is just on value but there will only be one value in it
-       // String board = boardGenerator(numberedattackersetup, defendersetup[result[0]]); // Generates a board string from the attacker setup and the predicted best defender setup
-       // GameBoard gameboard = GameBoard.loadBoard(board, width, height); // creates a gameboard object based on the string representation
-       return result[0];
+        System.out.println("Best setup: "+result[0]);
+       return result[0]-1; // the network classifies the best out of 1 through 6, while they are stored normally as in Java from 0 to 5, so we need to subtract one to get the correct setup
     }
     
     /*
     *A method that takes a setup in string format and interprets this as numbers, since the neural network does not like strings, only numbers.
     */
-    public int[] generateAttackerSetup(String[] setup){
-        int attackersetup[] = new int[setup.length];
+    public double[] generateAttackerSetup(String[] setup){
+        double attackersetup[] = new double[setup.length];
         
         //Parses the string array, and changes the letters in the string to the correct number
         for(int i=0; i<setup.length;i++){
