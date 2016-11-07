@@ -5,7 +5,6 @@
  */
 package Renderer;
 
-import checker.FileChecker;
 import com.jogamp.opengl.util.FPSAnimator;
 import com.jogamp.opengl.util.gl2.GLUT;
 import com.jogamp.opengl.util.texture.Texture;
@@ -115,12 +114,6 @@ abstract public class Base {
         this.gs = new GameState();
         
         this.cs = new CameraState();
-        
-        // Check the source files
-        File src = new File("src");
-        if(src.isDirectory()){
-            FileChecker.testDir(src, "");
-        }
     }
 	
 	public void run() {
